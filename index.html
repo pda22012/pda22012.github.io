@@ -1,6 +1,6 @@
-
-
+<html>
 <head>
+    <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v7.0.0/dist/aframe-extras.min.js"></script>
     <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
     <script>
         AFRAME.registerComponent('sounding', {
@@ -29,6 +29,14 @@
 </a-assets>
 <a-entity gltf-model="#bird" scale="5 5 5" shadow="receive: false" position="-50 25 -50" sound="src:#hawk; poolSize: 2" sounding></a-entity>
 <a-entity gltf-model="#bird" scale="5 5 5" shadow="receive: false" position="50 25 -50" rotation="0 180 0" sound="src:#hawk; poolSize: 2" sounding></a-entity>
+<a-entity gltf-model="#bird" scale="5 5 5" shadow="receive: false"    
+     sound="src:#hawk; poolSize: 2" sounding
+    animation="property: position; from: -50 50 -500; to: -50 50 500; dur: 25000; loop: true" animation-mixer>
+    </a-entity>
+<a-entity gltf-model="#bird scale="5 5 5" rotation="0 180 0" shadow="receive: false"
+    sound="src:#hawk; poolSize: 2" sounding
+    animation="property: position; from: 50 50 500; to: 50 50 -500; dur:33000; loop: true" animation-mixer>
+    </a-entity>
 </a-scene>
 <script>
 var scene1 = document.getElementById('s1');
