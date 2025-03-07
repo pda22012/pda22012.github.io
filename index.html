@@ -1,7 +1,16 @@
 
-<html>
+
 <head>
     <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+    <script>
+        AFRAME.registerComponent('sounding', {
+            tick: function () {
+                if (Math.random() < 0.99) return;
+                var sound = this.el.components.sound;
+                if (sound) sound.playSound();
+            }
+        });
+    </script>
 </head>
 <body>
         <a-scene id="s1" background="color:#0d0928" fog="far:300" shadow="type: pcfsoft">
@@ -10,18 +19,32 @@
                 <a-entity position="0 250 0" light="type: directional; intensity: 0.5; castShadow: true; shadowCameraBottom: -500; shadowCameraTop: 500; shadowCameraLeft: -500; shadowCameraRight: 500"></a-entity>
                 <a-light type="ambient" intensity="0.25"></a-light>
                 <a-plane color="#2a1c0e" height="1000" width="1000" rotation="-90 0 0" metalness="0" shadow></a-plane>
-    <a-assets>
-       <a-asset-item id="tree" src="tree.gltf"></a-asset-item>
-       <a-asset-item id="bird" src="bird.gltf"></a-asset-item>
-       <a-asset-item id="bee" src="bee.gltf"></a-asset-item>
-       <a-asset-item id="witch" src="witch.glb"></a-asset-item>
-       <audio id="hawk" src="Hawk Call 2x-SoundBible.com-1697796838.mp3"></audio>
-       <audio id="bzzz" src="Bee-SoundBible.com-914644763.mp3"></audio>
-    </a-assets>
-    <a-entity gltf-model="#bird" scale="5 5 5" shadow="receive: false" position="-50 25 -50"></a-entity>
-    <a-entity gltf-model="#bird" scale="5 5 5" shadow="receive: false" position="50 25 -50" rotation="0 180 0">
-    </a-entity>
-    </a-scene>
-    
+<a-assets>
+    <a-asset-item id="tree" src="tree.gltf"></a-asset-item>
+    <a-asset-item id="bird" src="bird.gltf"></a-asset-item>
+    <a-asset-item id="bee" src="bee.gltf"></a-asset-item>
+    <a-asset-item id="witch" src="witch.glb"></a-asset-item>
+    <audio id="hawk" src="Hawk Call 2x-SoundBible.com-1697796838.mp3"></audio>
+    <audio id="bzzz" src="Bee-SoundBible.com-914644763.mp3"></audio>
+</a-assets>
+<a-entity gltf-model="#bird" scale="5 5 5" shadow="receive: false" position="-50 25 -50" sound="src:#hawk; poolSize: 2" sounding></a-entity>
+<a-entity gltf-model="#bird" scale="5 5 5" shadow="receive: false" position="50 25 -50" rotation="0 180 0" sound="src:#hawk; poolSize: 2" sounding></a-entity>
+</a-scene>
+<script>
+var scene1 = document.getElementById('s1');
+    for (var i = 0; i < 500; i++) {
+        var tree = document.createElement('a-entity');
+        var x = Math.random() * 800 - 400;
+        var z = Math.random() * 800 - 400;
+        var s = Math.random() * 15 + 5;
+        var r = Math.random() * 180 - 90;
+        tree.setAttribute('gltf-model', '#tree');
+        tree.setAttribute('position', x + ' 0 ' + z);
+        tree.setAttribute('scale', s + ' ' + s + ' ' + s);
+        tree.setAttribute('rotation', '0 ' + r + ' 0');
+        tree.setAttribute('shadow', 'receive: false');
+        scene1.appendChild(tree);
+    }
+</script>
 </body>
 </html>
