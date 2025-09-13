@@ -10,7 +10,4 @@ function startGame() {
   console.log("Game started!");
 }
 
-  // Start background music
-  const music = document.querySelector('#mainmusic');
-  music.components.sound.playSound();
-}
+ 
