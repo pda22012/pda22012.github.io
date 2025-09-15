@@ -16,7 +16,94 @@
           'plate',
           'strawberry',
           'recipeTab',
-          'timerBar' // If you want the timer bar visible at start
+          'timerBar'
+          <script>
+  function startGame() {
+    // Hide the start screen
+    const startScreen = document.getElementById('startScreen');
+    startScreen.style.display = 'none';
+
+    // Show the A-Frame scene (no need to hide it anymore if already visible)
+    const scene = document.getElementById('scene');
+    scene.setAttribute('visible', true);
+
+    // IDs of all entities to make visible
+    const entityIds = [
+      'kitchenrightwall',
+      'blueberries',
+      'plate',
+      'strawberry',
+      'recipeTab',
+      'timerBar',
+      'blackcabinet',
+      'blackplate',
+      'bluebottle',
+      'bowl',
+      'clock',
+      'coffee',
+      'coffeemaker',
+      'counterfloorright',
+      'cuttingboard',
+      'exhaustfan',
+      'faucet',
+      'floor',
+      'kitchenopenwall',
+      'kitchenroofslide',
+      'kitchenrooftop',
+      'kitchenwallback',
+      'kniveholder',
+      'ladlesandspoonswall',
+      'light',
+      'mugs',
+      'pandeep',
+      'plant',
+      'plantwindow',
+      'salt1',
+      'salt2',
+      'salt3',
+      'shelves',
+      'sink',
+      'slicefruitcake',
+      'soap',
+      'soap2',
+      'spatula',
+      'stool',
+      'stove',
+      'stovecabinets',
+      'sugarbag',
+      'vanilla',
+      'wallclock',
+      'wallcountertop',
+      'wallstove',
+      'whitebottle',
+      'windowbottom'
+    ];
+
+    // Show each entity
+    entityIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.setAttribute('visible', true);
+        console.log(`${id} is now visible!`);
+      } else {
+        console.warn(`${id} not found!`);
+      }
+    });
+
+    // Play background music
+    const music = document.querySelector('#mainmusic');
+    if (music && music.components && music.components.sound) {
+      music.components.sound.playSound();
+      console.log("Background music started!");
+    } else {
+      console.warn("Music sound component not ready yet.");
+    }
+
+    console.log("Game started!");
+  }
+</script>
+
+    // If you want the timer bar visible at start
         ];
 
         idsToShow.forEach(id => {
@@ -67,7 +154,7 @@
     <a-scene id="scene" vr-mode-ui="enabled: false">
       <!-- Camera and Cursor -->
       <a-entity id="cameraRig">
-        <a-camera position="0 1.6 0">
+        <a-camera position="0 1.8 4">
           <a-cursor 
             rayOrigin="mouse" 
             material="color: black; shader: flat">
@@ -80,82 +167,57 @@
       <a-entity light="type: directional; intensity: 0.8" position="0 2 1"></a-entity>
 
       <!-- Kitchen Wall -->
-      <a-entity id="kitchenrightwall" 
-                gltf-model="kitchenrightwall.glb" 
-                position="1 1 -3" 
-                visible="false">
-      </a-entity>
-      <a-entity id="blackcabinet" gltf-model="blackcabinet.glb" position="0 0 -4" visible="false"></a-entity>
-<a-entity id="blackplate" gltf-model="blackplate.glb" position="1 0 -4" visible="false"></a-entity>
-<a-entity id="bluebottle" gltf-model="bluebottle.glb" position="2 0 -4" visible="false"></a-entity>
-<a-entity id="bowl" gltf-model="bowl.glb" position="3 0 -4" visible="false"></a-entity>
-<a-entity id="clock" gltf-model="clock.glb" position="-1 2 -4" visible="false"></a-entity>
-<a-entity id="coffee" gltf-model="coffee.glb" position="0 1 -4" visible="false"></a-entity>
-<a-entity id="coffeemaker" gltf-model="coffeemaker.glb" position="1 1 -4" visible="false"></a-entity>
-<a-entity id="counterfloorright" gltf-model="counterfloorright.glb" position="2 1 -4" visible="false"></a-entity>
-<a-entity id="cuttingboard" gltf-model="cutting board.glb" position="3 1 -4" visible="false"></a-entity>
-<a-entity id="exhaustfan" gltf-model="exhaustfan.glb" position="0 3 -4" visible="false"></a-entity>
-<a-entity id="faucet" gltf-model="faucet.glb" position="1 0.8 -4" visible="false"></a-entity>
-<a-entity id="floor" gltf-model="floor.glb" position="0 0 0" visible="false"></a-entity>
-<a-entity id="kitchenopenwall" gltf-model="kitchenopenwall.glb" position="-2 1 -4" visible="false"></a-entity>
-<a-entity id="kitchenroofslide" gltf-model="kitchenroofslide.glb" position="0 3 -3" visible="false"></a-entity>
-<a-entity id="kitchenrooftop" gltf-model="kitchenrooftop.glb" position="0 3.5 -3" visible="false"></a-entity>
-<a-entity id="kitchenwallback" gltf-model="kitchenwallback.glb" position="0 1 -5" visible="false"></a-entity>
-<a-entity id="kniveholder" gltf-model="kniveholder.glb" position="3 1 -3" visible="false"></a-entity>
-<a-entity id="light" gltf-model="light.glb" position="0 3.8 -3" visible="false"></a-entity>
-<a-entity id="mugs" gltf-model="mugs.glb" position="1 1 -3" visible="false"></a-entity>
-<a-entity id="plant" gltf-model="plant.glb" position="-1 1 -3" visible="false"></a-entity>
-<a-entity id="plantwindow" gltf-model="plantwindow.glb" position="3 1 -3" visible="false"></a-entity>
-<a-entity id="salt1" gltf-model="salt1.glb" position="-2 0.5 -3" visible="false"></a-entity>
-<a-entity id="salt2" gltf-model="salt2.glb" position="-2.5 0.5 -3" visible="false"></a-entity>
-<a-entity id="salt3" gltf-model="salt3.glb" position="-3 0.5 -3" visible="false"></a-entity>
-<a-entity id="shelves" gltf-model="shelves.glb" position="3 2 -4" visible="false"></a-entity>
-<a-entity id="sink" gltf-model="sink.glb" position="1 0.7 -3" visible="false"></a-entity>
-<a-entity id="soap" gltf-model="soap.glb" position="2.5 0.5 -2" visible="false"></a-entity>
-<a-entity id="soap2" gltf-model="soap2.glb" position="3 0.5 -2" visible="false"></a-entity>
-<a-entity id="stool" gltf-model="stool.glb" position="1 0 -2" visible="false"></a-entity>
-<a-entity id="stove" gltf-model="stove.glb" position="0 0.8 -2" visible="false"></a-entity>
-<a-entity id="stovecabinets" gltf-model="stovecabinets.glb" position="0 1 -2.5" visible="false"></a-entity>
-<a-entity id="sugarbag" gltf-model="sugarbag.glb" position="2.8 0.5 -2" visible="false"></a-entity>
-<a-entity id="wallclock" gltf-model="wallclock.glb" position="-1.5 2 -3.5" visible="false"></a-entity>
-<a-entity id="wallcountertop" gltf-model="wallcountertop.glb" position="0 1 -3.5" visible="false"></a-entity>
-<a-entity id="wallstove" gltf-model="wallstove.glb" position="1 1 -3.5" visible="false"></a-entity>
-<a-entity id="whitebottle" gltf-model="whitebottle.glb" position="2 0.5 -1.5" visible="false"></a-entity>
-<a-entity id="windowbottom" gltf-model="windowbottom.glb" position="0 1 -5" visible="false"></a-entity>
+      <a-entity id="kitchenrightwall" gltf-model="kitchenrightwall.glb"  position="1 1 -3" visible="false"></a-entity>
+     <a-entity id="blackcabinet" gltf-model="blackcabinet.glb" position="0 0 -4" visible="false"></a-entity>
+     <a-entity id="blackplate" gltf-model="blackplate.glb" position="1 0 -4" visible="false"></a-entity>
+     <a-entity id="bluebottle" gltf-model="bluebottle.glb" position="2 0 -4" visible="false"></a-entity>
+     <a-entity id="bowl" gltf-model="bowl.glb" position="3 0 -4" visible="false"></a-entity>
+     <a-entity id="clock" gltf-model="clock.glb" position="-1 2 -4" visible="false"></a-entity>
+     <a-entity id="coffee" gltf-model="coffee.glb" position="0 1 -4" visible="false"></a-entity>
+     <a-entity id="coffeemaker" gltf-model="coffeemaker.glb" position="1 1 -4" visible="false"></a-entity>
+     <a-entity id="counterfloorright" gltf-model="counterfloorright.glb" position="2 1 -4" visible="false"></a-entity>
+     <a-entity id="cuttingboard" gltf-model="cutting board.glb" position="3 1 -4" visible="false"></a-entity>
+     <a-entity id="exhaustfan" gltf-model="exhaustfan.glb" position="0 3 -4" visible="false"></a-entity>
+     <a-entity id="faucet" gltf-model="faucet.glb" position="1 0.8 -4" visible="false"></a-entity>
+     <a-entity id="floor" gltf-model="floor.glb" position="0 0 0" visible="false"></a-entity>
+     <a-entity id="kitchenopenwall" gltf-model="kitchenopenwall.glb" position="-2 1 -4" visible="false"></a-entity>
+     <a-entity id="kitchenroofslide" gltf-model="kitchenroofslide.glb" position="0 3 -3" visible="false"></a-entity>
+     <a-entity id="kitchenrooftop" gltf-model="kitchenrooftop.glb" position="0 3.5 -3" visible="false"></a-entity>
+     <a-entity id="kitchenwallback" gltf-model="kitchenwallback.glb" position="0 1 -5" visible="false"></a-entity>
+     <a-entity id="kniveholder" gltf-model="kniveholder.glb" position="3 1 -3" visible="false"></a-entity>
+     <a-entity id="light" gltf-model="light.glb" position="0 3.8 -3" visible="false"></a-entity>
+     <a-entity id="mugs" gltf-model="mugs.glb" position="1 1 -3" visible="false"></a-entity>
+     <a-entity id="plant" gltf-model="plant.glb" position="-1 1 -3" visible="false"></a-entity>
+     <a-entity id="plantwindow" gltf-model="plantwindow.glb" position="3 1 -3" visible="false"></a-entity>
+     <a-entity id="salt1" gltf-model="salt1.glb" position="-2 0.5 -3" visible="false"></a-entity>
+     <a-entity id="salt2" gltf-model="salt2.glb" position="-2.5 0.5 -3" visible="false"></a-entity>
+     <a-entity id="salt3" gltf-model="salt3.glb" position="-3 0.5 -3" visible="false"></a-entity>
+     <a-entity id="shelves" gltf-model="shelves.glb" position="3 2 -4" visible="false"></a-entity>
+     <a-entity id="sink" gltf-model="sink.glb" position="1 0.7 -3" visible="false"></a-entity>
+     <a-entity id="soap" gltf-model="soap.glb" position="2.5 0.5 -2" visible="false"></a-entity>
+     <a-entity id="soap2" gltf-model="soap2.glb" position="3 0.5 -2" visible="false"></a-entity>
+     <a-entity id="stool" gltf-model="stool.glb" position="1 0 -2" visible="false"></a-entity>
+     <a-entity id="stove" gltf-model="stove.glb" position="0 0.8 -2" visible="false"></a-entity>
+     <a-entity id="stovecabinets" gltf-model="stovecabinets.glb" position="0 1 -2.5" visible="false"></a-entity>
+     <a-entity id="sugarbag" gltf-model="sugarbag.glb" position="2.8 0.5 -2" visible="false"></a-entity>
+     <a-entity id="wallclock" gltf-model="wallclock.glb" position="-1.5 2 -3.5" visible="false"></a-entity>
+     <a-entity id="wallcountertop" gltf-model="wallcountertop.glb" position="0 1 -3.5" visible="false"></a-entity>
+     <a-entity id="wallstove" gltf-model="wallstove.glb" position="1 1 -3.5" visible="false"></a-entity>
+     <a-entity id="whitebottle" gltf-model="whitebottle.glb" position="2 0.5 -1.5" visible="false"></a-entity>
+     <a-entity id="windowbottom" gltf-model="windowbottom.glb" position="0 1 -5" visible="false"></a-entity>
       
       <!-- Ingredients (initially hidden) -->
-      <a-entity id="blueberries" class="ingredient" 
-                gltf-model="blueberries.glb" 
-                position="1 1 -2" 
-                visible="false">
-      </a-entity>
-
-
-<a-entity id="ladlesandspoonswall" gltf-model="ladlesandspoonswall.glb" position="-3 1 -3" visible="false"></a-entity>
-<a-entity id="pandeep" gltf-model="pan deep.glb" position="2 0.5 -3" visible="false"></a-entity>
-<a-entity id="slicefruitcake" gltf-model="slicefruitcake.glb" position="2 0.5 -2" visible="false"></a-entity>
-<a-entity id="spatula" gltf-model="spatula.glb" position="3.5 0.5 -2" visible="false"></a-entity>
-<a-entity id="vanilla" gltf-model="vanilla.glb" position="2.5 0.5 -1.5" visible="false"></a-entity>
-
-
-      <a-entity id="plate" class="ingredient" 
-                gltf-model="plate.glb" 
-                position="2 1 -2" 
-                visible="false">
-      </a-entity>
-
-      <a-entity id="strawberry" class="ingredient" 
-                gltf-model="strawberry.glb" 
-                position="3 1 -2" 
-                visible="false">
-      </a-entity>
+      <a-entity id="blueberries" class="ingredient"  gltf-model="blueberries.glb"  position="1 1 -2"  visible="false"> </a-entity>
+      <a-entity id="ladlesandspoonswall" gltf-model="ladlesandspoonswall.glb" position="-3 1 -3" visible="false"></a-entity>
+      <a-entity id="pandeep" gltf-model="pan deep.glb" position="2 0.5 -3" visible="false"></a-entity>
+      <a-entity id="slicefruitcake" gltf-model="slicefruitcake.glb" position="2 0.5 -2" visible="false"></a-entity>
+      <a-entity id="spatula" gltf-model="spatula.glb" position="3.5 0.5 -2" visible="false"></a-entity>
+      <a-entity id="vanilla" gltf-model="vanilla.glb" position="2.5 0.5 -1.5" visible="false"></a-entity>
+      <a-entity id="plate" class="ingredient" gltf-model="plate.glb" position="2 1 -2"  visible="false"> </a-entity>
+      <a-entity id="strawberry" class="ingredient"  gltf-model="strawberry.glb" position="3 1 -2" visible="false"></a-entity>
 
       <!-- Cake (hidden until completed) -->
-      <a-entity id="strawberrychocolatecake" 
-                gltf-model="strawberrychocolatecake.glb" 
-                position="0 1 -1" 
-                visible="false">
-      </a-entity>
+      <a-entity id="strawberrychocolatecake"  gltf-model="strawberrychocolatecake.glb"  position="0 1 -1" visible="false"></a-entity>
 
       <!-- Recipe Tab -->
       <a-plane id="recipeTab" 
