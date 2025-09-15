@@ -7,6 +7,15 @@ function startGame() {
   const scene = document.getElementById('scene');
   scene.setAttribute('visible', true);
 
+  // Show additional item (e.g., kitchenrightwall)
+  const whisk = document.getElementById('kitchenrightwall');
+  if (kitchenrightwall) {
+    kitchenrightwall.setAttribute('visible', true);
+    console.log("kitchenrightwall is now visible!");
+  } else {
+    console.warn("kitchenrightwall entity not found!");
+  }
+
   // Play background music
   const music = document.querySelector('#mainmusic');
   if (music && music.components && music.components.sound) {
