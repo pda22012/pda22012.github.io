@@ -4,7 +4,38 @@
     <title>Bake your cake</title>
     <meta name="description" content="Bake your cake">
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-    <script src="script.js" defer></script>
+    <script defer>
+      function startGame() {
+        // Hide the start screen UI
+        document.getElementById('startScreen').style.display = 'none';
+
+        // Show game objects
+        const idsToShow = [
+          'kitchenrightwall',
+          'blueberries',
+          'plate',
+          'strawberry',
+          'recipeTab',
+          'timerBar' // If you want the timer bar visible at start
+        ];
+
+        idsToShow.forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.setAttribute('visible', true);
+        });
+
+        // Start background music
+        const music = document.getElementById('mainmusic');
+        if (music && music.components && music.components.sound) {
+          music.components.sound.playSound();
+          console.log("Background music started!");
+        } else {
+          console.warn("Music component not ready.");
+        }
+
+        console.log("Game started!");
+      }
+    </script>
     <style>
       .start-ui {
         position: absolute;
@@ -34,8 +65,7 @@
 
     <!-- A-Frame Scene -->
     <a-scene id="scene" vr-mode-ui="enabled: false">
-
-      <!-- Camera and Mouse Cursor -->
+      <!-- Camera and Cursor -->
       <a-entity id="cameraRig">
         <a-camera position="0 1.6 0">
           <a-cursor 
@@ -49,33 +79,30 @@
       <a-entity light="type: ambient; intensity: 0.5"></a-entity>
       <a-entity light="type: directional; intensity: 0.8" position="0 2 1"></a-entity>
 
-      <!-- Environment -->
-      <!--<a-entity gltf-model="assets/kitchen.glb" position="0 0 -3" scale="1 1 1"></a-entity>-->
-
-      <!-- Kitchen Wall (hidden until game starts) -->
+      <!-- Kitchen Wall -->
       <a-entity id="kitchenrightwall" 
                 gltf-model="kitchenrightwall.glb" 
                 position="1 1 -3" 
                 visible="false">
       </a-entity>
 
-      <!-- Ingredient Placements -->
+      <!-- Ingredients (initially hidden) -->
       <a-entity id="blueberries" class="ingredient" 
                 gltf-model="blueberries.glb" 
                 position="1 1 -2" 
-                data-name="blueberries">
+                visible="false">
       </a-entity>
 
       <a-entity id="plate" class="ingredient" 
                 gltf-model="plate.glb" 
                 position="2 1 -2" 
-                data-name="plate">
+                visible="false">
       </a-entity>
 
       <a-entity id="strawberry" class="ingredient" 
                 gltf-model="strawberry.glb" 
                 position="3 1 -2" 
-                data-name="strawberry">
+                visible="false">
       </a-entity>
 
       <!-- Cake (hidden until completed) -->
@@ -91,10 +118,11 @@
                 width="1.5" height="1" 
                 color="#FFF" 
                 material="shader: flat" 
-                text="value: Cake Recipe:\n- Egg\n- Milk\n- Flour; align: center;">
+                text="value: Cake Recipe:\n- Egg\n- Milk\n- Flour; align: center;" 
+                visible="false">
       </a-plane>
 
-      <!-- Timer Bar (hidden initially) -->
+      <!-- Timer Bar -->
       <a-plane id="timerBar" 
                 visible="false" 
                 position="0 2 -2" 
@@ -106,7 +134,6 @@
       <a-sound id="correctSound" src="assets/correct.mp3"></a-sound>
       <a-sound id="wrongSound" src="assets/wrong.mp3"></a-sound>
       <a-sound id="mainmusic" src="baking cooking jazz.mp3" autoplay="false" loop="true"></a-sound>
-
     </a-scene>
   </body>
 </html>
