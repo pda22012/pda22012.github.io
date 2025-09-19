@@ -51,7 +51,6 @@
         position: absolute;
         top: 20%;
         left: 5%;
-        background: rgba(255, 255, 255, 0.9);
         padding: 20px;
         border-radius: 12px;
         font-family: sans-serif;
@@ -59,6 +58,7 @@
         display: none;
         z-index: 10;
         min-width: 180px;
+        color: white;
       }
 
       #recipePanel h2 {
@@ -74,29 +74,30 @@
 
       #recipePanel li {
         margin: 5px 0;
-        color: red;
+        color: white;
       }
+
+      /* Colored recipe panels */
+      #recipePanel.chocolate { background: peru; }
+      #recipePanel.blueberry { background: steelblue; }
+      #recipePanel.cherry { background: hotpink; }
     </style>
 
     <script>
       function startGame() {
-        // Hide start screen
         document.getElementById('startScreen').style.display = 'none';
-        // Show cake choice tabs
         document.getElementById('cakeChoices').style.display = 'flex';
       }
 
       function chooseCake(cakeName) {
-        // Hide cake choice tabs
         document.getElementById('cakeChoices').style.display = 'none';
-
-        // Show A-Frame scene
         const scene = document.getElementById('scene');
         scene.style.display = 'block';
 
-        // Show recipe panel
         const recipePanel = document.getElementById('recipePanel');
         recipePanel.style.display = 'block';
+        recipePanel.className = ''; // reset
+        recipePanel.classList.add(cakeName);
 
         let ingredients = [];
         let title = "";
@@ -112,7 +113,6 @@
           ingredients = ["Flour", "Sugar", "Butter", "Milk", "Vanilla", "Cherries", "Spatula"];
         }
 
-        // Fill recipe panel
         recipePanel.innerHTML = `
           <h2>${title}</h2>
           <ul>
@@ -122,20 +122,19 @@
 
         // Reveal all kitchen objects
         const entityIds = [
-          'kitchenrightwall','blueberries','plate','strawberry','recipeTab','timerBar','blackcabinet',
-          'blackplate','bluebottle','bowl','clock','coffee','coffeemaker','counterfloorright',
-          'cuttingboard','exhaustfan','faucet','floor','kitchenopenwall','kitchenroofslide','kitchenrooftop',
-          'kitchenwallback','kniveholder','ladlesandspoonswall','light','mugs','pandeep','plant','plantwindow',
-          'salt1','salt2','salt3','shelves','sink','slicefruitcake','soap','soap2','spatula','stool',
-          'stove','stovecabinets','sugarbag','vanilla','wallclock','wallcountertop','wallstove','whitebottle','windowbottom'
+          'kitchenrightwall','blueberries','plate','strawberry','blackcabinet','blackplate','bluebottle',
+          'bowl','clock','coffee','coffeemaker','counterfloorright','cuttingboard','exhaustfan','faucet',
+          'floor','kitchenopenwall','kitchenroofslide','kitchenrooftop','kitchenwallback','kniveholder',
+          'ladlesandspoonswall','light','mugs','pandeep','plant','plantwindow','salt1','salt2','salt3',
+          'shelves','sink','slicefruitcake','soap','soap2','spatula','stool','stove','stovecabinets',
+          'sugarbag','vanilla','wallclock','wallcountertop','wallstove','whitebottle','windowbottom'
         ];
-
         entityIds.forEach(id => {
           const el = document.getElementById(id);
           if (el) el.setAttribute('visible', true);
         });
 
-        // Restart background music
+        // Restart music
         const music = document.querySelector('#mainmusic');
         if (music && music.components && music.components.sound) {
           music.components.sound.stopSound();
@@ -148,6 +147,11 @@
   <body>
     <!-- Start Screen -->
     <div class="start-ui" id="startScreen">
+      <img 
+        src="https://images.pexels.com/photos/9095/pexels-photo.jpg" 
+        alt="Start Background" 
+        style="width: 100%; max-width: 600px; border-radius: 10px; margin-bottom: 20px;" 
+      />
       <h1>Bake your cake</h1>
       <button onclick="startGame()">Start</button>
       <button onclick="window.close()">Quit</button>
@@ -163,7 +167,7 @@
     <!-- Recipe panel -->
     <div id="recipePanel"></div>
 
-    <!-- A-Frame Scene (hidden until cake chosen) -->
+    <!-- A-Frame Scene -->
     <a-scene id="scene" vr-mode-ui="enabled: false" style="display:none;">
       <!-- Camera -->
       <a-entity id="cameraRig" position="0 0 0">
@@ -176,12 +180,53 @@
       <a-entity light="type: ambient; intensity: 0.5"></a-entity>
       <a-entity light="type: directional; intensity: 0.8" position="0 2 1"></a-entity>
 
-      <!-- Kitchen entities (hidden initially) -->
+      <!-- Kitchen objects (hidden until cake chosen) -->
       <a-entity id="kitchenrightwall" gltf-model="kitchenrightwall.glb" visible="false"></a-entity>
       <a-entity id="blueberries" gltf-model="blueberries.glb" visible="false"></a-entity>
       <a-entity id="plate" gltf-model="plate.glb" visible="false"></a-entity>
       <a-entity id="strawberry" gltf-model="strawberry.glb" visible="false"></a-entity>
-      <!-- (other entities go here) -->
+      <a-entity id="blackcabinet" gltf-model="blackcabinet.glb" visible="false"></a-entity>
+      <a-entity id="blackplate" gltf-model="blackplate.glb" visible="false"></a-entity>
+      <a-entity id="bluebottle" gltf-model="bluebottle.glb" visible="false"></a-entity>
+      <a-entity id="bowl" gltf-model="bowl.glb" visible="false"></a-entity>
+      <a-entity id="clock" gltf-model="clock.glb" visible="false"></a-entity>
+      <a-entity id="coffee" gltf-model="coffee.glb" visible="false"></a-entity>
+      <a-entity id="coffeemaker" gltf-model="coffeemaker.glb" visible="false"></a-entity>
+      <a-entity id="counterfloorright" gltf-model="counterfloorright.glb" visible="false"></a-entity>
+      <a-entity id="cuttingboard" gltf-model="cuttingboard.glb" visible="false"></a-entity>
+      <a-entity id="exhaustfan" gltf-model="exhaustfan.glb" visible="false"></a-entity>
+      <a-entity id="faucet" gltf-model="faucet.glb" visible="false"></a-entity>
+      <a-entity id="floor" gltf-model="floor.glb" visible="false"></a-entity>
+      <a-entity id="kitchenopenwall" gltf-model="kitchenopenwall.glb" visible="false"></a-entity>
+      <a-entity id="kitchenroofslide" gltf-model="kitchenroofslide.glb" visible="false"></a-entity>
+      <a-entity id="kitchenrooftop" gltf-model="kitchenrooftop.glb" visible="false"></a-entity>
+      <a-entity id="kitchenwallback" gltf-model="kitchenwallback.glb" visible="false"></a-entity>
+      <a-entity id="kniveholder" gltf-model="kniveholder.glb" visible="false"></a-entity>
+      <a-entity id="ladlesandspoonswall" gltf-model="ladlesandspoonswall.glb" visible="false"></a-entity>
+      <a-entity id="light" gltf-model="light.glb" visible="false"></a-entity>
+      <a-entity id="mugs" gltf-model="mugs.glb" visible="false"></a-entity>
+      <a-entity id="pandeep" gltf-model="pandeep.glb" visible="false"></a-entity>
+      <a-entity id="plant" gltf-model="plant.glb" visible="false"></a-entity>
+      <a-entity id="plantwindow" gltf-model="plantwindow.glb" visible="false"></a-entity>
+      <a-entity id="salt1" gltf-model="salt1.glb" visible="false"></a-entity>
+      <a-entity id="salt2" gltf-model="salt2.glb" visible="false"></a-entity>
+      <a-entity id="salt3" gltf-model="salt3.glb" visible="false"></a-entity>
+      <a-entity id="shelves" gltf-model="shelves.glb" visible="false"></a-entity>
+      <a-entity id="sink" gltf-model="sink.glb" visible="false"></a-entity>
+      <a-entity id="slicefruitcake" gltf-model="slicefruitcake.glb" visible="false"></a-entity>
+      <a-entity id="soap" gltf-model="soap.glb" visible="false"></a-entity>
+      <a-entity id="soap2" gltf-model="soap2.glb" visible="false"></a-entity>
+      <a-entity id="spatula" gltf-model="spatula.glb" visible="false"></a-entity>
+      <a-entity id="stool" gltf-model="stool.glb" visible="false"></a-entity>
+      <a-entity id="stove" gltf-model="stove.glb" visible="false"></a-entity>
+      <a-entity id="stovecabinets" gltf-model="stovecabinets.glb" visible="false"></a-entity>
+      <a-entity id="sugarbag" gltf-model="sugarbag.glb" visible="false"></a-entity>
+      <a-entity id="vanilla" gltf-model="vanilla.glb" visible="false"></a-entity>
+      <a-entity id="wallclock" gltf-model="wallclock.glb" visible="false"></a-entity>
+      <a-entity id="wallcountertop" gltf-model="wallcountertop.glb" visible="false"></a-entity>
+      <a-entity id="wallstove" gltf-model="wallstove.glb" visible="false"></a-entity>
+      <a-entity id="whitebottle" gltf-model="whitebottle.glb" visible="false"></a-entity>
+      <a-entity id="windowbottom" gltf-model="windowbottom.glb" visible="false"></a-entity>
 
       <!-- Music -->
       <a-sound id="mainmusic" src="baking cooking jazz.mp3" autoplay="false" loop="true"></a-sound>
