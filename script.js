@@ -6,140 +6,125 @@
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
 
     <style>
-      .start-ui {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        z-index: 10;
-        text-align: center;
-      }
+  .start-ui {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    text-align: center;
+  }
 
-      .start-ui button {
-        margin: 10px;
-        padding: 15px 30px;
-        font-size: 18px;
-        cursor: pointer;
-      }
+  .start-ui button {
+    margin: 10px;
+    padding: 15px 30px;
+    font-size: 18px;
+    cursor: pointer;
+  }
 
-      /* Cake choice tabs */
-      #cakeChoices {
-        position: absolute;
-        top: 20%;
-        left: 50%;
-        transform: translateX(-50%);
-        display: none; /* hidden until Start */
-        gap: 20px;
-        z-index: 10;
-      }
+  /* Cake choice tabs */
+  #cakeChoices {
+    position: absolute;
+    top: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    gap: 20px;
+    z-index: 10;
+  }
 
-      .cake-tab {
-        padding: 20px 40px;
-        font-size: 20px;
-        border-radius: 12px;
-        color: white;
-        cursor: pointer;
-        font-weight: bold;
-      }
+  #cakeChoices div {
+    padding: 20px;
+    border-radius: 10px;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    text-align: center;
+    width: 180px;
+  }
 
-      .chocolate { background: peru; }
-      .blueberry { background: steelblue; }
-      .cherry { background: hotpink; }
+  #chocolateTab { background-color: #8B4513; } /* Light brown */
+  #blueberryTab { background-color: #1E90FF; } /* Blue */
+  #cherryTab { background-color: #FF69B4; }    /* Pink */
+</style>
 
-      /* Recipe panel on the left */
-      #recipePanel {
-        position: absolute;
-        top: 20%;
-        left: 5%;
-        background: rgba(255, 255, 255, 0.9);
-        padding: 20px;
-        border-radius: 12px;
-        font-family: sans-serif;
-        font-size: 18px;
-        display: none;
-        z-index: 10;
-        min-width: 180px;
-      }
-
-      #recipePanel h2 {
-        margin-top: 0;
-        font-size: 22px;
-        text-align: center;
-      }
-
-      #recipePanel ul {
-        list-style: none;
-        padding: 0;
-      }
-
-      #recipePanel li {
-        margin: 5px 0;
-        color: red; /* will turn green when collected */
-      }
-    </style>
 
     <script>
-      function startGame() {
-        // Hide start screen
-        document.getElementById('startScreen').style.display = 'none';
-        // Show cake choice tabs
-        document.getElementById('cakeChoices').style.display = 'flex';
-        console.log("Choose your cake!");
-      }
+  let selectedCake = null;
+  const recipes = {
+    blueberry: ["flour", "sugar", "butter", "milk", "vanilla", "blueberries", "spatula"],
+    chocolate: ["flour", "sugar", "butter", "milk", "vanilla", "chocolate", "strawberries", "spatula"],
+    cherry: ["flour", "sugar", "butter", "milk", "vanilla", "cherries", "spatula"]
+  };
 
-      function chooseCake(cakeName) {
-        // Hide cake choice tabs
-        document.getElementById('cakeChoices').style.display = 'none';
+  function showCakeChoices() {
+    document.getElementById('startScreen').style.display = 'none';
+    document.getElementById('cakeChoices').style.display = 'flex';
+  }
 
-        // Show recipe panel
-        const recipePanel = document.getElementById('recipePanel');
-        recipePanel.style.display = 'block';
+  function selectCake(cakeType) {
+    selectedCake = cakeType;
 
-        let ingredients = [];
-        let title = "";
+    // Hide cake choices
+    document.getElementById('cakeChoices').style.display = 'none';
 
-        if (cakeName === 'blueberry') {
-          title = "Blueberry Cake";
-          ingredients = ["Flour", "Sugar", "Butter", "Milk", "Vanilla", "Blueberries", "Spatula"];
-        } else if (cakeName === 'chocolate') {
-          title = "Chocolate Cake";
-          ingredients = ["Flour", "Sugar", "Butter", "Milk", "Vanilla", "Chocolate", "Strawberries", "Spatula"];
-        } else if (cakeName === 'cherry') {
-          title = "Cherry Cake";
-          ingredients = ["Flour", "Sugar", "Butter", "Milk", "Vanilla", "Cherries", "Spatula"];
-        }
+    // Show kitchen scene
+    const scene = document.getElementById('scene');
+    scene.setAttribute('visible', true);
 
-        // Fill recipe panel
-        recipePanel.innerHTML = `
-          <h2>${title}</h2>
-          <ul>
-            ${ingredients.map(item => `<li id="recipe-${item.toLowerCase()}">${item}</li>`).join('')}
-          </ul>
-        `;
+    // Make all kitchen objects visible
+    const entityIds = [
+      'kitchenrightwall','blueberries','plate','strawberry','recipeTab','timerBar',
+      'blackcabinet','blackplate','bluebottle','bowl','clock','coffee','coffeemaker',
+      'counterfloorright','cuttingboard','exhaustfan','faucet','floor','kitchenopenwall',
+      'kitchenroofslide','kitchenrooftop','kitchenwallback','kniveholder','ladlesandspoonswall',
+      'light','mugs','pandeep','plant','plantwindow','salt1','salt2','salt3','shelves',
+      'sink','slicefruitcake','soap','soap2','spatula','stool','stove','stovecabinets',
+      'sugarbag','vanilla','wallclock','wallcountertop','wallstove','whitebottle','windowbottom'
+    ];
+    entityIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.setAttribute('visible', true);
+    });
 
-        // Reveal kitchen + objects
-        const entityIds = [
-          'kitchenrightwall','blueberries','plate','strawberry','recipeTab','timerBar','blackcabinet',
-          'blackplate','bluebottle','bowl','clock','coffee','coffeemaker','counterfloorright',
-          'cuttingboard','exhaustfan','faucet','floor','kitchenopenwall','kitchenroofslide','kitchenrooftop',
-          'kitchenwallback','kniveholder','ladlesandspoonswall','light','mugs','pandeep','plant','plantwindow',
-          'salt1','salt2','salt3','shelves','sink','slicefruitcake','soap','soap2','spatula','stool',
-          'stove','stovecabinets','sugarbag','vanilla','wallclock','wallcountertop','wallstove','whitebottle','windowbottom'
-        ];
+    // Restart background music
+    const music = document.querySelector('#mainmusic');
+    if (music && music.components && music.components.sound) {
+      music.components.sound.stopSound();
+      music.components.sound.playSound();
+    }
 
-        entityIds.forEach(id => {
-          const el = document.getElementById(id);
-          if (el) el.setAttribute('visible', true);
-        });
+    // Show recipe tab on left side with ingredients
+    const recipeTab = document.getElementById('recipeTab');
+    const ingredients = recipes[cakeType];
+    recipeTab.setAttribute('visible', true);
+    recipeTab.setAttribute('position', '-2 2 -2'); // Left side of screen
+    recipeTab.setAttribute('text', {
+      value: `${cakeType.charAt(0).toUpperCase() + cakeType.slice(1)} Cake:\n- ${ingredients.join("\n- ")}`,
+      align: 'left',
+      color: 'black',
+      width: 4
+    });
 
-        // Restart music
-        const music = document.querySelector('#mainmusic');
-        if (music && music.components && music.components.sound) {
-          music.components.sound.stopSound();
-          music.components.sound.playSound();
-        }
-      }
-    </script>
+    // Add clickable behavior for ingredients
+    document.querySelectorAll('.ingredient').forEach(el => {
+      el.addEventListener('click', () => collectIngredient(el.id));
+    });
+  }
+
+  function collectIngredient(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.setAttribute('visible', false);
+
+    // Update recipe tab text (mark ingredient as collected ✅)
+    const recipeTab = document.getElementById('recipeTab');
+    let currentText = recipeTab.getAttribute('text').value;
+    const regex = new RegExp(`- ${id}`, "i");
+    recipeTab.setAttribute('text', 'value', currentText.replace(regex, `- ✅ ${id}`));
+  }
+</script>
+
   </head>
 
   <body>
