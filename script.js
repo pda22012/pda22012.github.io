@@ -1,14 +1,31 @@
 <script>
   function startGame() {
     // Hide the start screen
-    const startScreen = document.getElementById('startScreen');
-    startScreen.style.display = 'none';
+    document.getElementById('startScreen').style.display = 'none';
 
-    // Show the A-Frame scene (no need to hide it anymore if already visible)
-    const scene = document.getElementById('scene');
-    scene.setAttribute('visible', true);
+    // Show cake choice tabs
+    document.getElementById('cakeChoices').style.display = 'flex';
 
-    // IDs of all entities to make visible
+    // Restart background music from the beginning
+    const music = document.querySelector('#mainmusic');
+    if (music && music.components && music.components.sound) {
+      music.components.sound.stopSound();
+      music.components.sound.playSound();
+      console.log("Background music restarted!");
+    } else {
+      console.warn("Music sound component not ready yet.");
+    }
+
+    console.log("Game started — choose your cake!");
+  }
+
+  function chooseCake(cakeName) {
+    // Hide cake choice tabs
+    document.getElementById('cakeChoices').style.display = 'none';
+
+    console.log(`You chose: ${cakeName} cake!`);
+
+    // Reveal the kitchen now
     const entityIds = [
       'kitchenrightwall',
       'blueberries',
@@ -60,27 +77,11 @@
       'windowbottom'
     ];
 
-    // Show each entity
     entityIds.forEach(id => {
       const el = document.getElementById(id);
       if (el) {
         el.setAttribute('visible', true);
-        console.log(`${id} is now visible!`);
-      } else {
-        console.warn(`${id} not found!`);
       }
     });
-
-    // Play background music
-    const music = document.querySelector('#mainmusic');
-    if (music && music.components && music.components.sound) {
-      music.components.sound.playSound();
-      console.log("Background music started!");
-    } else {
-      console.warn("Music sound component not ready yet.");
-    }
-
-    console.log("Game started!");
   }
 </script>
-
