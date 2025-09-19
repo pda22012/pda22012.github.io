@@ -32,10 +32,35 @@
       border-radius: 10px;
       background: #fff;
       cursor: pointer;
+      transition: transform 0.5s ease, opacity 0.5s ease;
     }
 
     .choice-box:hover {
       background: #f5f5f5;
+    }
+
+    /* Left panel for chosen recipe */
+    #leftPanel {
+      position: absolute;
+      top: 20px;
+      left: -300px; /* Start hidden offscreen */
+      width: 250px;
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      display: none;
+      z-index: 10;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      transition: left 0.7s ease;
+    }
+
+    #leftPanel.active {
+      left: 20px; /* Slides into view */
+    }
+
+    #leftPanel ul {
+      text-align: left;
+      padding-left: 15px;
     }
   </style>
 </head>
@@ -52,15 +77,16 @@
 
   <!-- Cake Choice Screen -->
   <div class="choice-ui" id="choiceScreen">
-    <div class="choice-box" onclick="chooseCake('strawberry')">
+    <div class="choice-box" id="strawberryChoice" onclick="chooseCake('strawberry')">
       <h2>Strawberry Cake</h2>
-      <p>Ingredients:<br>Flour, Strawberries, Vanilla, Sugar, Butter, Milk, Chocolate</p>
     </div>
-    <div class="choice-box" onclick="chooseCake('blueberry')">
+    <div class="choice-box" id="blueberryChoice" onclick="chooseCake('blueberry')">
       <h2>Blueberry Cake</h2>
-      <p>Ingredients:<br>Flour, Blueberries, Vanilla, Sugar, Butter, Milk, Chocolate</p>
     </div>
   </div>
+
+  <!-- Recipe Panel -->
+  <div id="leftPanel"></div>
 
   <!-- Bake Button -->
   <div class="bake-ui" id="bakeScreen">
@@ -94,7 +120,7 @@
     <a-entity id="finalCake" gltf-model="strawberrychocolatecake.glb" position="0 1 -1" visible="false"></a-entity>
 
     <!-- Timer Bar -->
-    <a-plane id="timerBar" visible="false" position="0 2 -2" width="1.5" height="0.2" color="#4CAF50"></a-plane>
+    <a-plane id="timerBar" visible="false" position="0 2 -2" width="0.1" height="0.2" color="#4CAF50"></a-plane>
 
     <!-- Sounds -->
     <a-sound id="correctSound" src="assets/correct.mp3"></a-sound>
@@ -114,13 +140,48 @@
 
     function chooseCake(cake) {
       chosenCake = cake;
-      document.getElementById('choiceScreen').style.display = 'none';
+      const choiceScreen = document.getElementById('choiceScreen');
+      const leftPanel = document.getElementById('leftPanel');
 
+      // Hide choice screen
+      choiceScreen.style.display = 'none';
+
+      // Show left panel
+      leftPanel.style.display = 'block';
+      leftPanel.classList.add('active');
+      leftPanel.innerHTML = `<h2>${cake === 'strawberry' ? 'Strawberry Cake' : 'Blueberry Cake'}</h2>
+        <ul id="ingredientList"></ul>`;
+
+      // Define required ingredients
       if (cake === 'strawberry') {
         requiredIngredients = ["flour", "strawberries", "vanilla", "sugar", "butter", "milk", "chocolate"];
       } else {
         requiredIngredients = ["flour", "blueberries", "vanilla", "sugar", "butter", "milk", "chocolate"];
       }
+
+      // Build checklist
+      const list = document.getElementById('ingredientList');
+      requiredIngredients.forEach(ing => {
+        const li = document.createElement('li');
+        li.id = `check-${ing}`;
+        li.textContent = ing;
+        list.appendChild(li);
+      });
+
+      // Show all kitchen props (walls, furniture, etc.)
+      const entityIds = [
+        'kitchenrightwall', 'blackcabinet', 'blackplate', 'bluebottle', 'bowl', 'clock',
+        'coffee', 'coffeemaker', 'counterfloorright', 'cuttingboard', 'exhaustfan',
+        'faucet', 'floor', 'kitchenopenwall', 'kitchenroofslide', 'kitchenrooftop',
+        'kitchenwallback', 'kniveholder', 'ladlesandspoonswall', 'light', 'mugs',
+        'pandeep', 'plant', 'plantwindow', 'salt1', 'salt2', 'salt3', 'shelves',
+        'sink', 'slicefruitcake', 'soap', 'soap2', 'spatula', 'stool', 'stove',
+        'stovecabinets', 'wallclock', 'wallcountertop', 'wallstove', 'windowbottom'
+      ];
+      entityIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.setAttribute('visible', true);
+      });
 
       // Show only required ingredients
       document.querySelectorAll('.ingredient').forEach(el => {
@@ -130,7 +191,7 @@
         }
       });
 
-      // Start background music
+      // Start music
       const music = document.querySelector('#mainmusic');
       if (music && music.components.sound) {
         music.components.sound.playSound();
@@ -140,12 +201,27 @@
     function collectIngredient(id) {
       if (requiredIngredients.includes(id) && !collectedIngredients.includes(id)) {
         collectedIngredients.push(id);
+
+        // Hide from scene
+        const el = document.getElementById(id);
+        el.setAttribute('visible', false);
+
+        // Update checklist
+        const li = document.getElementById(`check-${id}`);
+        if (li) {
+          li.style.color = 'green';
+          li.style.textDecoration = 'line-through';
+        }
+
+        // Play correct sound
         document.querySelector('#correctSound').components.sound.playSound();
+
       } else {
+        // Wrong ingredient
         document.querySelector('#wrongSound').components.sound.playSound();
       }
 
-      // Check if all collected
+      // If all collected
       if (collectedIngredients.length === requiredIngredients.length) {
         document.getElementById('bakeScreen').style.display = 'block';
       }
@@ -156,8 +232,7 @@
       const timer = document.getElementById('timerBar');
       timer.setAttribute('visible', true);
 
-      // Fake loading progress
-      let width = 0;
+      let width = 0.1;
       const interval = setInterval(() => {
         width += 0.1;
         timer.setAttribute('width', width);
