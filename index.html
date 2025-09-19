@@ -1,11 +1,16 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <title>Bake your cake</title>
   <meta name="description" content="Bake your cake">
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
   <style>
+    /* Simple CSS included here for completeness */
+    body { margin: 0; font-family: sans-serif; background: #222; }
+
     .start-ui {
       position: absolute;
       top: 50%;
@@ -13,6 +18,7 @@
       transform: translate(-50%, -50%);
       z-index: 10;
       text-align: center;
+      color: white;
     }
 
     .start-ui img {
@@ -33,7 +39,7 @@
       top: 20%;
       left: 50%;
       transform: translateX(-50%);
-      display: none;
+      display: none; /* hidden initially */
       gap: 20px;
       z-index: 10;
       display: flex;
@@ -60,7 +66,6 @@
       left: 5%;
       padding: 20px;
       border-radius: 12px;
-      font-family: sans-serif;
       font-size: 18px;
       display: none;
       z-index: 10;
@@ -68,111 +73,15 @@
       color: white;
     }
 
-    #recipePanel h2 {
-      margin-top: 0;
-      font-size: 22px;
-      text-align: center;
-    }
-
-    #recipePanel ul {
-      list-style: none;
-      padding: 0;
-    }
-
-    #recipePanel li {
-      margin: 5px 0;
-      font-weight: bold;
-    }
-
-    #recipePanel li.collected {
-      color: lightgreen;
-    }
+    #recipePanel h2 { font-size: 22px; text-align: center; margin-top: 0; }
+    #recipePanel ul { list-style: none; padding: 0; }
+    #recipePanel li { margin: 5px 0; font-weight: bold; }
+    #recipePanel li.collected { color: lightgreen; }
   </style>
-
-  <script>
-    let selectedCake = null;
-    const recipes = {
-      blueberry: ["Flour", "Sugar", "Butter", "Milk", "Vanilla", "Blueberries", "Spatula"],
-      chocolate: ["Flour", "Sugar", "Butter", "Milk", "Vanilla", "Chocolate", "Strawberries", "Spatula"],
-      cherry: ["Flour", "Sugar", "Butter", "Milk", "Vanilla", "Cherries", "Spatula"]
-    };
-
-    function startGame() {
-      document.getElementById('startScreen').style.display = 'none';
-      document.getElementById('cakeChoices').style.display = 'flex';
-    }
-
-    function selectCake(cakeType) {
-      selectedCake = cakeType;
-
-      document.getElementById('cakeChoices').style.display = 'none';
-      document.getElementById('scene').style.display = 'block';
-
-      const recipePanel = document.getElementById('recipePanel');
-      recipePanel.style.display = 'block';
-
-      if (cakeType === "blueberry") recipePanel.style.backgroundColor = "#1E90FF";
-      if (cakeType === "chocolate") recipePanel.style.backgroundColor = "#8B4513";
-      if (cakeType === "cherry") recipePanel.style.backgroundColor = "#FF69B4";
-
-      const ingredients = recipes[cakeType];
-      recipePanel.innerHTML = `
-        <h2>${cakeType.charAt(0).toUpperCase() + cakeType.slice(1)} Cake</h2>
-        <ul>
-          ${ingredients.map(item => `<li id="recipe-${item.toLowerCase()}">${item}</li>`).join('')}
-        </ul>
-      `;
-
-      // Show kitchen objects with positions & scales
-      const kitchenObjects = [
-        {id: 'kitchenrightwall', pos:'0 1.5 -5', scale:'1 1 1'},
-        {id: 'blueberries', pos:'-0.5 1 -1', scale:'0.2 0.2 0.2'},
-        {id: 'plate', pos:'0.5 1 -1', scale:'0.3 0.3 0.3'},
-        {id: 'strawberry', pos:'1 1 -1', scale:'0.2 0.2 0.2'},
-        {id: 'spatula', pos:'-1 1 -0.5', scale:'0.3 0.3 0.3'},
-        {id: 'sugarbag', pos:'-1.2 1 -0.7', scale:'0.3 0.3 0.3'},
-        {id: 'vanilla', pos:'-0.8 1 -0.7', scale:'0.2 0.2 0.2'},
-        {id: 'chocolate', pos:'0 1 -0.7', scale:'0.3 0.3 0.3'},
-        {id: 'milk', pos:'0.5 1 -0.7', scale:'0.3 0.3 0.3'}
-      ];
-
-      kitchenObjects.forEach(obj => {
-        const el = document.getElementById(obj.id);
-        if(el){
-          el.setAttribute('visible', true);
-          el.setAttribute('position', obj.pos);
-          el.setAttribute('scale', obj.scale);
-        }
-      });
-
-      // Background music
-      const music = document.querySelector('#mainmusic');
-      if (music && music.components && music.components.sound) {
-        music.components.sound.stopSound();
-        music.components.sound.playSound();
-      }
-
-      // Clickable ingredients
-      document.querySelectorAll('.ingredient').forEach(el => {
-        el.addEventListener('click', () => collectIngredient(el.id));
-      });
-    }
-
-    function collectIngredient(id) {
-      const el = document.getElementById(id);
-      if (!el) return;
-      el.setAttribute('visible', false);
-
-      const recipeItem = document.getElementById(`recipe-${id.toLowerCase()}`);
-      if (recipeItem) {
-        recipeItem.classList.add('collected');
-        recipeItem.innerHTML = `✅ ${recipeItem.innerText}`;
-      }
-    }
-  </script>
 </head>
 
 <body>
+  <!-- Start Screen -->
   <div class="start-ui" id="startScreen">
     <img src="https://images.pexels.com/photos/9095/pexels-photo.jpg" alt="Start Background" />
     <h1>Bake your cake</h1>
@@ -180,14 +89,17 @@
     <button onclick="window.close()">Quit</button>
   </div>
 
+  <!-- Cake choice tabs -->
   <div id="cakeChoices">
     <div id="chocolateTab" class="cake-tab" onclick="selectCake('chocolate')">Chocolate Cake</div>
     <div id="blueberryTab" class="cake-tab" onclick="selectCake('blueberry')">Blueberry Cake</div>
     <div id="cherryTab" class="cake-tab" onclick="selectCake('cherry')">Cherry Cake</div>
   </div>
 
+  <!-- Recipe panel -->
   <div id="recipePanel"></div>
 
+  <!-- A-Frame Scene -->
   <a-scene id="scene" vr-mode-ui="enabled: false" style="display:none;">
     <!-- Camera -->
     <a-entity id="cameraRig" position="0 0 0">
@@ -200,7 +112,7 @@
     <a-entity light="type: ambient; intensity: 0.5"></a-entity>
     <a-entity light="type: directional; intensity: 0.8" position="0 2 1"></a-entity>
 
-    <!-- Kitchen objects -->
+    <!-- Kitchen objects (hidden initially) -->
     <a-entity id="kitchenrightwall" gltf-model="kitchenrightwall.glb" visible="false"></a-entity>
     <a-entity id="blueberries" class="ingredient" gltf-model="blueberries.glb" visible="false"></a-entity>
     <a-entity id="plate" class="ingredient" gltf-model="plate.glb" visible="false"></a-entity>
