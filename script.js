@@ -1,87 +1,187 @@
-<script>
-  function startGame() {
-    // Hide the start screen
-    document.getElementById('startScreen').style.display = 'none';
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Bake your cake</title>
+    <meta name="description" content="Bake your cake">
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
 
-    // Show cake choice tabs
-    document.getElementById('cakeChoices').style.display = 'flex';
-
-    // Restart background music from the beginning
-    const music = document.querySelector('#mainmusic');
-    if (music && music.components && music.components.sound) {
-      music.components.sound.stopSound();
-      music.components.sound.playSound();
-      console.log("Background music restarted!");
-    } else {
-      console.warn("Music sound component not ready yet.");
-    }
-
-    console.log("Game started — choose your cake!");
-  }
-
-  function chooseCake(cakeName) {
-    // Hide cake choice tabs
-    document.getElementById('cakeChoices').style.display = 'none';
-
-    console.log(`You chose: ${cakeName} cake!`);
-
-    // Reveal the kitchen now
-    const entityIds = [
-      'kitchenrightwall',
-      'blueberries',
-      'plate',
-      'strawberry',
-      'recipeTab',
-      'timerBar',
-      'blackcabinet',
-      'blackplate',
-      'bluebottle',
-      'bowl',
-      'clock',
-      'coffee',
-      'coffeemaker',
-      'counterfloorright',
-      'cuttingboard',
-      'exhaustfan',
-      'faucet',
-      'floor',
-      'kitchenopenwall',
-      'kitchenroofslide',
-      'kitchenrooftop',
-      'kitchenwallback',
-      'kniveholder',
-      'ladlesandspoonswall',
-      'light',
-      'mugs',
-      'pandeep',
-      'plant',
-      'plantwindow',
-      'salt1',
-      'salt2',
-      'salt3',
-      'shelves',
-      'sink',
-      'slicefruitcake',
-      'soap',
-      'soap2',
-      'spatula',
-      'stool',
-      'stove',
-      'stovecabinets',
-      'sugarbag',
-      'vanilla',
-      'wallclock',
-      'wallcountertop',
-      'wallstove',
-      'whitebottle',
-      'windowbottom'
-    ];
-
-    entityIds.forEach(id => {
-      const el = document.getElementById(id);
-      if (el) {
-        el.setAttribute('visible', true);
+    <style>
+      .start-ui {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 10;
+        text-align: center;
       }
-    });
-  }
-</script>
+
+      .start-ui button {
+        margin: 10px;
+        padding: 15px 30px;
+        font-size: 18px;
+        cursor: pointer;
+      }
+
+      /* Cake choice tabs */
+      #cakeChoices {
+        position: absolute;
+        top: 20%;
+        left: 50%;
+        transform: translateX(-50%);
+        display: none; /* hidden until Start */
+        gap: 20px;
+        z-index: 10;
+      }
+
+      .cake-tab {
+        padding: 20px 40px;
+        font-size: 20px;
+        border-radius: 12px;
+        color: white;
+        cursor: pointer;
+        font-weight: bold;
+      }
+
+      .chocolate { background: peru; }
+      .blueberry { background: steelblue; }
+      .cherry { background: hotpink; }
+
+      /* Recipe panel on the left */
+      #recipePanel {
+        position: absolute;
+        top: 20%;
+        left: 5%;
+        background: rgba(255, 255, 255, 0.9);
+        padding: 20px;
+        border-radius: 12px;
+        font-family: sans-serif;
+        font-size: 18px;
+        display: none;
+        z-index: 10;
+        min-width: 180px;
+      }
+
+      #recipePanel h2 {
+        margin-top: 0;
+        font-size: 22px;
+        text-align: center;
+      }
+
+      #recipePanel ul {
+        list-style: none;
+        padding: 0;
+      }
+
+      #recipePanel li {
+        margin: 5px 0;
+        color: red; /* will turn green when collected */
+      }
+    </style>
+
+    <script>
+      function startGame() {
+        // Hide start screen
+        document.getElementById('startScreen').style.display = 'none';
+        // Show cake choice tabs
+        document.getElementById('cakeChoices').style.display = 'flex';
+        console.log("Choose your cake!");
+      }
+
+      function chooseCake(cakeName) {
+        // Hide cake choice tabs
+        document.getElementById('cakeChoices').style.display = 'none';
+
+        // Show recipe panel
+        const recipePanel = document.getElementById('recipePanel');
+        recipePanel.style.display = 'block';
+
+        let ingredients = [];
+        let title = "";
+
+        if (cakeName === 'blueberry') {
+          title = "Blueberry Cake";
+          ingredients = ["Flour", "Sugar", "Butter", "Milk", "Vanilla", "Blueberries", "Spatula"];
+        } else if (cakeName === 'chocolate') {
+          title = "Chocolate Cake";
+          ingredients = ["Flour", "Sugar", "Butter", "Milk", "Vanilla", "Chocolate", "Strawberries", "Spatula"];
+        } else if (cakeName === 'cherry') {
+          title = "Cherry Cake";
+          ingredients = ["Flour", "Sugar", "Butter", "Milk", "Vanilla", "Cherries", "Spatula"];
+        }
+
+        // Fill recipe panel
+        recipePanel.innerHTML = `
+          <h2>${title}</h2>
+          <ul>
+            ${ingredients.map(item => `<li id="recipe-${item.toLowerCase()}">${item}</li>`).join('')}
+          </ul>
+        `;
+
+        // Reveal kitchen + objects
+        const entityIds = [
+          'kitchenrightwall','blueberries','plate','strawberry','recipeTab','timerBar','blackcabinet',
+          'blackplate','bluebottle','bowl','clock','coffee','coffeemaker','counterfloorright',
+          'cuttingboard','exhaustfan','faucet','floor','kitchenopenwall','kitchenroofslide','kitchenrooftop',
+          'kitchenwallback','kniveholder','ladlesandspoonswall','light','mugs','pandeep','plant','plantwindow',
+          'salt1','salt2','salt3','shelves','sink','slicefruitcake','soap','soap2','spatula','stool',
+          'stove','stovecabinets','sugarbag','vanilla','wallclock','wallcountertop','wallstove','whitebottle','windowbottom'
+        ];
+
+        entityIds.forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.setAttribute('visible', true);
+        });
+
+        // Restart music
+        const music = document.querySelector('#mainmusic');
+        if (music && music.components && music.components.sound) {
+          music.components.sound.stopSound();
+          music.components.sound.playSound();
+        }
+      }
+    </script>
+  </head>
+
+  <body>
+    <!-- Start Screen -->
+    <div class="start-ui" id="startScreen">
+      <h1>Bake your cake</h1>
+      <button onclick="startGame()">Start</button>
+      <button onclick="window.close()">Quit</button>
+    </div>
+
+    <!-- Cake choice tabs -->
+    <div id="cakeChoices">
+      <div class="cake-tab chocolate" onclick="chooseCake('chocolate')">Chocolate Cake</div>
+      <div class="cake-tab blueberry" onclick="chooseCake('blueberry')">Blueberry Cake</div>
+      <div class="cake-tab cherry" onclick="chooseCake('cherry')">Cherry Cake</div>
+    </div>
+
+    <!-- Recipe panel (appears after cake chosen) -->
+    <div id="recipePanel"></div>
+
+    <!-- A-Frame Scene -->
+    <a-scene id="scene" vr-mode-ui="enabled: false">
+      <!-- Camera in middle of kitchen, human height -->
+      <a-entity id="cameraRig" position="0 0 0">
+        <a-camera position="0 1.6 0">
+          <a-cursor rayOrigin="mouse" material="color: black; shader: flat"></a-cursor>
+        </a-camera>
+      </a-entity>
+
+      <!-- Lights -->
+      <a-entity light="type: ambient; intensity: 0.5"></a-entity>
+      <a-entity light="type: directional; intensity: 0.8" position="0 2 1"></a-entity>
+
+      <!-- Example entities (all hidden initially) -->
+      <a-entity id="kitchenrightwall" gltf-model="kitchenrightwall.glb" visible="false"></a-entity>
+      <a-entity id="blueberries" gltf-model="blueberries.glb" visible="false"></a-entity>
+      <a-entity id="plate" gltf-model="plate.glb" visible="false"></a-entity>
+      <a-entity id="strawberry" gltf-model="strawberry.glb" visible="false"></a-entity>
+      <!-- (rest of kitchen entities go here) -->
+
+      <!-- Sounds -->
+      <a-sound id="mainmusic" src="baking cooking jazz.mp3" autoplay="false" loop="true"></a-sound>
+    </a-scene>
+  </body>
+</html>
