@@ -77,10 +77,10 @@
 
   <!-- Cake Choice Screen -->
   <div class="choice-ui" id="choiceScreen">
-    <div class="choice-box" id="strawberryChoice" onclick="chooseCake('strawberry')">
+    <div class="choice-box" onclick="chooseCake('strawberry')">
       <h2>Strawberry Cake</h2>
     </div>
-    <div class="choice-box" id="blueberryChoice" onclick="chooseCake('blueberry')">
+    <div class="choice-box" onclick="chooseCake('blueberry')">
       <h2>Blueberry Cake</h2>
     </div>
   </div>
@@ -98,7 +98,7 @@
     <!-- Camera -->
     <a-entity id="cameraRig" position="0 1.6 0">
       <a-camera>
-        <a-cursor rayOrigin="mouse" material="color: black; shader: flat"></a-cursor>
+        <a-cursor rayOrigin="mouse" fuse="false" material="color: black; shader: flat"></a-cursor>
       </a-camera>
     </a-entity>
 
@@ -106,15 +106,18 @@
     <a-entity light="type: ambient; intensity: 0.5"></a-entity>
     <a-entity light="type: directional; intensity: 0.8" position="0 2 1"></a-entity>
 
-    <!-- Example Ingredients -->
-    <a-entity id="flour" class="ingredient" gltf-model="flour.glb" position="0 1 -3" visible="false"></a-entity>
-    <a-entity id="strawberries" class="ingredient" gltf-model="strawberry.glb" position="2 1 -3" visible="false"></a-entity>
-    <a-entity id="blueberries" class="ingredient" gltf-model="blueberries.glb" position="-2 1 -3" visible="false"></a-entity>
-    <a-entity id="vanilla" class="ingredient" gltf-model="vanilla.glb" position="1 0.5 -2" visible="false"></a-entity>
-    <a-entity id="sugar" class="ingredient" gltf-model="sugarbag.glb" position="3 1 -2" visible="false"></a-entity>
-    <a-entity id="butter" class="ingredient" gltf-model="butter.glb" position="-3 1 -2" visible="false"></a-entity>
-    <a-entity id="milk" class="ingredient" gltf-model="whitebottle.glb" position="0 0.5 -2" visible="false"></a-entity>
-    <a-entity id="chocolate" class="ingredient" gltf-model="chocolate.glb" position="-1 1 -2" visible="false"></a-entity>
+    <!-- Ingredients -->
+    <a-entity id="flour" class="ingredient" gltf-model="flour.glb" position="0 1 -3" visible="true"></a-entity>
+    <a-entity id="strawberries" class="ingredient" gltf-model="strawberry.glb" position="2 1 -3" visible="true"></a-entity>
+    <a-entity id="blueberries" class="ingredient" gltf-model="blueberries.glb" position="-2 1 -3" visible="true"></a-entity>
+    <a-entity id="vanilla" class="ingredient" gltf-model="vanilla.glb" position="1 0.5 -2" visible="true"></a-entity>
+    <a-entity id="sugar" class="ingredient" gltf-model="sugarbag.glb" position="3 1 -2" visible="true"></a-entity>
+    <a-entity id="butter" class="ingredient" gltf-model="butter.glb" position="-3 1 -2" visible="true"></a-entity>
+    <a-entity id="milk" class="ingredient" gltf-model="whitebottle.glb" position="0 0.5 -2" visible="true"></a-entity>
+    <a-entity id="chocolate" class="ingredient" gltf-model="chocolate.glb" position="-1 1 -2" visible="true"></a-entity>
+    <!-- Some extras to act as "wrong" choices -->
+    <a-entity id="soap" class="ingredient" gltf-model="soap.glb" position="4 1 -2" visible="true"></a-entity>
+    <a-entity id="mugs" class="ingredient" gltf-model="mugs.glb" position="-4 1 -2" visible="true"></a-entity>
 
     <!-- Cake Result -->
     <a-entity id="finalCake" gltf-model="strawberrychocolatecake.glb" position="0 1 -1" visible="false"></a-entity>
@@ -136,6 +139,13 @@
     function startGame() {
       document.getElementById('startScreen').style.display = 'none';
       document.getElementById('choiceScreen').style.display = 'block';
+
+      // Restart background music from the beginning
+      const music = document.querySelector('#mainmusic');
+      if (music && music.components.sound) {
+        music.components.sound.stopSound();
+        music.components.sound.playSound();
+      }
     }
 
     function chooseCake(cake) {
@@ -168,34 +178,10 @@
         list.appendChild(li);
       });
 
-      // Show all kitchen props (walls, furniture, etc.)
-      const entityIds = [
-        'kitchenrightwall', 'blackcabinet', 'blackplate', 'bluebottle', 'bowl', 'clock',
-        'coffee', 'coffeemaker', 'counterfloorright', 'cuttingboard', 'exhaustfan',
-        'faucet', 'floor', 'kitchenopenwall', 'kitchenroofslide', 'kitchenrooftop',
-        'kitchenwallback', 'kniveholder', 'ladlesandspoonswall', 'light', 'mugs',
-        'pandeep', 'plant', 'plantwindow', 'salt1', 'salt2', 'salt3', 'shelves',
-        'sink', 'slicefruitcake', 'soap', 'soap2', 'spatula', 'stool', 'stove',
-        'stovecabinets', 'wallclock', 'wallcountertop', 'wallstove', 'windowbottom'
-      ];
-      entityIds.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.setAttribute('visible', true);
-      });
-
-      // Show only required ingredients
+      // Attach click listeners to all ingredients (correct + wrong)
       document.querySelectorAll('.ingredient').forEach(el => {
-        if (requiredIngredients.includes(el.id)) {
-          el.setAttribute('visible', true);
-          el.addEventListener('click', () => collectIngredient(el.id));
-        }
+        el.addEventListener('click', () => collectIngredient(el.id));
       });
-
-      // Start music
-      const music = document.querySelector('#mainmusic');
-      if (music && music.components.sound) {
-        music.components.sound.playSound();
-      }
     }
 
     function collectIngredient(id) {
@@ -215,7 +201,6 @@
 
         // Play correct sound
         document.querySelector('#correctSound').components.sound.playSound();
-
       } else {
         // Wrong ingredient
         document.querySelector('#wrongSound').components.sound.playSound();
