@@ -85,87 +85,91 @@
     </style>
 
     <script>
-      let selectedCake = null;
-      const recipes = {
-        blueberry: ["Flour", "Sugar", "Butter", "Milk", "Vanilla", "Blueberries", "Spatula"],
-        chocolate: ["Flour", "Sugar", "Butter", "Milk", "Vanilla", "Chocolate", "Strawberries", "Spatula"],
-        cherry: ["Flour", "Sugar", "Butter", "Milk", "Vanilla", "Cherries", "Spatula"]
-      };
+  function startGame() {
+    document.getElementById('startScreen').style.display = 'none';
+    document.getElementById('cakeChoices').style.display = 'flex';
+  }
 
-      function startGame() {
-        document.getElementById('startScreen').style.display = 'none';
-        document.getElementById('cakeChoices').style.display = 'flex';
-      }
+  function chooseCake(cakeName) {
+    // Hide cake menu
+    document.getElementById('cakeChoices').style.display = 'none';
 
-      function selectCake(cakeType) {
-        selectedCake = cakeType;
+    // Show scene
+    document.getElementById('scene').style.display = 'block';
 
-        // Hide cake choices
-        document.getElementById('cakeChoices').style.display = 'none';
+    // Show recipe panel
+    const recipePanel = document.getElementById('recipePanel');
+    recipePanel.style.display = 'block';
+    recipePanel.className = ''; // reset
+    recipePanel.classList.add(cakeName);
 
-        // Show A-Frame scene
-        document.getElementById('scene').style.display = 'block';
+    // Decide ingredients
+    let ingredients = [];
+    let title = "";
 
-        // Make all kitchen objects visible
-        const entityIds = [
-          'kitchenrightwall','blueberries','plate','strawberry','blackcabinet','blackplate',
-          'bluebottle','bowl','clock','coffee','coffeemaker','counterfloorright','cuttingboard',
-          'exhaustfan','faucet','floor','kitchenopenwall','kitchenroofslide','kitchenrooftop',
-          'kitchenwallback','kniveholder','ladlesandspoonswall','light','mugs','pandeep','plant',
-          'plantwindow','salt1','salt2','salt3','shelves','sink','slicefruitcake','soap','soap2',
-          'spatula','stool','stove','stovecabinets','sugarbag','vanilla','wallclock','wallcountertop',
-          'wallstove','whitebottle','windowbottom','sugar','whisk','rollingpin','radio','platenice','milk',
-          'fryingpan','chocostrawberrycake','flour','choco','cherries','butter','wall1','wall2','countertop'
-        ];
-        entityIds.forEach(id => {
-          const el = document.getElementById(id);
-          if (el) el.setAttribute('visible', true);
-        });
+    if (cakeName === 'blueberry') {
+      title = "Blueberry Cake";
+      ingredients = ["flour", "sugar", "butter", "milk", "vanilla", "blueberries", "strawberry", "spatula", "whisk"];
+    } else if (cakeName === 'chocolate') {
+      title = "Chocolate Cake";
+      ingredients = ["flour", "sugar", "butter", "milk", "vanilla", "choco", "strawberry", "spatula", "whisk"];
+    } else if (cakeName === 'cherry') {
+      title = "Cherry Cake";
+      ingredients = ["flour", "sugar", "butter", "milk", "vanilla", "cherries", "spatula", "whisk"];
+    }
 
-        // Restart background music
-        const music = document.querySelector('#mainmusic');
-        if (music && music.components && music.components.sound) {
-          music.components.sound.stopSound();
-          music.components.sound.playSound();
+    // Build recipe list
+    recipePanel.innerHTML = `
+      <h2>${title}</h2>
+      <ul>
+        ${ingredients.map(item =>
+          `<li id="recipe-${item.toLowerCase()}"><span class="check"></span> ${item}</li>`
+        ).join('')}
+      </ul>
+    `;
+
+    // Reveal all kitchen objects
+    const entityIds = [
+      'kitchenrightwall','blueberries','plate','strawberry','blackcabinet','blackplate','bluebottle',
+      'bowl','clock','coffee','coffeemaker','counterfloorright','cuttingboard','exhaustfan','faucet',
+      'floor','kitchenopenwall','kitchenroofslide','kitchenrooftop','kitchenwallback','kniveholder',
+      'ladlesandspoonswall','light','mugs','pandeep','plant','plantwindow','salt1','salt2','salt3',
+      'shelves','sink','slicefruitcake','soap','soap2','spatula','stool','stove','stovecabinets',
+      'sugarbag','vanilla','wallclock','wallcountertop','wallstove','whitebottle','windowbottom',
+      'sugar','whisk','rollingpin','radio','platenice','milk',
+      'fryingpan','chocostrawberrycake','flour','choco','cherries','butter','wall1','wall2','countertop'
+    ];
+    entityIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.setAttribute('visible', true);
+    });
+
+    // Restart music
+    const music = document.querySelector('#mainmusic');
+    if (music && music.components && music.components.sound) {
+      music.components.sound.stopSound();
+      music.components.sound.playSound();
+    }
+  }
+
+  // Step 3: A-Frame collectable component
+  AFRAME.registerComponent('collectable', {
+    init: function () {
+      this.el.addEventListener('click', () => {
+        const name = this.el.getAttribute('data-name');
+        // Hide the object
+        this.el.setAttribute('visible', false);
+        // Update recipe panel
+        const li = document.getElementById(`recipe-${name}`);
+        if (li) {
+          li.querySelector('.check').textContent = "✅";
+          li.classList.add('collected');
         }
+      });
+    }
+  });
+</script>
 
-        // Show recipe panel
-        const recipePanel = document.getElementById('recipePanel');
-        recipePanel.style.display = 'block';
-
-        // Set panel background to cake color
-        if (cakeType === "blueberry") recipePanel.style.backgroundColor = "#1E90FF";
-        if (cakeType === "chocolate") recipePanel.style.backgroundColor = "#8B4513";
-        if (cakeType === "cherry") recipePanel.style.backgroundColor = "#FF69B4";
-
-        // Fill recipe panel
-        const ingredients = recipes[cakeType];
-        recipePanel.innerHTML = `
-          <h2>${cakeType.charAt(0).toUpperCase() + cakeType.slice(1)} Cake</h2>
-          <ul>
-            ${ingredients.map(item => `<li id="recipe-${item.toLowerCase()}">${item}</li>`).join('')}
-          </ul>
-        `;
-
-        // Add clickable behavior for collectable ingredients
-        document.querySelectorAll('.ingredient').forEach(el => {
-          el.addEventListener('click', () => collectIngredient(el.id));
-        });
-      }
-
-      function collectIngredient(id) {
-        const el = document.getElementById(id);
-        if (!el) return;
-        el.setAttribute('visible', false);
-
-        // Update recipe panel text
-        const recipeItem = document.getElementById(`recipe-${id.toLowerCase()}`);
-        if (recipeItem) {
-          recipeItem.classList.add('collected');
-          recipeItem.innerHTML = `✅ ${recipeItem.innerText}`;
-        }
-      }
-    </script>
   </head>
 
   <body>
