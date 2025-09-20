@@ -142,6 +142,7 @@
         }
       }
 
+      // Collectable component
       AFRAME.registerComponent('collectable', {
         init: function () {
           this.el.addEventListener('click', () => {
@@ -175,7 +176,7 @@
 
     <a-scene id="scene" vr-mode-ui="enabled: false" style="display:none;">
       <a-entity id="cameraRig" position="0 0 0">
-        <a-camera position="1 5.0 0">
+        <a-camera position="1 5 0">
           <a-cursor rayOrigin="mouse" material="color: black; shader: flat"></a-cursor>
         </a-camera>
       </a-entity>
@@ -183,7 +184,7 @@
       <a-entity light="type: ambient; intensity: 0.5"></a-entity>
       <a-entity light="type: directional; intensity: 0.8" position="0 2 1"></a-entity>
 
-      <!-- Kitchen objects -->
+      <!-- ALL kitchen objects with original positions/scales/rotations -->
       <a-entity id="kitchenrightwall" gltf-model="kitchenrightwall.glb" visible="false"></a-entity>
       <a-entity id="blackcabinet" gltf-model="blackcabinet.glb" visible="false"></a-entity>
       <a-entity id="blackplate" gltf-model="blackplate.glb" visible="false"></a-entity>
@@ -227,7 +228,7 @@
       <a-entity id="wall2" gltf-model="wall2.glb" visible="false"></a-entity>
       <a-entity id="countertop" gltf-model="countertop.glb" visible="false"></a-entity>
 
-      <!-- Ingredients -->
+      <!-- Ingredients with collectable component -->
       <a-entity id="blueberries" gltf-model="blueberries.glb" visible="false" collectable data-name="blueberries"></a-entity>
       <a-entity id="strawberry" gltf-model="strawberry.glb" visible="false" collectable data-name="strawberry"></a-entity>
       <a-entity id="vanilla" gltf-model="vanilla.glb" visible="false" collectable data-name="vanilla"></a-entity>
