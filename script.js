@@ -190,7 +190,7 @@
     <a-scene id="scene" vr-mode-ui="enabled: false" style="display:none;">
       <!-- Camera -->
       <a-entity id="cameraRig" position="0 0 0">
-        <a-camera position="1 2.0 0">
+        <a-camera position="1 9.0 0">
           <a-cursor rayOrigin="mouse" material="color: black; shader: flat"></a-cursor>
         </a-camera>
       </a-entity>
