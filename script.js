@@ -147,7 +147,7 @@
           </ul>
         `;
 
-        // Add click-to-collect functionality
+        // Add clickable behavior for collectable ingredients
         document.querySelectorAll('.ingredient').forEach(el => {
           el.addEventListener('click', () => collectIngredient(el.id));
         });
@@ -158,9 +158,9 @@
         if (!el) return;
         el.setAttribute('visible', false);
 
-        // Update recipe panel
+        // Update recipe panel text
         const recipeItem = document.getElementById(`recipe-${id.toLowerCase()}`);
-        if (recipeItem && !recipeItem.classList.contains('collected')) {
+        if (recipeItem) {
           recipeItem.classList.add('collected');
           recipeItem.innerHTML = `✅ ${recipeItem.innerText}`;
         }
@@ -199,51 +199,14 @@
       <a-entity light="type: ambient; intensity: 0.5"></a-entity>
       <a-entity light="type: directional; intensity: 0.8" position="0 2 1"></a-entity>
 
-      <!-- Kitchen objects and ingredients -->
-      <a-entity id="kitchenrightwall" gltf-model="kitchenrightwall.glb"></a-entity>
-      <a-entity id="blackcabinet" gltf-model="blackcabinet.glb"></a-entity>
-      <a-entity id="blackplate" gltf-model="blackplate.glb"></a-entity>
-      <a-entity id="bluebottle" gltf-model="bluebottle.glb"></a-entity>
-      <a-entity id="bowl" gltf-model="bowl.glb"></a-entity>
-      <a-entity id="clock" gltf-model="clock.glb"></a-entity>
-      <a-entity id="coffee" gltf-model="coffee.glb"></a-entity>
-      <a-entity id="coffeemaker" gltf-model="coffeemaker.glb"></a-entity>
-      <a-entity id="counterfloorright" gltf-model="counterfloorright.glb"></a-entity>
-      <a-entity id="exhaustfan" gltf-model="exhaustfan.glb"></a-entity>
-      <a-entity id="faucet" gltf-model="faucet.glb"></a-entity>
-      <a-entity id="floor" gltf-model="floor.glb"></a-entity>
-      <a-entity id="kitchenopenwall" gltf-model="kitchenopenwall.glb"></a-entity>
-      <a-entity id="kitchenroofslide" gltf-model="kitchenroofslide.glb"></a-entity>
-      <a-entity id="kitchenrooftop" gltf-model="kitchenrooftop.glb"></a-entity>
-      <a-entity id="kitchenwallback" gltf-model="kitchenwallback.glb"></a-entity>
-      <a-entity id="kniveholder" gltf-model="kniveholder.glb"></a-entity>
-      <a-entity id="ladlesandspoonswall" gltf-model="ladlesandspoonswall.glb"></a-entity>
-      <a-entity id="light" gltf-model="light.glb"></a-entity>
-      <a-entity id="mugs" gltf-model="mugs.glb"></a-entity>
-      <a-entity id="pandeep" gltf-model="pandeep.glb"></a-entity>
-      <a-entity id="plant" gltf-model="plant.glb"></a-entity>
-      <a-entity id="plantwindow" gltf-model="plantwindow.glb"></a-entity>
-      <a-entity id="salt1" gltf-model="salt1.glb"></a-entity>
-      <a-entity id="salt2" gltf-model="salt2.glb"></a-entity>
-      <a-entity id="salt3" gltf-model="salt3.glb"></a-entity>
-      <a-entity id="shelves" gltf-model="shelves.glb"></a-entity>
-      <a-entity id="sink" gltf-model="sink.glb"></a-entity>
-      <a-entity id="soap" gltf-model="soap.glb"></a-entity>
-      <a-entity id="soap2" gltf-model="soap2.glb"></a-entity>
-      <a-entity id="spatula" class="ingredient" gltf-model="spatula.glb"></a-entity>
-      <a-entity id="stool" gltf-model="stool.glb"></a-entity>
-      <a-entity id="stove" gltf-model="stove.glb"></a-entity>
-      <a-entity id="stovecabinets" gltf-model="stovecabinets.glb"></a-entity>
-      <a-entity id="sugarbag" class="ingredient" gltf-model="sugarbag.glb"></a-entity>
-      <a-entity id="vanilla" class="ingredient" gltf-model="vanilla.glb"></a-entity>
-      <a-entity id="wallclock" gltf-model="wallclock.glb"></a-entity>
-      <a-entity id="wallcountertop" gltf-model="wallcountertop.glb"></a-entity>
-      <a-entity id="wallstove" gltf-model="wallstove.glb"></a-entity>
-      <a-entity id="whitebottle" gltf-model="whitebottle.glb"></a-entity>
-      <a-entity id="windowbottom" gltf-model="windowbottom.glb"></a-entity>
-      <a-entity id="wall1" gltf-model="wall1.glb"></a-entity>
-      <a-entity id="wall2" gltf-model="wall2.glb"></a-entity>
-      <a-entity id="countertop" gltf-model="countertop.glb"></a-entity>
 
-      <!-- Ingredients with click -->
-      <a-entity id="blueberries" class="ingred
+      <!-- Ingredients -->
+      <a-entity id="blueberries" class="ingredient" gltf-model="blueberries.glb" visible="false"></a-entity>
+      <a-entity id="plate" class="ingredient" gltf-model="plate.glb" visible="false"></a-entity>
+      <a-entity id="strawberry" class="ingredient" gltf-model="strawberry.glb" visible="false"></a-entity>
+
+      <!-- Sounds -->
+      <a-sound id="mainmusic" src="baking cooking jazz.mp3" autoplay="false" loop="true"></a-sound>
+    </a-scene>
+  </body>
+</html>
