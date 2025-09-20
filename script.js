@@ -114,7 +114,8 @@
           'kitchenwallback','kniveholder','ladlesandspoonswall','light','mugs','pandeep','plant',
           'plantwindow','salt1','salt2','salt3','shelves','sink','slicefruitcake','soap','soap2',
           'spatula','stool','stove','stovecabinets','sugarbag','vanilla','wallclock','wallcountertop',
-          'wallstove','whitebottle','windowbottom'
+          'wallstove','whitebottle','windowbottom', 'sugar','whisk','rollingpin','radio','platenice','milk',
+          'fryingpan','chocostrawberrycake','flour','choco','cherries','butter'
         ];
         entityIds.forEach(id => {
           const el = document.getElementById(id);
@@ -198,8 +199,6 @@
       <a-entity light="type: ambient; intensity: 0.5"></a-entity>
       <a-entity light="type: directional; intensity: 0.8" position="0 2 1"></a-entity>
 
-      <!-- Kitchen objects (hidden initially) -->
-      <a-entity id="kitchenrightwall" gltf-model="kitchenrightwall.glb" visible="false"></a-entity>
 
       <!-- Ingredients -->
       <a-entity id="blueberries" class="ingredient" gltf-model="blueberries.glb" visible="false"></a-entity>
