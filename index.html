@@ -48,6 +48,15 @@
 
       /* Recipe panel on the left */
       #recipePanel {
+        recipePanel.innerHTML = `
+  <h2>${Blueberry Cake}</h2>
+  <ul>
+    ${ingredients.map(item => 
+      `<li id="recipe-${item.toLowerCase()}"><span class="check"></span> ${item}</li>`
+    ).join('')}
+  </ul>
+`;
+
         position: absolute;
         top: 20%;
         left: 5%;
@@ -104,13 +113,13 @@
 
         if (cakeName === 'blueberry') {
           title = "Blueberry Cake";
-          ingredients = ["Flour", "Sugar", "Butter", "Milk", "Vanilla", "Blueberries", "Spatula"];
+          ingredients = ["flour1", "sugar", "butter", "milk", "vanilla", "blueberries", "strawberries","spatula","whisk"];
         } else if (cakeName === 'chocolate') {
           title = "Chocolate Cake";
-          ingredients = ["Flour", "Sugar", "Butter", "Milk", "Vanilla", "Chocolate", "Strawberries", "Spatula"];
+          ingredients = ["flour1", "sugar", "butter", "milk", "vanilla", "choco", "strawberries", "spatula","whisk"];
         } else if (cakeName === 'cherry') {
           title = "Cherry Cake";
-          ingredients = ["Flour", "Sugar", "Butter", "Milk", "Vanilla", "Cherries", "Spatula"];
+          ingredients = ["flour1", "sugar", "butter", "milk", "vanilla", "cherries", "spatula","whisk"];
         }
 
         recipePanel.innerHTML = `
@@ -225,15 +234,15 @@
        <a-entity id="wall1" gltf-model="wall1.glb" visible="false"></a-entity>
       <a-entity id="wall2" gltf-model="wall2.glb" visible="false"></a-entity>
       <a-entity id="countertop" gltf-model="countertop.glb" visible="false"></a-entity>
-      <a-entity id="blueberries" gltf-model="blueberries.glb" 
+      <a-entity id="blueberries" gltf-model="blueberries.glb" class="collectable" data-name="blueberries"
         position="-0.7 1 -1.8"
         scale="0.6 0.6 0.6"
         rotation="0 25 0" visible="false"></a-entity>
-      <a-entity id="strawberry" gltf-model="strawberry.glb" 
+      <a-entity id="strawberry" gltf-model="strawberry.glb" class="collectable" data-name="strawberry"
          position="9 3 8"
           scale="0.2 0.2 0.2"
           rotation="0 25 45" visible="false"></a-entity>
-      <a-entity id="vanilla" gltf-model="vanilla.glb" 
+      <a-entity id="vanilla" gltf-model="vanilla.glb" class="collectable" data-name="vanilla"
          position="-0.7 1 -1.8"
           scale="0.6 0.6 0.6"
           rotation="0 25 0" visible="false"></a-entity>
@@ -249,19 +258,19 @@
          position="-3 4 4"
           scale="0.1 0.1 0.1"
           rotation="0 0 0" visible="false"></a-entity>
-      <a-entity id="pandeep" gltf-model="pandeep.glb" 
+      <a-entity id="pandeep" gltf-model="pandeep.glb" class="collectable" data-name="pandeep"
          position="-2 4 0"
           scale="0.3 0.3 0.3"
           rotation="0 25 0" visible="false"></a-entity>
-      <a-entity id="sugar" gltf-model="sugar.glb" 
+      <a-entity id="sugar" gltf-model="sugar.glb" class="collectable" data-name="sugar"
          position="-0.7 1 -1.8"
           scale="0.6 0.6 0.6"
           rotation="0 25 0" visible="false"></a-entity>
-      <a-entity id="whisk" gltf-model="whisk.glb" 
+      <a-entity id="whisk" gltf-model="whisk.glb" class="collectable" data-name="whisk"
          position="-0.7 1 -1.8"
           scale="0.6 0.6 0.6"
           rotation="0 25 0" visible="false"></a-entity>
-      <a-entity id="rollingpin" gltf-model="rollingpin.glb" 
+      <a-entity id="rollingpin" gltf-model="rollingpin.glb" class="collectable" data-name="rollingpin"
          position="-0.7 1 -1.8"
           scale="0.6 0.6 0.6"
           rotation="0 25 0" visible="false"></a-entity>
@@ -269,11 +278,11 @@
          position="-0.7 1 -1.8"
           scale="0.6 0.6 0.6"
           rotation="0 25 0" visible="false"></a-entity>
-      <a-entity id="platenice" gltf-model="platenice.glb" 
+      <a-entity id="platenice" gltf-model="platenice.glb" class="collectable" data-name="platenice"
          position="-0.7 1 -1.8"
           scale="0.6 0.6 0.6"
           rotation="0 25 0" visible="false"></a-entity>
-      <a-entity id="milk" gltf-model="milk.glb" 
+      <a-entity id="milk" gltf-model="milk.glb" class="collectable" data-name="milk"
          position="-0.7 1 -1.8"
           scale="0.6 0.6 0.6"
           rotation="0 25 0" visible="false"></a-entity>
@@ -281,7 +290,7 @@
          position="-0.7 1 -1.8"
           scale="0.6 0.6 0.6"
           rotation="0 25 0" visible="false"></a-entity>
-      <a-entity id="flour" gltf-model="flour.glb" 
+      <a-entity id="flour" gltf-model="flour.glb" class="collectable" data-name="flour"
          position="-0.7 1 -1.8"
           scale="0.6 0.6 0.6"
           rotation="0 25 0" visible="false"></a-entity>
@@ -289,15 +298,15 @@
          position="-0.7 1 -1.8"
           scale="0.6 0.6 0.6"
           rotation="0 25 0" visible="false"></a-entity>
-      <a-entity id="choco" gltf-model="choco.glb" 
+      <a-entity id="choco" gltf-model="choco.glb" class="collectable" data-name="choco"
          position="-0.7 1 -1.8"
           scale="0.6 0.6 0.6"
           rotation="0 25 0" visible="false"></a-entity>
-      <a-entity id="cherries" gltf-model="cherries.glb" 
+      <a-entity id="cherries" gltf-model="cherries.glb" class="collectable" data-name="cherries"
          position="-0.7 1 -1.8"
           scale="0.6 0.6 0.6"
           rotation="0 25 0" visible="false"></a-entity>
-      <a-entity id="butter" gltf-model="butter.glb" 
+      <a-entity id="butter" gltf-model="butter.glb" class="collectable" data-name="butter"
          position="-0.7 1 -1.8"
           scale="0.6 0.6 0.6"
           rotation="0 25 0" visible="false"></a-entity>
