@@ -184,61 +184,77 @@
     </a-scene>
 
     <script>
-      function startGame() {
-        document.getElementById('startScreen').style.display = 'none';
-        document.getElementById('cakeChoices').style.display = 'flex';
-      }
+  function startGame() {
+    document.getElementById('startScreen').style.display = 'none';
+    document.getElementById('cakeChoices').style.display = 'flex';
+  }
 
-      function chooseCake(cakeName) {
-        document.getElementById('cakeChoices').style.display = 'none';
-        document.getElementById('scene').style.display = 'block';
+  function chooseCake(cakeName) {
+    document.getElementById('cakeChoices').style.display = 'none';
+    const scene = document.getElementById('scene');
+    scene.style.display = 'block';
 
-        const recipePanel = document.getElementById('recipePanel');
-        recipePanel.style.display = 'block';
-        recipePanel.className = '';
-        recipePanel.classList.add(cakeName);
+    const recipePanel = document.getElementById('recipePanel');
+    recipePanel.style.display = 'block';
+    recipePanel.className = '';
+    recipePanel.classList.add(cakeName);
 
-        let ingredients = [];
-        let title = "";
+    // Ingredients per cake
+    let ingredients = [];
+    let title = "";
 
-        if (cakeName === 'blueberry') {
-          title = "Blueberry Cake";
-          ingredients = ["Flour1","Sugar","Milk","Butter","Vanilla","Spatula","Pandeep","Bowl","Blueberries"];
-        } else if (cakeName === 'chocolate') {
-          title = "Chocolate Cake";
-          ingredients = ["Flour1","Sugar","Milk","Butter","Vanilla","Spatula","Pandeep","Bowl","Choco","Strawberry"];
-        } else if (cakeName === 'cherry') {
-          title = "Cherry Cake";
-          ingredients = ["Flour1","Sugar","Milk","Butter","Vanilla","Spatula","Pandeep","Bowl","Cherries"];
-        }
+    if (cakeName === 'blueberry') {
+      title = "Blueberry Cake";
+      ingredients = ["Flour","Sugar","Butter","Milk","Vanilla","Blueberries","Spatula"];
+    } else if (cakeName === 'chocolate') {
+      title = "Chocolate Cake";
+      ingredients = ["Flour","Sugar","Butter","Milk","Vanilla","Chocolate","Strawberries","Spatula"];
+    } else if (cakeName === 'cherry') {
+      title = "Cherry Cake";
+      ingredients = ["Flour","Sugar","Butter","Milk","Vanilla","Cherries","Spatula"];
+    }
 
-        recipePanel.innerHTML = `
-          <h2>${title}</h2>
-          <ul>
-            ${ingredients.map(item => `<li id="recipe-${item.toLowerCase()}">${item}</li>`).join('')}
-          </ul>
-        `;
+    recipePanel.innerHTML = `
+      <h2>${title}</h2>
+      <ul>
+        ${ingredients.map(item => `<li id="recipe-${item.toLowerCase()}">${item}</li>`).join('')}
+      </ul>
+    `;
 
-        // Make ingredients clickable
-        document.querySelectorAll('.ingredient').forEach(el => {
-          el.addEventListener('click', () => {
-            const id = el.id;
-            el.setAttribute('visible', false);
-            const recipeItem = document.getElementById(`recipe-${id.toLowerCase()}`);
-            if (recipeItem) {
-              recipeItem.classList.add('collected');
-              recipeItem.innerHTML = `✅ ${recipeItem.innerText}`;
-            }
-          });
+    // Reveal all kitchen objects (you already have this)
+    const entityIds = [
+      'kitchenrightwall','blueberries','plate','strawberry','blackcabinet','blackplate','bluebottle',
+      'bowl','clock','coffee','coffeemaker','counterfloorright','cuttingboard','exhaustfan','faucet',
+      'floor','kitchenopenwall','kitchenroofslide','kitchenrooftop','kitchenwallback','kniveholder',
+      'ladlesandspoonswall','light','mugs','pandeep','plant','plantwindow','salt1','salt2','salt3',
+      'shelves','sink','slicefruitcake','soap','soap2','spatula','stool','stove','stovecabinets',
+      'sugarbag','vanilla','wallclock','wallcountertop','wallstove','whitebottle','windowbottom',
+      'sugar','whisk','rollingpin','radio','platenice','milk',
+      'fryingpan','chocostrawberrycake','flour','choco','cherries','butter', 'wall1','wall2','countertop'
+    ];
+    entityIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.setAttribute('visible', true);
+    });
+
+    // Add click handlers for collecting ingredients
+    ingredients.forEach(name => {
+      const entity = document.getElementById(name.toLowerCase());
+      const li = document.getElementById(`recipe-${name.toLowerCase()}`);
+      if (entity && li) {
+        entity.addEventListener('click', () => {
+          entity.setAttribute('visible', false);        // Hide in scene
+          li.innerHTML = `✅ ${name}`;                  // Add check mark
         });
-
-        // Play music
-        const music = document.querySelector('#mainmusic');
-        if (music && music.components && music.components.sound) {
-          music.components.sound.stopSound();
-          music.components.sound.playSound();
-        }
       }
-    </script>
-  </body>
-</html>
+    });
+
+    // Play music
+    const music = document.querySelector('#mainmusic');
+    if (music && music.components && music.components.sound) {
+      music.components.sound.stopSound();
+      music.components.sound.playSound();
+    }
+  }
+</script>
+
