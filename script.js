@@ -114,8 +114,8 @@
           'kitchenwallback','kniveholder','ladlesandspoonswall','light','mugs','pandeep','plant',
           'plantwindow','salt1','salt2','salt3','shelves','sink','slicefruitcake','soap','soap2',
           'spatula','stool','stove','stovecabinets','sugarbag','vanilla','wallclock','wallcountertop',
-          'wallstove','whitebottle','windowbottom', 'sugar','whisk','rollingpin','radio','platenice','milk',
-          'fryingpan','chocostrawberrycake','flour','choco','cherries','butter'
+          'wallstove','whitebottle','windowbottom','sugar','whisk','rollingpin','radio','platenice','milk',
+          'fryingpan','chocostrawberrycake','flour','choco','cherries','butter','wall1','wall2','countertop'
         ];
         entityIds.forEach(id => {
           const el = document.getElementById(id);
@@ -190,7 +190,7 @@
     <a-scene id="scene" vr-mode-ui="enabled: false" style="display:none;">
       <!-- Camera -->
       <a-entity id="cameraRig" position="0 0 0">
-        <a-camera position="1 9.0 0">
+        <a-camera position="1 5.0 0">
           <a-cursor rayOrigin="mouse" material="color: black; shader: flat"></a-cursor>
         </a-camera>
       </a-entity>
