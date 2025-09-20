@@ -75,14 +75,113 @@
         color: white;
       }
 
-      #recipePanel li.collected {
-        color: lightgreen;
-      }
-
       #recipePanel.chocolate { background: peru; }
       #recipePanel.blueberry { background: steelblue; }
       #recipePanel.cherry { background: hotpink; }
+
+      #recipePanel li.collected {
+        color: lightgreen;
+      }
     </style>
+  </head>
+
+  <body>
+    <!-- Start Screen -->
+    <div class="start-ui" id="startScreen">
+      <img 
+        src="https://images.pexels.com/photos/9095/pexels-photo.jpg" 
+        alt="Start Background" 
+        style="width: 100%; max-width: 600px; border-radius: 10px; margin-bottom: 20px;" 
+      />
+      <h1>Bake your cake</h1>
+      <button onclick="startGame()">Start</button>
+      <button onclick="window.close()">Quit</button>
+    </div>
+
+    <!-- Cake choice tabs -->
+    <div id="cakeChoices">
+      <div class="cake-tab chocolate" onclick="chooseCake('chocolate')">Chocolate Cake</div>
+      <div class="cake-tab blueberry" onclick="chooseCake('blueberry')">Blueberry Cake</div>
+      <div class="cake-tab cherry" onclick="chooseCake('cherry')">Cherry Cake</div>
+    </div>
+
+    <!-- Recipe panel -->
+    <div id="recipePanel"></div>
+
+    <!-- A-Frame Scene -->
+    <a-scene id="scene" vr-mode-ui="enabled: false" style="display:none;">
+      <!-- Camera -->
+      <a-entity id="cameraRig" position="0 0 0">
+        <a-camera position="0 1.6 0" cursor="rayOrigin: mouse">
+          <a-cursor material="color: black; shader: flat"></a-cursor>
+        </a-camera>
+      </a-entity>
+
+      <!-- Lights -->
+      <a-entity light="type: ambient; intensity: 0.5"></a-entity>
+      <a-entity light="type: directional; intensity: 0.8" position="0 2 1"></a-entity>
+
+      <!-- Ingredients (clickable) -->
+      <a-entity id="flour1" class="ingredient" gltf-model="flour1.glb" position="-0.7 1 -1.8" scale="0.6 0.6 0.6" rotation="0 25 0"></a-entity>
+      <a-entity id="sugar" class="ingredient" gltf-model="sugar.glb" position="-0.7 1 -1.8" scale="0.6 0.6 0.6" rotation="0 25 0"></a-entity>
+      <a-entity id="milk" class="ingredient" gltf-model="milk.glb" position="-0.7 1 -1.8" scale="0.6 0.6 0.6" rotation="0 25 0"></a-entity>
+      <a-entity id="butter" class="ingredient" gltf-model="butter.glb" position="-0.7 1 -1.8" scale="0.6 0.6 0.6" rotation="0 25 0"></a-entity>
+      <a-entity id="vanilla" class="ingredient" gltf-model="vanilla.glb" position="-0.7 1 -1.8" scale="0.6 0.6 0.6" rotation="0 25 0"></a-entity>
+      <a-entity id="spatula" class="ingredient" gltf-model="spatula.glb" position="-0.7 1 -1.8" scale="0.6 0.6 0.6" rotation="0 25 0"></a-entity>
+      <a-entity id="pandeep" class="ingredient" gltf-model="pandeep.glb" position="-2 4 0" scale="0.3 0.3 0.3" rotation="0 25 0"></a-entity>
+      <a-entity id="bowl" class="ingredient" gltf-model="bowl.glb" position="-0.7 1 -1.8" scale="0.6 0.6 0.6" rotation="0 25 0"></a-entity>
+      <a-entity id="blueberries" class="ingredient" gltf-model="blueberries.glb" position="-0.7 1 -1.8" scale="0.6 0.6 0.6" rotation="0 25 0"></a-entity>
+      <a-entity id="choco" class="ingredient" gltf-model="choco.glb" position="-0.7 1 -1.8" scale="0.6 0.6 0.6" rotation="0 25 0"></a-entity>
+      <a-entity id="strawberry" class="ingredient" gltf-model="strawberry.glb" position="9 3 8" scale="0.2 0.2 0.2" rotation="0 25 45"></a-entity>
+      <a-entity id="cherries" class="ingredient" gltf-model="cherries.glb" position="-0.7 1 -1.8" scale="0.6 0.6 0.6" rotation="0 25 0"></a-entity>
+
+      <!-- Non-collectible kitchen items (all visible) -->
+      <a-entity id="kitchenrightwall" gltf-model="kitchenrightwall.glb"></a-entity>
+      <a-entity id="blackcabinet" gltf-model="blackcabinet.glb"></a-entity>
+      <a-entity id="blackplate" gltf-model="blackplate.glb"></a-entity>
+      <a-entity id="bluebottle" gltf-model="bluebottle.glb"></a-entity>
+      <a-entity id="clock" gltf-model="clock.glb"></a-entity>
+      <a-entity id="coffee" gltf-model="coffee.glb"></a-entity>
+      <a-entity id="coffeemaker" gltf-model="coffeemaker.glb"></a-entity>
+      <a-entity id="counterfloorright" gltf-model="counterfloorright.glb"></a-entity>
+      <a-entity id="cuttingboard" gltf-model="cuttingboard.glb" position="-0.7 1 -1.8" scale="0.6 0.6 0.6" rotation="0 25 0"></a-entity>
+      <a-entity id="exhaustfan" gltf-model="exhaustfan.glb"></a-entity>
+      <a-entity id="faucet" gltf-model="faucet.glb"></a-entity>
+      <a-entity id="floor" gltf-model="floor.glb"></a-entity>
+      <a-entity id="kitchenopenwall" gltf-model="kitchenopenwall.glb"></a-entity>
+      <a-entity id="kitchenroofslide" gltf-model="kitchenroofslide.glb"></a-entity>
+      <a-entity id="kitchenrooftop" gltf-model="kitchenrooftop.glb"></a-entity>
+      <a-entity id="kitchenwallback" gltf-model="kitchenwallback.glb"></a-entity>
+      <a-entity id="kniveholder" gltf-model="kniveholder.glb"></a-entity>
+      <a-entity id="ladlesandspoonswall" gltf-model="ladlesandspoonswall.glb" position="-3 4 4" scale="0.1 0.1 0.1" rotation="0 0 0"></a-entity>
+      <a-entity id="light" gltf-model="light.glb"></a-entity>
+      <a-entity id="mugs" gltf-model="mugs.glb"></a-entity>
+      <a-entity id="plant" gltf-model="plant.glb"></a-entity>
+      <a-entity id="plantwindow" gltf-model="plantwindow.glb"></a-entity>
+      <a-entity id="salt1" gltf-model="salt1.glb"></a-entity>
+      <a-entity id="salt2" gltf-model="salt2.glb"></a-entity>
+      <a-entity id="salt3" gltf-model="salt3.glb"></a-entity>
+      <a-entity id="shelves" gltf-model="shelves.glb"></a-entity>
+      <a-entity id="sink" gltf-model="sink.glb"></a-entity>
+      <a-entity id="soap" gltf-model="soap.glb"></a-entity>
+      <a-entity id="soap2" gltf-model="soap2.glb"></a-entity>
+      <a-entity id="stool" gltf-model="stool.glb"></a-entity>
+      <a-entity id="stove" gltf-model="stove.glb"></a-entity>
+      <a-entity id="stovecabinets" gltf-model="stovecabinets.glb"></a-entity>
+      <a-entity id="wallclock" gltf-model="wallclock.glb"></a-entity>
+      <a-entity id="wallcountertop" gltf-model="wallcountertop.glb"></a-entity>
+      <a-entity id="wallstove" gltf-model="wallstove.glb"></a-entity>
+      <a-entity id="whitebottle" gltf-model="whitebottle.glb"></a-entity>
+      <a-entity id="windowbottom" gltf-model="windowbottom.glb"></a-entity>
+      <a-entity id="rollingpin" gltf-model="rollingpin.glb" position="-0.7 1 -1.8" scale="0.6 0.6 0.6" rotation="0 25 0"></a-entity>
+      <a-entity id="whisk" gltf-model="whisk.glb" position="-0.7 1 -1.8" scale="0.6 0.6 0.6" rotation="0 25 0"></a-entity>
+      <a-entity id="platenice" gltf-model="platenice.glb" position="-0.7 1 -1.8" scale="0.6 0.6 0.6" rotation="0 25 0"></a-entity>
+      <a-entity id="fryingpan" gltf-model="fryingpan.glb" position="-0.7 1 -1.8" scale="0.6 0.6 0.6" rotation="0 25 0"></a-entity>
+      <a-entity id="flour" gltf-model="flour.glb" position="-0.7 1 -1.8" scale="0.6 0.6 0.6" rotation="0 25 0"></a-entity>
+
+      <!-- Music -->
+      <a-sound id="mainmusic" src="baking cooking jazz.mp3" autoplay="false" loop="true"></a-sound>
+    </a-scene>
 
     <script>
       function startGame() {
@@ -92,8 +191,7 @@
 
       function chooseCake(cakeName) {
         document.getElementById('cakeChoices').style.display = 'none';
-        const scene = document.getElementById('scene');
-        scene.style.display = 'block';
+        document.getElementById('scene').style.display = 'block';
 
         const recipePanel = document.getElementById('recipePanel');
         recipePanel.style.display = 'block';
@@ -101,17 +199,17 @@
         recipePanel.classList.add(cakeName);
 
         let ingredients = [];
-        let title = '';
+        let title = "";
 
         if (cakeName === 'blueberry') {
-          title = 'Blueberry Cake';
-          ingredients = ["flour", "sugar", "milk", "butter", "vanilla", "spatula", "pandeep", "bowl", "blueberries"];
+          title = "Blueberry Cake";
+          ingredients = ["Flour1","Sugar","Milk","Butter","Vanilla","Spatula","Pandeep","Bowl","Blueberries"];
         } else if (cakeName === 'chocolate') {
-          title = 'Chocolate Cake';
-          ingredients = ["flour", "sugar", "milk", "butter", "vanilla", "spatula", "pandeep", "bowl", "choco", "strawberry"];
+          title = "Chocolate Cake";
+          ingredients = ["Flour1","Sugar","Milk","Butter","Vanilla","Spatula","Pandeep","Bowl","Choco","Strawberry"];
         } else if (cakeName === 'cherry') {
-          title = 'Cherry Cake';
-          ingredients = ["flour", "sugar", "milk", "butter", "vanilla", "spatula", "pandeep", "bowl", "cherries"];
+          title = "Cherry Cake";
+          ingredients = ["Flour1","Sugar","Milk","Butter","Vanilla","Spatula","Pandeep","Bowl","Cherries"];
         }
 
         recipePanel.innerHTML = `
@@ -121,23 +219,20 @@
           </ul>
         `;
 
-        // Show all kitchen objects
-        document.querySelectorAll('a-entity').forEach(el => el.setAttribute('visible', true));
-
-        // Add click listeners to collectible ingredients
-        document.querySelectorAll('.collectible').forEach(el => {
+        // Make ingredients clickable
+        document.querySelectorAll('.ingredient').forEach(el => {
           el.addEventListener('click', () => {
+            const id = el.id;
             el.setAttribute('visible', false);
-            const id = el.getAttribute('id');
             const recipeItem = document.getElementById(`recipe-${id.toLowerCase()}`);
-            if (recipeItem && !recipeItem.classList.contains('collected')) {
+            if (recipeItem) {
               recipeItem.classList.add('collected');
               recipeItem.innerHTML = `✅ ${recipeItem.innerText}`;
             }
           });
         });
 
-        // Restart music
+        // Play music
         const music = document.querySelector('#mainmusic');
         if (music && music.components && music.components.sound) {
           music.components.sound.stopSound();
@@ -145,65 +240,5 @@
         }
       }
     </script>
-  </head>
-
-  <body>
-    <div class="start-ui" id="startScreen">
-      <img src="https://images.pexels.com/photos/9095/pexels-photo.jpg" 
-           alt="Start Background" style="width: 100%; max-width: 600px; border-radius: 10px; margin-bottom: 20px;" />
-      <h1>Bake your cake</h1>
-      <button onclick="startGame()">Start</button>
-      <button onclick="window.close()">Quit</button>
-    </div>
-
-    <div id="cakeChoices">
-      <div class="cake-tab chocolate" onclick="chooseCake('chocolate')">Chocolate Cake</div>
-      <div class="cake-tab blueberry" onclick="chooseCake('blueberry')">Blueberry Cake</div>
-      <div class="cake-tab cherry" onclick="chooseCake('cherry')">Cherry Cake</div>
-    </div>
-
-    <div id="recipePanel"></div>
-
-    <a-scene id="scene" vr-mode-ui="enabled: false" style="display:none;">
-      <a-entity id="cameraRig" position="0 0 0">
-        <a-camera position="0 5 0">
-          <a-cursor rayOrigin="mouse" material="color: black; shader: flat"></a-cursor>
-        </a-camera>
-      </a-entity>
-
-      <a-entity light="type: ambient; intensity: 0.5"></a-entity>
-      <a-entity light="type: directional; intensity: 0.8" position="0 2 1"></a-entity>
-
-      <!-- Collectible ingredients -->
-      <a-entity id="flour" class="collectible" gltf-model="flour.glb" 
-                position="-0.7 1 -1.8" scale="0.6 0.6 0.6" rotation="0 25 0" visible="false"></a-entity>
-      <a-entity id="sugar" class="collectible" gltf-model="sugar.glb" 
-                position="-0.7 1 -1.8" scale="0.6 0.6 0.6" rotation="0 25 0" visible="false"></a-entity>
-      <a-entity id="milk" class="collectible" gltf-model="milk.glb" 
-                position="-0.7 1 -1.8" scale="0.6 0.6 0.6" rotation="0 25 0" visible="false"></a-entity>
-      <a-entity id="butter" class="collectible" gltf-model="butter.glb" 
-                position="-0.7 1 -1.8" scale="0.6 0.6 0.6" rotation="0 25 0" visible="false"></a-entity>
-      <a-entity id="vanilla" class="collectible" gltf-model="vanilla.glb" 
-                position="-0.7 1 -1.8" scale="0.6 0.6 0.6" rotation="0 25 0" visible="false"></a-entity>
-      <a-entity id="spatula" class="collectible" gltf-model="spatula.glb" 
-                position="-0.7 1 -1.8" scale="0.6 0.6 0.6" rotation="0 25 0" visible="false"></a-entity>
-      <a-entity id="pandeep" class="collectible" gltf-model="pandeep.glb" 
-                position="-2 4 0" scale="0.3 0.3 0.3" rotation="0 25 0" visible="false"></a-entity>
-      <a-entity id="bowl" class="collectible" gltf-model="bowl.glb" 
-                position="-0.7 1 -1.8" scale="0.6 0.6 0.6" rotation="0 25 0" visible="false"></a-entity>
-      <a-entity id="blueberries" class="collectible" gltf-model="blueberries.glb" 
-                position="-0.7 1 -1.8" scale="0.6 0.6 0.6" rotation="0 25 0" visible="false"></a-entity>
-      <a-entity id="choco" class="collectible" gltf-model="choco.glb" 
-                position="-0.7 1 -1.8" scale="0.6 0.6 0.6" rotation="0 25 0" visible="false"></a-entity>
-      <a-entity id="strawberry" class="collectible" gltf-model="strawberry.glb" 
-                position="9 3 8" scale="0.2 0.2 0.2" rotation="0 25 45" visible="false"></a-entity>
-      <a-entity id="cherries" class="collectible" gltf-model="cherries.glb" 
-                position="-0.7 1 -1.8" scale="0.6 0.6 0.6" rotation="0 25 0" visible="false"></a-entity>
-
-      <!-- Non-collectible kitchen objects -->
-      <!-- Keep all your other objects here, same as before -->
-
-      <a-sound id="mainmusic" src="baking cooking jazz.mp3" autoplay="false" loop="true"></a-sound>
-    </a-scene>
   </body>
 </html>
