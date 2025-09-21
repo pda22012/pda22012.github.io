@@ -53,6 +53,12 @@
   <script>
     let currentIngredients = [];
 
+    function randomPosition(xMin, xMax, zMin, zMax, y=1){
+      const x = Math.random()*(xMax-xMin)+xMin;
+      const z = Math.random()*(zMax-zMin)+zMin;
+      return `${x} ${y} ${z}`;
+    }
+
     function startGame(){
       document.getElementById('startScreen').style.display='none';
       document.getElementById('cakeChoices').style.display='flex';
@@ -89,7 +95,14 @@
       ];
 
       entityIds.forEach(id=>{
-        const el=document.getElementById(id); if(el) el.setAttribute('visible', true);
+        const el=document.getElementById(id); 
+        if(el){
+          el.setAttribute('visible', true);
+          if(el.classList.contains('collectable')){
+            el.setAttribute('scale','1.5 1.5 1.5');  // Increase size
+            el.setAttribute('position', randomPosition(-3,3,-3,3,1)); // Randomize position
+          }
+        }
       });
 
       // Restart music
