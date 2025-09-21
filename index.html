@@ -76,11 +76,11 @@
       recipePanel.style.display='block';
       recipePanel.className = cakeName;
 
-      if(cakeName==='blueberry'){
-        currentIngredients = ["flour","sugar","butter","milk","vanilla","blueberries","strawberry","spatula","whisk"];
-      } else if(cakeName==='chocolate'){
-        currentIngredients = ["flour","sugar","butter","milk","vanilla","choco","strawberry","spatula","whisk"];
-      } else if(cakeName==='cherry'){
+      if(cakeName==='blueberrycake'){
+        currentIngredients = ["flour","sugar","butter","milk","vanilla","blueberry","strawberry","spatula","whisk"];
+      } else if(cakeName==='strawberrycake'){
+        currentIngredients = ["flour","sugar","butter","milk","vanilla","chocolate","strawberry","spatula","whisk"];
+      } else if(cakeName==='cherrycake'){
         currentIngredients = ["flour","sugar","butter","milk","vanilla","cherries","spatula","whisk"];
       }
 
@@ -130,9 +130,9 @@
         document.getElementById('quitButton').style.display='block';
         // Show cake depending on type
         let cakeModel = "cake.glb";
-        if(currentCake === "chocolate"){ cakeModel = "strawberrychocolatecake.glb"; }
-        if(currentCake === "blueberry"){ cakeModel = "slicefruitcake.glb"; }
-        if(currentCake === "cherry"){ cakeModel = "cake.glb"; } // placeholder for later
+        if(currentCake === "strawberry cake"){ cakeModel = "strawberrycake.glb"; }
+        if(currentCake === "blueberry cake"){ cakeModel = "blueberrycake.glb"; }
+        if(currentCake === "cherry cake"){ cakeModel = "cherrycake.glb"; } // placeholder for later
 
         const cake=document.createElement('a-entity');
         cake.setAttribute('gltf-model', cakeModel);
@@ -160,7 +160,7 @@
   </div>
 
   <div id="cakeChoices">
-    <div id="chocolateTab" class="cake-tab" onclick="chooseCake('chocolate')">Chocolate Cake</div>
+    <div id="strawberryTab" class="cake-tab" onclick="chooseCake('strawberry')">Strawberry Cake</div>
     <div id="blueberryTab" class="cake-tab" onclick="chooseCake('blueberry')">Blueberry Cake</div>
     <div id="cherryTab" class="cake-tab" onclick="chooseCake('cherry')">Cherry Cake</div>
   </div>
