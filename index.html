@@ -178,28 +178,48 @@
     <a-entity light="type:directional; intensity:0.8" position="0 2 1"></a-entity>
 
     <!-- Kitchen objects -->
-    <a-entity id="kitchenrightwall" gltf-model="kitchenrightwall.glb" static-body></a-entity>
+    <a-entity id="leftwall" gltf-model="leftwall.glb" static-body></a-entity>
     <a-entity id="blackcabinet" gltf-model="blackcabinet.glb" static-body></a-entity>
+    <a-entity id="backwall" gltf-model="backwall.glb" static-body></a-entity>
+    <a-entity id="banana" gltf-model="banana.glb" static-body></a-entity>
     <a-entity id="blackplate" gltf-model="blackplate.glb" static-body></a-entity>
     <a-entity id="bluebottle" gltf-model="bluebottle.glb" static-body></a-entity>
     <a-entity id="bowl" gltf-model="bowl.glb" static-body></a-entity>
-    <a-entity id="clock" gltf-model="clock.glb" static-body></a-entity>
+    <a-entity id="chefhat" gltf-model="chefhat.glb" static-body></a-entity>
+    <a-entity id="countersandsink" gltf-model="countersandsink.glb" static-body></a-entity>
+    <a-entity id="countertopdecor" gltf-model="countertopdecor.glb" static-body></a-entity>
+     <a-entity id="cuttingboard" gltf-model="cuttingboard.glb" static-body></a-entity>
+    <a-entity id="wallclock" gltf-model="wallclock.glb" static-body></a-entity>
     <a-entity id="coffee" gltf-model="coffee.glb" static-body></a-entity>
     <a-entity id="coffeemaker" gltf-model="coffeemaker.glb" static-body></a-entity>
     <a-entity id="counterfloorright" gltf-model="counterfloorright.glb" static-body></a-entity>
     <a-entity id="exhaustfan" gltf-model="exhaustfan.glb" static-body></a-entity>
+    <a-entity id="egg" gltf-model="egg.glb" static-body></a-entity>
+    <a-entity id="eggcarton" gltf-model="eggcarton.glb" static-body></a-entity>
     <a-entity id="faucet" gltf-model="faucet.glb" static-body></a-entity>
     <a-entity id="floor" gltf-model="floor.glb" static-body></a-entity>
-    <a-entity id="kitchenopenwall" gltf-model="kitchenopenwall.glb" static-body></a-entity>
-    <a-entity id="kitchenroofslide" gltf-model="kitchenroofslide.glb" static-body></a-entity>
-    <a-entity id="kitchenrooftop" gltf-model="kitchenrooftop.glb" static-body></a-entity>
+    <a-entity id="frontwall" gltf-model="frontwall.glb" static-body></a-entity>
+     <a-entity id="fruitbowl" gltf-model="fruitbowl.glb" static-body></a-entity>
+    <a-entity id="leftroof" gltf-model="leftroof.glb" static-body></a-entity>
+    <a-entity id="rightroof" gltf-model="rightroof.glb" static-body></a-entity>
+    <a-entity id="mixingbowl" gltf-model="mixingbowl.glb" static-body></a-entity>
+    <a-entity id="mug" gltf-model="mug.glb" static-body></a-entity>
+    <a-entity id="pan" gltf-model="pan.glb" static-body></a-entity>
+    <a-entity id="peanutbutter" gltf-model="peanutbutter.glb" static-body></a-entity>
+    <a-entity id="plate" gltf-model="plate.glb" static-body></a-entity>
+    <a-entity id="radio" gltf-model="radio.glb" static-body></a-entity>
+    <a-entity id="rightwall" gltf-model="rightwall.glb" static-body></a-entity>
+    <a-entity id="rollingpin" gltf-model="rollingpin.glb" static-body></a-entity>
     <a-entity id="kitchenwallback" gltf-model="kitchenwallback.glb" static-body></a-entity>
     <a-entity id="kniveholder" gltf-model="kniveholder.glb" static-body></a-entity>
+     <a-entity id="knife" gltf-model="knife.glb" static-body></a-entity>
     <a-entity id="plant" gltf-model="plant.glb" static-body></a-entity>
     <a-entity id="plantwindow" gltf-model="plantwindow.glb" static-body></a-entity>
+    <a-entity id="salt" gltf-model="salt.glb" static-body></a-entity>
     <a-entity id="salt1" gltf-model="salt1.glb" static-body></a-entity>
     <a-entity id="salt2" gltf-model="salt2.glb" static-body></a-entity>
     <a-entity id="salt3" gltf-model="salt3.glb" static-body></a-entity>
+    <a-entity id="smallplate" gltf-model="smallplate.glb" static-body></a-entity>
     <a-entity id="shelves" gltf-model="shelves.glb" static-body></a-entity>
     <a-entity id="sink" gltf-model="sink.glb" static-body></a-entity>
     <a-entity id="stool" gltf-model="stool.glb" static-body></a-entity>
@@ -210,6 +230,8 @@
     <a-entity id="wallstove" gltf-model="wallstove.glb" static-body></a-entity>
     <a-entity id="whitebottle" gltf-model="whitebottle.glb" static-body></a-entity>
     <a-entity id="windowbottom" gltf-model="windowbottom.glb" static-body></a-entity>
+    <a-entity id="walldecor" gltf-model="walldecor.glb" static-body></a-entity>
+    <a-entity id="windowdecor" gltf-model="windowdecor.glb" static-body></a-entity>
 
     <!-- Collectable ingredients with invisible colliders -->
     <a-entity id="flour" gltf-model="flour.glb" class="collectable" collectable data-name="flour" position="4 2 0.5">
@@ -227,7 +249,7 @@
     <a-entity id="vanilla" gltf-model="vanilla.glb" class="collectable" collectable data-name="vanilla" position="-3 2 1">
       <a-box visible="false" class="click-target" scale="2 2 2"></a-box>
     </a-entity>
-    <a-entity id="blueberries" gltf-model="blueberries.glb" class="collectable" collectable data-name="blueberries" position="5 2 2">
+    <a-entity id="blueberry" gltf-model="blueberry.glb" class="collectable" collectable data-name="blueberry" position="5 2 2">
       <a-box visible="false" class="click-target" scale="2 2 2"></a-box>
     </a-entity>
     <a-entity id="strawberry" gltf-model="strawberry.glb" class="collectable" collectable data-name="strawberry" position="8 2 2">
@@ -239,7 +261,10 @@
     <a-entity id="whisk" gltf-model="whisk.glb" class="collectable" collectable data-name="whisk" position="6 2 2.5">
       <a-box visible="false" class="click-target" scale="4 4 4"></a-box>
     </a-entity>
-    <a-entity id="choco" gltf-model="choco.glb" class="collectable" collectable data-name="choco" position="6 2 2.5">
+    <a-entity id="chocolate" gltf-model="chocolate.glb" class="collectable" collectable data-name="chocolate" position="6 2 2.5">
+      <a-box visible="false" class="click-target" scale="5 2 2"></a-box>
+    </a-entity>
+     <a-entity id="cherries" gltf-model="cherries.glb" class="collectable" collectable data-name="cherries" position="6 2 2.5">
       <a-box visible="false" class="click-target" scale="5 2 2"></a-box>
     </a-entity>
 
