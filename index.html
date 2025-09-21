@@ -73,7 +73,7 @@
         title='Cherry Cake'; ingredients=["flour","sugar","butter","milk","vanilla","cherries","spatula","whisk"];
       }
 
-      recipePanel.innerHTML=`<h2>${title}</h2><ul>${ingredients.map(item=>`<li id="recipe-${item.toLowerCase()}"><span class="check"></span> ${item}</li>`).join('')}</ul>`;
+      recipePanel.innerHTML=`<h2>${title}</h2><ul>${ingredients.map(item=>`<li id="recipe-${item.toLowerCase()}"><span class=\"check\"></span> ${item}</li>`).join('')}</ul>`;
 
       // Show all kitchen objects
       const entityIds=[
@@ -128,10 +128,10 @@
   <a-scene id="scene" vr-mode-ui="enabled:false" style="display:none;">
    <a-entity id="cameraRig" position="0 3 0">
   <a-camera>
-    <a-cursor material="color:black; shader:flat" fuse="false"></a-cursor>
+    <a-cursor material="color:black; shader:flat" fuse="false" rayOrigin="mouse"></a-cursor>
   </a-camera>
 
-  <!-- Add raycaster here -->
+  <!-- Updated raycaster -->
   <a-entity 
       raycaster="objects: .collectable; far: 20">
   </a-entity>
@@ -140,6 +140,28 @@
     <a-entity light="type:directional; intensity:0.8" position="0 2 1"></a-entity>
 
     <!-- All kitchen and collectable objects -->
+    <a-entity id="cuttingboard" gltf-model="cuttingboard.glb" visible="false" class="collectable" collectable data-name="cuttingboard"></a-entity>
+    <a-entity id="ladlesandspoonswall" gltf-model="ladlesandspoonswall.glb" visible="false" class="collectable" collectable data-name="ladlesandspoonswall"></a-entity>
+    <a-entity id="pandeep" gltf-model="pandeep.glb" visible="false" class="collectable" collectable data-name="pandeep"></a-entity>
+    <a-entity id="spatula" gltf-model="spatula.glb" visible="false" class="collectable" collectable data-name="spatula"></a-entity>
+    <a-entity id="vanilla" gltf-model="vanilla.glb" visible="false" class="collectable" collectable data-name="vanilla"></a-entity>
+    <a-entity id="sugar" gltf-model="sugar.glb" visible="false" class="collectable" collectable data-name="sugar"></a-entity>
+    <a-entity id="whisk" gltf-model="whisk.glb" visible="false" class="collectable" collectable data-name="whisk"></a-entity>
+    <a-entity id="rollingpin" gltf-model="rollingpin.glb" visible="false" class="collectable" collectable data-name="rollingpin"></a-entity>
+    <a-entity id="radio" gltf-model="radio.glb" visible="false" class="collectable" collectable data-name="radio"></a-entity>
+    <a-entity id="platenice" gltf-model="platenice.glb" visible="false" class="collectable" collectable data-name="platenice"></a-entity>
+    <a-entity id="milk" gltf-model="milk.glb" visible="false" class="collectable" collectable data-name="milk"></a-entity>
+    <a-entity id="fryingpan" gltf-model="fryingpan.glb" visible="false" class="collectable" collectable data-name="fryingpan"></a-entity>
+    <a-entity id="chocostrawberrycake" gltf-model="chocostrawberrycake.glb" visible="false" class="collectable" collectable data-name="chocostrawberrycake"></a-entity>
+    <a-entity id="choco" gltf-model="choco.glb" visible="false" class="collectable" collectable data-name="choco"></a-entity>
+    <a-entity id="cherries" gltf-model="cherries.glb" visible="false" class="collectable" collectable data-name="cherries"></a-entity>
+    <a-entity id="butter" gltf-model="butter.glb" visible="false" class="collectable" collectable data-name="butter"></a-entity>
+    <a-entity id="blueberries" gltf-model="blueberries.glb" visible="false" class="collectable" collectable data-name="blueberries"></a-entity>
+    <a-entity id="plate" gltf-model="plate.glb" visible="false" class="collectable" collectable data-name="plate"></a-entity>
+    <a-entity id="strawberry" gltf-model="strawberry.glb" visible="false" class="collectable" collectable data-name="strawberry"></a-entity>
+    <a-entity id="flour" gltf-model="flour.glb" visible="false" class="collectable" collectable data-name="flour"></a-entity>
+
+    <!-- Non-collectable objects remain unchanged -->
     <a-entity id="kitchenrightwall" gltf-model="kitchenrightwall.glb" visible="false"></a-entity>
     <a-entity id="blackcabinet" gltf-model="blackcabinet.glb" visible="false"></a-entity>
     <a-entity id="blackplate" gltf-model="blackplate.glb" visible="false"></a-entity>
@@ -149,7 +171,6 @@
     <a-entity id="coffee" gltf-model="coffee.glb" visible="false"></a-entity>
     <a-entity id="coffeemaker" gltf-model="coffeemaker.glb" visible="false"></a-entity>
     <a-entity id="counterfloorright" gltf-model="counterfloorright.glb" visible="false"></a-entity>
-    <a-entity id="cuttingboard" gltf-model="cuttingboard.glb" visible="false" collectable data-name="cuttingboard"></a-entity>
     <a-entity id="exhaustfan" gltf-model="exhaustfan.glb" visible="false"></a-entity>
     <a-entity id="faucet" gltf-model="faucet.glb" visible="false"></a-entity>
     <a-entity id="floor" gltf-model="floor.glb" visible="false"></a-entity>
@@ -158,10 +179,8 @@
     <a-entity id="kitchenrooftop" gltf-model="kitchenrooftop.glb" visible="false"></a-entity>
     <a-entity id="kitchenwallback" gltf-model="kitchenwallback.glb" visible="false"></a-entity>
     <a-entity id="kniveholder" gltf-model="kniveholder.glb" visible="false"></a-entity>
-    <a-entity id="ladlesandspoonswall" gltf-model="ladlesandspoonswall.glb" visible="false" collectable data-name="ladlesandspoonswall"></a-entity>
     <a-entity id="light" gltf-model="light.glb" visible="false"></a-entity>
     <a-entity id="mugs" gltf-model="mugs.glb" visible="false"></a-entity>
-    <a-entity id="pandeep" gltf-model="pandeep.glb" visible="false" collectable data-name="pandeep"></a-entity>
     <a-entity id="plant" gltf-model="plant.glb" visible="false"></a-entity>
     <a-entity id="plantwindow" gltf-model="plantwindow.glb" visible="false"></a-entity>
     <a-entity id="salt1" gltf-model="salt1.glb" visible="false"></a-entity>
@@ -169,35 +188,17 @@
     <a-entity id="salt3" gltf-model="salt3.glb" visible="false"></a-entity>
     <a-entity id="shelves" gltf-model="shelves.glb" visible="false"></a-entity>
     <a-entity id="sink" gltf-model="sink.glb" visible="false"></a-entity>
-   
     <a-entity id="soap" gltf-model="soap.glb" visible="false"></a-entity>
     <a-entity id="soap2" gltf-model="soap2.glb" visible="false"></a-entity>
-    <a-entity id="spatula" gltf-model="spatula.glb" visible="false" collectable data-name="spatula"></a-entity>
     <a-entity id="stool" gltf-model="stool.glb" visible="false"></a-entity>
     <a-entity id="stove" gltf-model="stove.glb" visible="false"></a-entity>
     <a-entity id="stovecabinets" gltf-model="stovecabinets.glb" visible="false"></a-entity>
     <a-entity id="sugarbag" gltf-model="sugarbag.glb" visible="false"></a-entity>
-    <a-entity id="vanilla" gltf-model="vanilla.glb" visible="false" collectable data-name="vanilla"></a-entity>
     <a-entity id="wallclock" gltf-model="wallclock.glb" visible="false"></a-entity>
     <a-entity id="wallcountertop" gltf-model="wallcountertop.glb" visible="false"></a-entity>
     <a-entity id="wallstove" gltf-model="wallstove.glb" visible="false"></a-entity>
     <a-entity id="whitebottle" gltf-model="whitebottle.glb" visible="false"></a-entity>
     <a-entity id="windowbottom" gltf-model="windowbottom.glb" visible="false"></a-entity>
-    <a-entity id="sugar" gltf-model="sugar.glb" visible="false" collectable data-name="sugar"></a-entity>
-    <a-entity id="whisk" gltf-model="whisk.glb" visible="false" collectable data-name="whisk"></a-entity>
-    <a-entity id="rollingpin" gltf-model="rollingpin.glb" visible="false" collectable data-name="rollingpin"></a-entity>
-    <a-entity id="radio" gltf-model="radio.glb" visible="false" collectable data-name="radio"></a-entity>
-    <a-entity id="platenice" gltf-model="platenice.glb" visible="false" collectable data-name="platenice"></a-entity>
-    <a-entity id="milk" gltf-model="milk.glb" visible="false" collectable data-name="milk"></a-entity>
-    <a-entity id="fryingpan" gltf-model="fryingpan.glb" visible="false" collectable data-name="fryingpan"></a-entity>
-    <a-entity id="chocostrawberrycake" gltf-model="chocostrawberrycake.glb" visible="false" collectable data-name="chocostrawberrycake"></a-entity>
-    <a-entity id="choco" gltf-model="choco.glb" visible="false" collectable data-name="choco"></a-entity>
-    <a-entity id="cherries" gltf-model="cherries.glb" visible="false" collectable data-name="cherries"></a-entity>
-    <a-entity id="butter" gltf-model="butter.glb" visible="false" collectable data-name="butter"></a-entity>
-    <a-entity id="blueberries" gltf-model="blueberries.glb" visible="false" collectable data-name="blueberries"></a-entity>
-    <a-entity id="plate" gltf-model="plate.glb" visible="false" collectable data-name="plate"></a-entity>
-    <a-entity id="strawberry" gltf-model="strawberry.glb" visible="false" collectable data-name="strawberry"></a-entity>
-    <a-entity id="flour" gltf-model="flour.glb" visible="false" collectable data-name="flour"></a-entity>
 
     <a-sound id="mainmusic" src="baking cooking jazz.mp3" autoplay="false" loop="true"></a-sound>
   </a-scene>
