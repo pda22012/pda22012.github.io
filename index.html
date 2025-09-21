@@ -50,7 +50,7 @@
       document.querySelectorAll('a-entity').forEach(el=>{
         el.setAttribute('visible', true);
         if(el.classList.contains('collectable')){
-          el.setAttribute('scale','1.5 1.5 1.5');
+          el.setAttribute('scale','2 2 2'); // make them easier to click
         }
       });
     }
@@ -61,7 +61,7 @@
         this.el.addEventListener('click', ()=>{
           const name = this.el.getAttribute('data-name');
           if(currentIngredients.includes(name)){
-            this.el.setAttribute('visible', false);
+            this.el.setAttribute('visible', false); // disappear
             const li = document.getElementById(`recipe-${name}`);
             if(li){ li.querySelector('.check').textContent="✅"; li.classList.add('collected'); }
           }
@@ -85,9 +85,10 @@
   <div id="recipePanel"></div>
 
   <a-scene id="scene" style="display:none;">
-    <a-entity position="0 1.6 5">
+    <!-- Camera setup for mouse clicking -->
+    <a-entity position="0 1.6 7">
       <a-camera>
-        <a-cursor id="mouseCursor" rayOrigin="mouse" fuse="false" material="color: black; shader: flat"></a-cursor>
+        <a-cursor id="mouseCursor" rayOrigin="mouse" fuse="false" material="color:black; shader:flat"></a-cursor>
       </a-camera>
     </a-entity>
 
@@ -128,7 +129,7 @@
     <a-entity id="whitebottle" gltf-model="whitebottle.glb"></a-entity>
     <a-entity id="windowbottom" gltf-model="windowbottom.glb"></a-entity>
 
-    <!-- COLLECTABLES WITH ORIGINAL POSITIONS -->
+    <!-- COLLECTABLES WITH ORIGINAL POSITIONS, SCALE=2 -->
     <a-entity id="flour" gltf-model="flour.glb" class="collectable" collectable data-name="flour" position="4 2 0.5"></a-entity>
     <a-entity id="sugar" gltf-model="sugar.glb" class="collectable" collectable data-name="sugar" position="1 2 0.5"></a-entity>
     <a-entity id="butter" gltf-model="butter.glb" class="collectable" collectable data-name="butter" position="-2 2 1.5"></a-entity>
