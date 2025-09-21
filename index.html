@@ -84,8 +84,8 @@
 
   <div id="recipePanel"></div>
 
-  <a-scene id="scene" style="display:none;">
-    <!-- Camera setup for mouse clicking -->
+  <a-scene id="scene" style="display:none;" embedded>
+    <!-- Camera + mouse cursor -->
     <a-entity position="0 1.6 7">
       <a-camera>
         <a-cursor rayOrigin="mouse" fuse="false" material="color:black; shader:flat"></a-cursor>
@@ -95,50 +95,50 @@
     <a-entity light="type:ambient; intensity:0.5"></a-entity>
     <a-entity light="type:directional; intensity:0.8" position="0 2 1"></a-entity>
 
-    <!-- FULL KITCHEN OBJECTS -->
-    <a-entity id="kitchenrightwall" gltf-model="kitchenrightwall.glb"></a-entity>
-    <a-entity id="blackcabinet" gltf-model="blackcabinet.glb"></a-entity>
-    <a-entity id="blackplate" gltf-model="blackplate.glb"></a-entity>
-    <a-entity id="bluebottle" gltf-model="bluebottle.glb"></a-entity>
-    <a-entity id="bowl" gltf-model="bowl.glb"></a-entity>
-    <a-entity id="clock" gltf-model="clock.glb"></a-entity>
-    <a-entity id="coffee" gltf-model="coffee.glb"></a-entity>
-    <a-entity id="coffeemaker" gltf-model="coffeemaker.glb"></a-entity>
-    <a-entity id="counterfloorright" gltf-model="counterfloorright.glb"></a-entity>
-    <a-entity id="exhaustfan" gltf-model="exhaustfan.glb"></a-entity>
-    <a-entity id="faucet" gltf-model="faucet.glb"></a-entity>
-    <a-entity id="floor" gltf-model="floor.glb"></a-entity>
-    <a-entity id="kitchenopenwall" gltf-model="kitchenopenwall.glb"></a-entity>
-    <a-entity id="kitchenroofslide" gltf-model="kitchenroofslide.glb"></a-entity>
-    <a-entity id="kitchenrooftop" gltf-model="kitchenrooftop.glb"></a-entity>
-    <a-entity id="kitchenwallback" gltf-model="kitchenwallback.glb"></a-entity>
-    <a-entity id="kniveholder" gltf-model="kniveholder.glb"></a-entity>
-    <a-entity id="plant" gltf-model="plant.glb"></a-entity>
-    <a-entity id="plantwindow" gltf-model="plantwindow.glb"></a-entity>
-    <a-entity id="salt1" gltf-model="salt1.glb"></a-entity>
-    <a-entity id="salt2" gltf-model="salt2.glb"></a-entity>
-    <a-entity id="salt3" gltf-model="salt3.glb"></a-entity>
-    <a-entity id="shelves" gltf-model="shelves.glb"></a-entity>
-    <a-entity id="sink" gltf-model="sink.glb"></a-entity>
-    <a-entity id="stool" gltf-model="stool.glb"></a-entity>
-    <a-entity id="stove" gltf-model="stove.glb"></a-entity>
-    <a-entity id="stovecabinets" gltf-model="stovecabinets.glb"></a-entity>
-    <a-entity id="wallclock" gltf-model="wallclock.glb"></a-entity>
-    <a-entity id="wallcountertop" gltf-model="wallcountertop.glb"></a-entity>
-    <a-entity id="wallstove" gltf-model="wallstove.glb"></a-entity>
-    <a-entity id="whitebottle" gltf-model="whitebottle.glb"></a-entity>
-    <a-entity id="windowbottom" gltf-model="windowbottom.glb"></a-entity>
+    <!-- KITCHEN WITH COLLIDERS -->
+    <a-entity id="kitchenrightwall" gltf-model="kitchenrightwall.glb" static-body></a-entity>
+    <a-entity id="blackcabinet" gltf-model="blackcabinet.glb" static-body></a-entity>
+    <a-entity id="blackplate" gltf-model="blackplate.glb" static-body></a-entity>
+    <a-entity id="bluebottle" gltf-model="bluebottle.glb" static-body></a-entity>
+    <a-entity id="bowl" gltf-model="bowl.glb" static-body></a-entity>
+    <a-entity id="clock" gltf-model="clock.glb" static-body></a-entity>
+    <a-entity id="coffee" gltf-model="coffee.glb" static-body></a-entity>
+    <a-entity id="coffeemaker" gltf-model="coffeemaker.glb" static-body></a-entity>
+    <a-entity id="counterfloorright" gltf-model="counterfloorright.glb" static-body></a-entity>
+    <a-entity id="exhaustfan" gltf-model="exhaustfan.glb" static-body></a-entity>
+    <a-entity id="faucet" gltf-model="faucet.glb" static-body></a-entity>
+    <a-entity id="floor" gltf-model="floor.glb" static-body></a-entity>
+    <a-entity id="kitchenopenwall" gltf-model="kitchenopenwall.glb" static-body></a-entity>
+    <a-entity id="kitchenroofslide" gltf-model="kitchenroofslide.glb" static-body></a-entity>
+    <a-entity id="kitchenrooftop" gltf-model="kitchenrooftop.glb" static-body></a-entity>
+    <a-entity id="kitchenwallback" gltf-model="kitchenwallback.glb" static-body></a-entity>
+    <a-entity id="kniveholder" gltf-model="kniveholder.glb" static-body></a-entity>
+    <a-entity id="plant" gltf-model="plant.glb" static-body></a-entity>
+    <a-entity id="plantwindow" gltf-model="plantwindow.glb" static-body></a-entity>
+    <a-entity id="salt1" gltf-model="salt1.glb" static-body></a-entity>
+    <a-entity id="salt2" gltf-model="salt2.glb" static-body></a-entity>
+    <a-entity id="salt3" gltf-model="salt3.glb" static-body></a-entity>
+    <a-entity id="shelves" gltf-model="shelves.glb" static-body></a-entity>
+    <a-entity id="sink" gltf-model="sink.glb" static-body></a-entity>
+    <a-entity id="stool" gltf-model="stool.glb" static-body></a-entity>
+    <a-entity id="stove" gltf-model="stove.glb" static-body></a-entity>
+    <a-entity id="stovecabinets" gltf-model="stovecabinets.glb" static-body></a-entity>
+    <a-entity id="wallclock" gltf-model="wallclock.glb" static-body></a-entity>
+    <a-entity id="wallcountertop" gltf-model="wallcountertop.glb" static-body></a-entity>
+    <a-entity id="wallstove" gltf-model="wallstove.glb" static-body></a-entity>
+    <a-entity id="whitebottle" gltf-model="whitebottle.glb" static-body></a-entity>
+    <a-entity id="windowbottom" gltf-model="windowbottom.glb" static-body></a-entity>
 
-    <!-- COLLECTABLES REALISTICALLY SPREAD, SCALE=2 -->
-    <a-entity id="flour" gltf-model="flour.glb" class="collectable" collectable data-name="flour" position="4 2 0.5"></a-entity>
-    <a-entity id="sugar" gltf-model="sugar.glb" class="collectable" collectable data-name="sugar" position="1 2 0.5"></a-entity>
-    <a-entity id="butter" gltf-model="butter.glb" class="collectable" collectable data-name="butter" position="-2 2 1.5"></a-entity>
-    <a-entity id="milk" gltf-model="milk.glb" class="collectable" collectable data-name="milk" position="7 2 1"></a-entity>
-    <a-entity id="vanilla" gltf-model="vanilla.glb" class="collectable" collectable data-name="vanilla" position="-1 2 1"></a-entity>
-    <a-entity id="blueberries" gltf-model="blueberries.glb" class="collectable" collectable data-name="blueberries" position="0.5 2 2"></a-entity>
-    <a-entity id="strawberry" gltf-model="strawberry.glb" class="collectable" collectable data-name="strawberry" position="9 2 2"></a-entity>
-    <a-entity id="spatula" gltf-model="spatula.glb" class="collectable" collectable data-name="spatula" position="-4 2 2.5"></a-entity>
-    <a-entity id="whisk" gltf-model="whisk.glb" class="collectable" collectable data-name="whisk" position="10 2 2.5"></a-entity>
+    <!-- COLLECTABLES WITH COLLIDERS -->
+    <a-entity id="flour" gltf-model="flour.glb" class="collectable" collectable data-name="flour" position="4 2 0.5" geometry="primitive: box; height:1; width:1; depth:1"></a-entity>
+    <a-entity id="sugar" gltf-model="sugar.glb" class="collectable" collectable data-name="sugar" position="1 2 0.5" geometry="primitive: box; height:1; width:1; depth:1"></a-entity>
+    <a-entity id="butter" gltf-model="butter.glb" class="collectable" collectable data-name="butter" position="-2 2 1.5" geometry="primitive: box; height:1; width:1; depth:1"></a-entity>
+    <a-entity id="milk" gltf-model="milk.glb" class="collectable" collectable data-name="milk" position="7 2 1" geometry="primitive: box; height:1; width:1; depth:1"></a-entity>
+    <a-entity id="vanilla" gltf-model="vanilla.glb" class="collectable" collectable data-name="vanilla" position="-1 2 1" geometry="primitive: box; height:1; width:1; depth:1"></a-entity>
+    <a-entity id="blueberries" gltf-model="blueberries.glb" class="collectable" collectable data-name="blueberries" position="0.5 2 2" geometry="primitive: box; height:1; width:1; depth:1"></a-entity>
+    <a-entity id="strawberry" gltf-model="strawberry.glb" class="collectable" collectable data-name="strawberry" position="9 2 2" geometry="primitive: box; height:1; width:1; depth:1"></a-entity>
+    <a-entity id="spatula" gltf-model="spatula.glb" class="collectable" collectable data-name="spatula" position="-4 2 2.5" geometry="primitive: box; height:1; width:1; depth:1"></a-entity>
+    <a-entity id="whisk" gltf-model="whisk.glb" class="collectable" collectable data-name="whisk" position="10 2 2.5" geometry="primitive: box; height:1; width:1; depth:1"></a-entity>
 
     <a-sound id="mainmusic" src="baking cooking jazz.mp3" autoplay="false" loop="true"></a-sound>
   </a-scene>
