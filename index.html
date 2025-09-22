@@ -20,18 +20,18 @@
     #recipePanel.chocolate { background-color:#8B4513; }
     #recipePanel.blueberry { background-color:#1E90FF; }
     #recipePanel.cherry { background-color:#FF69B4; }
-    #collectTooltip {
-      position:absolute; bottom:15%; left:50%;
-      transform:translateX(-50%);
+    #collect-tip {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 6px 10px;
       background: rgba(0,0,0,0.7);
-      color:#fff;
-      padding:6px 10px;
-      border-radius:6px;
-      font-family:sans-serif;
-      display:none;
-      z-index:9999;
-      font-size:20px;
-      pointer-events:none;
+      color: #fff;
+      border-radius: 6px;
+      font-family: sans-serif;
+      display: none;
+      z-index: 9999;
     }
   </style>
 </head>
@@ -48,7 +48,7 @@
   </div>
 
   <div id="recipePanel"></div>
-  <div id="collectTooltip">Press E to collect</div>
+  <div id="collect-tip">Press E to collect</div>
 
   <a-scene id="scene" physics="gravity:-9.8" style="display:none;">
     <!-- Player camera with collision -->
@@ -67,7 +67,7 @@
     <a-entity light="type:ambient; intensity:0.5"></a-entity>
     <a-entity light="type:directional; intensity:0.8" position="0 2 1"></a-entity>
 
-    <!-- Full kitchen objects (all intact) -->
+    <!-- Full kitchen objects with colliders -->
     <a-entity id="backwall" gltf-model="backwall.glb" static-body></a-entity>
     <a-entity id="frontwall" gltf-model="frontwall.glb" static-body></a-entity>
     <a-entity id="rightwall" gltf-model="rightwall.glb" static-body></a-entity>
@@ -89,45 +89,19 @@
     <a-entity id="stove" gltf-model="stove.glb" static-body></a-entity>
 
     <!-- Collectables -->
-    <a-entity id="flour" gltf-model="flour.glb" class="collectable" data-name="flour">
-      <a-box class="click-target" opacity="0.01" scale="2 2 2"></a-box>
-    </a-entity>
-    <a-entity id="sugar" gltf-model="sugar.glb" class="collectable" data-name="sugar">
-      <a-box class="click-target" opacity="0.01" scale="2 2 2"></a-box>
-    </a-entity>
-    <a-entity id="butter" gltf-model="butter.glb" class="collectable" data-name="butter">
-      <a-box class="click-target" opacity="0.01" scale="2 2 2"></a-box>
-    </a-entity>
-    <a-entity id="milk" gltf-model="milk.glb" class="collectable" data-name="milk">
-      <a-box class="click-target" opacity="0.01" scale="2 2 2"></a-box>
-    </a-entity>
-    <a-entity id="vanilla" gltf-model="vanilla.glb" class="collectable" data-name="vanilla">
-      <a-box class="click-target" opacity="0.01" scale="2 2 2"></a-box>
-    </a-entity>
-    <a-entity id="blueberry" gltf-model="blueberry.glb" class="collectable" data-name="blueberry">
-      <a-box class="click-target" opacity="0.01" scale="2 2 2"></a-box>
-    </a-entity>
-    <a-entity id="strawberry" gltf-model="strawberry.glb" class="collectable" data-name="strawberry">
-      <a-box class="click-target" opacity="0.01" scale="2 2 2"></a-box>
-    </a-entity>
-    <a-entity id="chocolate" gltf-model="chocolate.glb" class="collectable" data-name="chocolate">
-      <a-box class="click-target" opacity="0.01" scale="2 2 2"></a-box>
-    </a-entity>
-    <a-entity id="spatula" gltf-model="spatula.glb" class="collectable" data-name="spatula">
-      <a-box class="click-target" opacity="0.01" scale="2 2 2"></a-box>
-    </a-entity>
-    <a-entity id="whisk" gltf-model="whisk.glb" class="collectable" data-name="whisk">
-      <a-box class="click-target" opacity="0.01" scale="2 2 2"></a-box>
-    </a-entity>
-    <a-entity id="banana" gltf-model="banana.glb" class="collectable" data-name="banana">
-      <a-box class="click-target" opacity="0.01" scale="2 2 2"></a-box>
-    </a-entity>
-    <a-entity id="cherries" gltf-model="cherries.glb" class="collectable" data-name="cherries">
-      <a-box class="click-target" opacity="0.01" scale="2 2 2"></a-box>
-    </a-entity>
-    <a-entity id="egg" gltf-model="egg.glb" class="collectable" data-name="egg">
-      <a-box class="click-target" opacity="0.01" scale="2 2 2"></a-box>
-    </a-entity>
+    <a-entity id="flour" gltf-model="flour.glb" class="collectable" static-body data-name="flour"></a-entity>
+    <a-entity id="sugar" gltf-model="sugar.glb" class="collectable" static-body data-name="sugar"></a-entity>
+    <a-entity id="butter" gltf-model="butter.glb" class="collectable" static-body data-name="butter"></a-entity>
+    <a-entity id="milk" gltf-model="milk.glb" class="collectable" static-body data-name="milk"></a-entity>
+    <a-entity id="vanilla" gltf-model="vanilla.glb" class="collectable" static-body data-name="vanilla"></a-entity>
+    <a-entity id="blueberry" gltf-model="blueberry.glb" class="collectable" static-body data-name="blueberry"></a-entity>
+    <a-entity id="strawberry" gltf-model="strawberry.glb" class="collectable" static-body data-name="strawberry"></a-entity>
+    <a-entity id="chocolate" gltf-model="chocolate.glb" class="collectable" static-body data-name="chocolate"></a-entity>
+    <a-entity id="spatula" gltf-model="spatula.glb" class="collectable" static-body data-name="spatula"></a-entity>
+    <a-entity id="whisk" gltf-model="whisk.glb" class="collectable" static-body data-name="whisk"></a-entity>
+    <a-entity id="banana" gltf-model="banana.glb" class="collectable" static-body data-name="banana"></a-entity>
+    <a-entity id="cherries" gltf-model="cherries.glb" class="collectable" static-body data-name="cherries"></a-entity>
+    <a-entity id="egg" gltf-model="egg.glb" class="collectable" static-body data-name="egg"></a-entity>
 
     <a-sound id="mainmusic" src="baking cooking jazz.mp3" autoplay="false" loop="true"></a-sound>
   </a-scene>
@@ -139,9 +113,9 @@
       document.getElementById('startScreen').style.display='none';
       document.getElementById('cakeChoices').style.display='flex';
 
-      // Start music on start button
+      // play music
       const music = document.querySelector('#mainmusic');
-      if(music && music.components.sound){
+      if(music && music.components && music.components.sound && !music.components.sound.isPlaying){
         music.components.sound.playSound();
       }
     }
@@ -159,72 +133,78 @@
       } else if(cakeName==='chocolate'){
         currentIngredients = ["flour","sugar","butter","milk","vanilla","chocolate","strawberry","spatula","whisk","banana","cherries","egg"];
       } else if(cakeName==='cherry'){
-        currentIngredients = ["flour","sugar","butter","milk","vanilla","cherries","spatula","whisk","banana","egg"];
+        currentIngredients = ["flour","sugar","butter","milk","vanilla","cherry","spatula","whisk","banana","cherries","egg"];
       }
 
       recipePanel.innerHTML = `<h2>${cakeName.charAt(0).toUpperCase()+cakeName.slice(1)} Cake</h2>
         <ul>${currentIngredients.map(i=>`<li id="recipe-${i.replace(/\s+/g,'-')}"><span class="check"></span> ${i}</li>`).join('')}</ul>`;
     }
 
-    // Original collectable component (clickable)
-    AFRAME.registerComponent('collectable',{
-      init:function(){
-        this.el.addEventListener('click', e=>{
-          e.stopPropagation();
-          const name = this.el.getAttribute('data-name');
-          if(currentIngredients.includes(name)){
-            this.el.setAttribute('visible','false');
-            const li = document.getElementById(`recipe-${name.replace(/\s+/g,'-')}`);
-            if(li){ li.querySelector('.check').textContent='✅'; li.classList.add('collected'); }
+    // Collision-based collectable system
+    AFRAME.registerComponent('collectable-trigger', {
+      schema: {},
+      init: function () {
+        this.playerInRange = false;
+        const tip = document.getElementById('collect-tip');
+        const el = this.el;
+
+        // Check collision every tick
+        this.tick = () => {
+          const player = document.getElementById('player');
+          if(!player) return;
+          const playerPos = new THREE.Vector3();
+          const objPos = new THREE.Vector3();
+          player.object3D.getWorldPosition(playerPos);
+          el.object3D.getWorldPosition(objPos);
+          const distance = playerPos.distanceTo(objPos);
+
+          if(distance < 2){ // collision radius
+            if(!this.playerInRange){
+              this.playerInRange = true;
+              tip.style.display = 'block';
+            }
+          } else {
+            if(this.playerInRange){
+              this.playerInRange = false;
+              tip.style.display = 'none';
+            }
           }
-        });
+        };
       }
     });
 
-    // Hover + E collection logic
-    (function(){
-      let hovered = null;
-      const tooltip = document.getElementById('collectTooltip');
-      const cursor = document.querySelector('[cursor]');
-
-      function findCollectable(el){
-        if(!el) return null;
-        if(el.classList && el.classList.contains('collectable')) return el;
-        let p = el.parentEl;
-        while(p){
-          if(p.classList && p.classList.contains('collectable')) return p;
-          p = p.parentEl;
-        }
-        return null;
-      }
-
-      if(cursor){
-        cursor.addEventListener('raycaster-intersection', e=>{
-          const first = e.detail.els[0];
-          const col = findCollectable(first);
-          if(col){ hovered = col; tooltip.style.display='block'; return; }
-          hovered = null; tooltip.style.display='none';
-        });
-
-        cursor.addEventListener('raycaster-intersection-cleared', e=>{
-          hovered = null; tooltip.style.display='none';
-        });
-      }
-
-      window.addEventListener('keydown', e=>{
-        if(e.key.toLowerCase()!=='e') return;
-        if(!hovered) return;
-
-        const name = hovered.getAttribute('data-name');
-        if(currentIngredients.includes(name)){
-          hovered.setAttribute('visible','false');
-          const li = document.getElementById(`recipe-${name.replace(/\s+/g,'-')}`);
-          if(li){ li.querySelector('.check').textContent='✅'; li.classList.add('collected'); }
-        }
-        hovered = null;
-        tooltip.style.display='none';
+    // Attach collectable-trigger to every collectable
+    document.addEventListener('DOMContentLoaded', () => {
+      const collectables = document.querySelectorAll('.collectable');
+      collectables.forEach(c => {
+        c.setAttribute('collectable-trigger','');
       });
-    })();
+    });
+
+    document.addEventListener('keydown', function(e){
+      if(e.key.toLowerCase() !== 'e') return;
+
+      const tip = document.getElementById('collect-tip');
+      const player = document.getElementById('player');
+      const collectables = document.querySelectorAll('.collectable');
+      collectables.forEach(c => {
+        const playerPos = new THREE.Vector3();
+        const objPos = new THREE.Vector3();
+        player.object3D.getWorldPosition(playerPos);
+        c.object3D.getWorldPosition(objPos);
+        const distance = playerPos.distanceTo(objPos);
+        if(distance < 2){ // in range
+          const name = c.getAttribute('data-name');
+          if(currentIngredients.includes(name)){
+            c.setAttribute('visible','false');
+            const li = document.getElementById(`recipe-${name.replace(/\s+/g,'-')}`);
+            if(li){ li.querySelector('.check').textContent='✅'; li.classList.add('collected'); }
+          }
+        }
+      });
+
+      tip.style.display = 'none';
+    });
   </script>
 </body>
 </html>
