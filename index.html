@@ -102,25 +102,43 @@
     <a-entity light="type:directional; intensity:0.8" position="0 2 1"></a-entity>
 
     <!-- Full kitchen with colliders -->
-    <a-entity id="backwall" gltf-model="backwall.glb" static-body></a-entity>
-    <a-entity id="frontwall" gltf-model="frontwall.glb" static-body></a-entity>
-    <a-entity id="rightwall" gltf-model="rightwall.glb" static-body></a-entity>
-    <a-entity id="leftwall" gltf-model="leftwall.glb" static-body></a-entity>
-    <a-entity id="floor" gltf-model="floor.glb" static-body></a-entity>
-    <a-entity id="fridge" gltf-model="fridge.glb" static-body></a-entity>
+    <a-entity id="backwall" gltf-model="backwall.glb" material="side: double; depthTest: true;"
+        static-body></a-entity>
+    <a-entity id="frontwall" gltf-model="frontwall.glb" material="side: double; depthTest: true;"
+        static-body></a-entity>
+    <a-entity id="rightwall" gltf-model="rightwall.glb" material="side: double; depthTest: true;"
+        static-body></a-entity>
+    <a-entity id="leftwall" gltf-model="leftwall.glb" material="side: double; depthTest: true;"
+        static-body></a-entity>
+    <a-entity id="floor" gltf-model="floor.glb" material="side: double; depthTest: true;"
+        static-body></a-entity>
+    <a-entity id="fridge" gltf-model="fridge.glb" material="side: double; depthTest: true;"
+        static-body></a-entity>
     <a-entity id="roof" gltf-model="roof.glb" static-body></a-entity>
-    <a-entity id="counterdecor" gltf-model="counterdecor.glb" static-body></a-entity>
-    <a-entity id="counters" gltf-model="counters.glb" static-body></a-entity>
-    <a-entity id="radio" gltf-model="radio.glb" static-body></a-entity>
-    <a-entity id="light" gltf-model="light.glb" static-body></a-entity>
-    <a-entity id="salt" gltf-model="salt.glb" static-body></a-entity>
-    <a-entity id="eggcarton" gltf-model="eggcarton.glb" static-body></a-entity>
-    <a-entity id="mixingbowl" gltf-model="mixingbowl.glb" static-body></a-entity>
-    <a-entity id="cuttingboard" gltf-model="cuttingboard.glb" static-body></a-entity>
-    <a-entity id="shelves" gltf-model="shelves.glb" static-body></a-entity>
-    <a-entity id="knife" gltf-model="knife.glb" static-body></a-entity>
-    <a-entity id="stool" gltf-model="stool.glb" static-body></a-entity>
-    <a-entity id="stove" gltf-model="stove.glb" static-body></a-entity>
+    <a-entity id="counterdecor" gltf-model="counterdecor.glb" material="side: double; depthTest: true;"
+        static-body></a-entity>
+    <a-entity id="counters" gltf-model="counters.glb" material="side: double; depthTest: true;"
+        static-body></a-entity>
+    <a-entity id="radio" gltf-model="radio.glb" material="side: double; depthTest: true;"
+        static-body></a-entity>
+    <a-entity id="light" gltf-model="light.glb" material="side: double; depthTest: true;"
+        static-body></a-entity>
+    <a-entity id="salt" gltf-model="salt.glb" material="side: double; depthTest: true;"
+        static-body></a-entity>
+    <a-entity id="eggcarton" gltf-model="eggcarton.glb" material="side: double; depthTest: true;"
+        static-body></a-entity>
+    <a-entity id="mixingbowl" gltf-model="mixingbowl.glb" material="side: double; depthTest: true;"
+        static-body></a-entity>
+    <a-entity id="cuttingboard" gltf-model="cuttingboard.glb" material="side: double; depthTest: true;"
+        static-body></a-entity>
+    <a-entity id="shelves" gltf-model="shelves.glb" material="side: double; depthTest: true;"
+        static-body></a-entity>
+    <a-entity id="knife" gltf-model="knife.glb" material="side: double; depthTest: true;"
+        static-body></a-entity>
+    <a-entity id="stool" gltf-model="stool.glb" material="side: double; depthTest: true;"
+        static-body></a-entity>
+    <a-entity id="stove" gltf-model="stove.glb" material="side: double; depthTest: true;"
+        static-body></a-entity>
 
     <!-- Collectable ingredients with invisible colliders -->
     <a-entity id="flour" gltf-model="flour.glb" class="collectable" collectable data-name="flour">
