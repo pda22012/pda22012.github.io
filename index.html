@@ -38,13 +38,13 @@
 
   <a-scene id="scene" physics="gravity:-9.8" style="display:none;">
     <!-- Player camera with collision -->
-    <a-entity id="player" kinematic-body position="0 1.6 0">
-      <a-entity id="cameraRig" camera look-controls wasd-controls="acceleration:150">
-        <a-entity cursor="fuse:false; rayOrigin:mouse"
-                  raycaster="objects:.click-target"
-                  geometry="primitive:ring; radiusInner:0.01; radiusOuter:0.015"
-                  material="color:black; shader:flat"
-                  position="0 0 -1">
+    <a-entity id="player" kinematic-body position="0 60 0">
+      <a-entity id="cameraRig" camera look-controls wasd-controls="acceleration:150" position="0 0 0">
+        <a-entity cursor="fuse:false; rayOrigin:mouse" 
+                  raycaster="objects:.click-target" 
+                  position="0 0 -1" 
+                  geometry="primitive:ring; radiusInner:0.01; radiusOuter:0.015" 
+                  material="color:black; shader:flat">
         </a-entity>
       </a-entity>
     </a-entity>
@@ -53,14 +53,29 @@
     <a-entity light="type:ambient; intensity:0.5"></a-entity>
     <a-entity light="type:directional; intensity:0.8" position="0 2 1"></a-entity>
 
-    <!-- Example kitchen objects -->
-    <a-entity id="floor" geometry="primitive:plane; width:20; height:20" rotation="-90 0 0" material="color:#ccc" static-body></a-entity>
+    <!-- Full kitchen objects with colliders -->
+    <a-entity id="backwall" gltf-model="backwall.glb" static-body></a-entity>
+    <a-entity id="frontwall" gltf-model="frontwall.glb" static-body></a-entity>
+    <a-entity id="rightwall" gltf-model="rightwall.glb" static-body></a-entity>
+    <a-entity id="leftwall" gltf-model="leftwall.glb" static-body></a-entity>
+    <a-entity id="floor" gltf-model="floor.glb" static-body></a-entity>
+    <a-entity id="fridge" gltf-model="fridge.glb" static-body></a-entity>
+    <a-entity id="roof" gltf-model="roof.glb" static-body></a-entity>
+    <a-entity id="counterdecor" gltf-model="counterdecor.glb" static-body></a-entity>
+    <a-entity id="counters" gltf-model="counters.glb" static-body></a-entity>
+    <a-entity id="radio" gltf-model="radio.glb" static-body></a-entity>
+    <a-entity id="light" gltf-model="light.glb" static-body></a-entity>
+    <a-entity id="salt" gltf-model="salt.glb" static-body></a-entity>
+    <a-entity id="eggcarton" gltf-model="eggcarton.glb" static-body></a-entity>
+    <a-entity id="mixingbowl" gltf-model="mixingbowl.glb" static-body></a-entity>
+    <a-entity id="cuttingboard" gltf-model="cuttingboard.glb" static-body></a-entity>
+    <a-entity id="shelves" gltf-model="shelves.glb" static-body></a-entity>
+    <a-entity id="knife" gltf-model="knife.glb" static-body></a-entity>
+    <a-entity id="stool" gltf-model="stool.glb" static-body></a-entity>
+    <a-entity id="stove" gltf-model="stove.glb" static-body></a-entity>
 
-    <!-- Collectables -->
+    <!-- Collectables (clickable) -->
     <a-entity id="flour" gltf-model="flour.glb" class="collectable" collectable data-name="flour">
-      <a-box class="click-target" position="0 0 0" scale="2 2 2" material="transparent:true; opacity:0;"></a-box>
-    </a-entity>
-     <a-entity id="banana" gltf-model="banana.glb" class="collectable" collectable data-name="banana">
       <a-box class="click-target" position="0 0 0" scale="2 2 2" material="transparent:true; opacity:0;"></a-box>
     </a-entity>
     <a-entity id="sugar" gltf-model="sugar.glb" class="collectable" collectable data-name="sugar">
@@ -75,16 +90,28 @@
     <a-entity id="vanilla" gltf-model="vanilla.glb" class="collectable" collectable data-name="vanilla">
       <a-box class="click-target" position="0 0 0" scale="2 2 2" material="transparent:true; opacity:0;"></a-box>
     </a-entity>
-    <a-entity id="chocolate" gltf-model="chocolate.glb" class="collectable" collectable data-name="chocolate">
-      <a-box class="click-target" position="0 0 0" scale="2 2 2" material="transparent:true; opacity:0;"></a-box>
-    </a-entity>
     <a-entity id="blueberry" gltf-model="blueberry.glb" class="collectable" collectable data-name="blueberry">
       <a-box class="click-target" position="0 0 0" scale="2 2 2" material="transparent:true; opacity:0;"></a-box>
     </a-entity>
-    <a-entity id="cherry" gltf-model="cherries.glb" class="collectable" collectable data-name="cherry">
+    <a-entity id="strawberry" gltf-model="strawberry.glb" class="collectable" collectable data-name="strawberry">
       <a-box class="click-target" position="0 0 0" scale="2 2 2" material="transparent:true; opacity:0;"></a-box>
     </a-entity>
-     <a-entity id="salt" gltf-model="salt.glb" class="collectable" collectable data-name="salt">
+    <a-entity id="chocolate" gltf-model="chocolate.glb" class="collectable" collectable data-name="chocolate">
+      <a-box class="click-target" position="0 0 0" scale="2 2 2" material="transparent:true; opacity:0;"></a-box>
+    </a-entity>
+    <a-entity id="spatula" gltf-model="spatula.glb" class="collectable" collectable data-name="spatula">
+      <a-box class="click-target" position="0 0 0" scale="2 2 2" material="transparent:true; opacity:0;"></a-box>
+    </a-entity>
+    <a-entity id="whisk" gltf-model="whisk.glb" class="collectable" collectable data-name="whisk">
+      <a-box class="click-target" position="0 0 0" scale="2 2 2" material="transparent:true; opacity:0;"></a-box>
+    </a-entity>
+    <a-entity id="banana" gltf-model="banana.glb" class="collectable" collectable data-name="banana">
+      <a-box class="click-target" position="0 0 0" scale="2 2 2" material="transparent:true; opacity:0;"></a-box>
+    </a-entity>
+    <a-entity id="cherries" gltf-model="cherries.glb" class="collectable" collectable data-name="cherries">
+      <a-box class="click-target" position="0 0 0" scale="2 2 2" material="transparent:true; opacity:0;"></a-box>
+    </a-entity>
+    <a-entity id="egg" gltf-model="egg.glb" class="collectable" collectable data-name="egg">
       <a-box class="click-target" position="0 0 0" scale="2 2 2" material="transparent:true; opacity:0;"></a-box>
     </a-entity>
 
