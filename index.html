@@ -90,12 +90,12 @@
     <!-- Camera with mouse cursor -->
 
      <a-entity id="player" position="0 0 0">
-  <a-entity 
+ <a-entity 
     id="cameraRig" 
     camera 
     look-controls 
-    wasd-controls 
-    position="0 40 0"> <!-- Height changed to 40 -->
+    wasd-controls="acceleration: 150" <!-- Faster movement -->
+    position="0 0 0"> 
 
     <!-- Cursor in center -->
     <a-entity 
