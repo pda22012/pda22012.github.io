@@ -39,10 +39,9 @@
   <a-scene id="scene" physics="gravity:-9.8" style="display:none;">
     <!-- Player camera with collision -->
     <a-entity id="player" kinematic-body position="0 45 0">
-      <a-entity id="cameraRig" camera look-controls wasd-controls="acceleration:150" position="0 1.6 0">
+      <a-entity camera look-controls wasd-controls="acceleration:150">
         <a-entity cursor="fuse:false; rayOrigin:mouse" 
-                  raycaster="objects:.click-target" 
-                  position="0 0 -1" 
+                  raycaster="objects:.collectable" 
                   geometry="primitive:ring; radiusInner:0.01; radiusOuter:0.015" 
                   material="color:black; shader:flat">
         </a-entity>
@@ -53,7 +52,7 @@
     <a-entity light="type:ambient; intensity:0.5"></a-entity>
     <a-entity light="type:directional; intensity:0.8" position="0 2 1"></a-entity>
 
-    <!-- Full kitchen objects with colliders -->
+    <!-- Kitchen objects -->
     <a-entity id="backwall" gltf-model="backwall.glb" static-body></a-entity>
     <a-entity id="frontwall" gltf-model="frontwall.glb" static-body></a-entity>
     <a-entity id="rightwall" gltf-model="rightwall.glb" static-body></a-entity>
@@ -74,49 +73,23 @@
     <a-entity id="stool" gltf-model="stool.glb" static-body></a-entity>
     <a-entity id="stove" gltf-model="stove.glb" static-body></a-entity>
 
-    <!-- Collectables with invisible box for raycasting -->
-    <a-entity id="flour" gltf-model="flour.glb" class="collectable" data-name="flour" static-body>
-      <a-box class="click-target" opacity="0.01" position="0 0 0" scale="2 2 2"></a-box>
-    </a-entity>
-    <a-entity id="sugar" gltf-model="sugar.glb" class="collectable" data-name="sugar" static-body>
-      <a-box class="click-target" opacity="0.01" position="0 0 0" scale="2 2 2"></a-box>
-    </a-entity>
-    <a-entity id="butter" gltf-model="butter.glb" class="collectable" data-name="butter" static-body>
-      <a-box class="click-target" opacity="0.01" position="0 0 0" scale="2 2 2"></a-box>
-    </a-entity>
-    <a-entity id="milk" gltf-model="milk.glb" class="collectable" data-name="milk" static-body>
-      <a-box class="click-target" opacity="0.01" position="0 0 0" scale="2 2 2"></a-box>
-    </a-entity>
-    <a-entity id="vanilla" gltf-model="vanilla.glb" class="collectable" data-name="vanilla" static-body>
-      <a-box class="click-target" opacity="0.01" position="0 0 0" scale="2 2 2"></a-box>
-    </a-entity>
-    <a-entity id="blueberry" gltf-model="blueberry.glb" class="collectable" data-name="blueberry" static-body>
-      <a-box class="click-target" opacity="0.01" position="0 0 0" scale="2 2 2"></a-box>
-    </a-entity>
-    <a-entity id="strawberry" gltf-model="strawberry.glb" class="collectable" data-name="strawberry" static-body>
-      <a-box class="click-target" opacity="0.01" position="0 0 0" scale="2 2 2"></a-box>
-    </a-entity>
-    <a-entity id="chocolate" gltf-model="chocolate.glb" class="collectable" data-name="chocolate" static-body>
-      <a-box class="click-target" opacity="0.01" position="0 0 0" scale="2 2 2"></a-box>
-    </a-entity>
-    <a-entity id="spatula" gltf-model="spatula.glb" class="collectable" data-name="spatula" static-body>
-      <a-box class="click-target" opacity="0.01" position="0 0 0" scale="2 2 2"></a-box>
-    </a-entity>
-    <a-entity id="whisk" gltf-model="whisk.glb" class="collectable" data-name="whisk" static-body>
-      <a-box class="click-target" opacity="0.01" position="0 0 0" scale="2 2 2"></a-box>
-    </a-entity>
-    <a-entity id="banana" gltf-model="banana.glb" class="collectable" data-name="banana" static-body>
-      <a-box class="click-target" opacity="0.01" position="0 0 0" scale="2 2 2"></a-box>
-    </a-entity>
-    <a-entity id="cherries" gltf-model="cherries.glb" class="collectable" data-name="cherries" static-body>
-      <a-box class="click-target" opacity="0.01" position="0 0 0" scale="2 2 2"></a-box>
-    </a-entity>
-    <a-entity id="egg" gltf-model="egg.glb" class="collectable" data-name="egg" static-body>
-      <a-box class="click-target" opacity="0.01" position="0 0 0" scale="2 2 2"></a-box>
-    </a-entity>
+    <!-- Collectables -->
+    <a-entity id="flour" gltf-model="flour.glb" class="collectable" data-name="flour" static-body></a-entity>
+    <a-entity id="sugar" gltf-model="sugar.glb" class="collectable" data-name="sugar" static-body></a-entity>
+    <a-entity id="butter" gltf-model="butter.glb" class="collectable" data-name="butter" static-body></a-entity>
+    <a-entity id="milk" gltf-model="milk.glb" class="collectable" data-name="milk" static-body></a-entity>
+    <a-entity id="vanilla" gltf-model="vanilla.glb" class="collectable" data-name="vanilla" static-body></a-entity>
+    <a-entity id="blueberry" gltf-model="blueberry.glb" class="collectable" data-name="blueberry" static-body></a-entity>
+    <a-entity id="strawberry" gltf-model="strawberry.glb" class="collectable" data-name="strawberry" static-body></a-entity>
+    <a-entity id="chocolate" gltf-model="chocolate.glb" class="collectable" data-name="chocolate" static-body></a-entity>
+    <a-entity id="spatula" gltf-model="spatula.glb" class="collectable" data-name="spatula" static-body></a-entity>
+    <a-entity id="whisk" gltf-model="whisk.glb" class="collectable" data-name="whisk" static-body></a-entity>
+    <a-entity id="banana" gltf-model="banana.glb" class="collectable" data-name="banana" static-body></a-entity>
+    <a-entity id="cherries" gltf-model="cherries.glb" class="collectable" data-name="cherries" static-body></a-entity>
+    <a-entity id="egg" gltf-model="egg.glb" class="collectable" data-name="egg" static-body></a-entity>
 
-    <!-- Floating 3D text for collection -->
-    <a-entity id="collect-text" text="value: Press E to collect; color: yellow; align:center" visible="false"></a-entity>
+    <!-- Press E to collect -->
+    <a-entity id="collect-text" text="value:Press E to collect;color:yellow;align:center" visible="false"></a-entity>
 
     <!-- Music -->
     <a-sound id="mainmusic" src="baking cooking jazz.mp3" autoplay="false" loop="true"></a-sound>
@@ -128,84 +101,61 @@
     function startGame() {
       document.getElementById('startScreen').style.display = 'none';
       document.getElementById('cakeChoices').style.display = 'flex';
-
       const music = document.querySelector('#mainmusic');
-      if (music && music.components && music.components.sound && !music.components.sound.isPlaying) {
-        music.components.sound.playSound();
-      }
+      if(music && music.components.sound){ music.components.sound.playSound(); }
     }
 
     function chooseCake(cakeName) {
-      document.getElementById('cakeChoices').style.display = 'none';
-      document.getElementById('scene').style.display = 'block';
+      document.getElementById('cakeChoices').style.display='none';
+      document.getElementById('scene').style.display='block';
+      const panel = document.getElementById('recipePanel');
+      panel.style.display='block';
+      panel.className = cakeName;
 
-      const recipePanel = document.getElementById('recipePanel');
-      recipePanel.style.display = 'block';
-      recipePanel.className = cakeName;
+      if(cakeName==='blueberry') currentIngredients=["flour","sugar","butter","milk","vanilla","blueberry","strawberry","spatula","whisk","banana","cherries","egg"];
+      else if(cakeName==='chocolate') currentIngredients=["flour","sugar","butter","milk","vanilla","chocolate","strawberry","spatula","whisk","banana","cherries","egg"];
+      else if(cakeName==='cherry') currentIngredients=["flour","sugar","butter","milk","vanilla","cherry","spatula","whisk","banana","cherries","egg"];
 
-      if (cakeName === 'blueberry') {
-        currentIngredients = ["flour","sugar","butter","milk","vanilla","blueberry","strawberry","spatula","whisk","banana","cherries","egg"];
-      } else if (cakeName === 'chocolate') {
-        currentIngredients = ["flour","sugar","butter","milk","vanilla","chocolate","strawberry","spatula","whisk","banana","cherries","egg"];
-      } else if (cakeName === 'cherry') {
-        currentIngredients = ["flour","sugar","butter","milk","vanilla","cherry","spatula","whisk","banana","cherries","egg"];
-      }
-
-      recipePanel.innerHTML = `<h2>${cakeName.charAt(0).toUpperCase()+cakeName.slice(1)} Cake</h2>
-        <ul>${currentIngredients.map(i => `<li id="recipe-${i.replace(/\s+/g,'-')}"><span class="check"></span> ${i}</li>`).join('')}</ul>`;
+      panel.innerHTML = `<h2>${cakeName.charAt(0).toUpperCase()+cakeName.slice(1)} Cake</h2>
+        <ul>${currentIngredients.map(i=>`<li id="recipe-${i.replace(/\s+/g,'-')}"><span class="check"></span> ${i}</li>`).join('')}</ul>`;
     }
 
-    // Collectable component
-    AFRAME.registerComponent('collectable-trigger', {
-      init: function() {
-        const el = this.el;
-        const player = document.getElementById('player');
-        const collectText = document.getElementById('collect-text');
-        let inRange = false;
-
-        this.tick = () => {
-          const playerPos = new THREE.Vector3();
-          const objPos = new THREE.Vector3();
-          player.object3D.getWorldPosition(playerPos);
-          el.object3D.getWorldPosition(objPos);
-          const distance = playerPos.distanceTo(objPos);
-
-          if (distance < 2) {
-            if (!inRange) {
-              inRange = true;
-              collectText.setAttribute('visible', true);
-            }
-            collectText.object3D.position.copy(objPos.clone().add(new THREE.Vector3(0, 0.5, 0)));
-          } else if (inRange) {
-            inRange = false;
-            collectText.setAttribute('visible', false);
-          }
-        };
+    // Attach collision and collect logic
+    AFRAME.registerComponent('collectable-trigger',{
+      init: function(){
+        const el=this.el;
+        const player=document.getElementById('player');
+        const tip=document.getElementById('collect-text');
+        let inRange=false;
+        this.tick=()=>{
+          const pPos=new THREE.Vector3();
+          const oPos=new THREE.Vector3();
+          player.object3D.getWorldPosition(pPos);
+          el.object3D.getWorldPosition(oPos);
+          const d=pPos.distanceTo(oPos);
+          if(d<2){
+            if(!inRange){ inRange=true; tip.setAttribute('visible',true); }
+            tip.object3D.position.copy(oPos.clone().add(new THREE.Vector3(0,1,0)));
+          } else if(inRange){ inRange=false; tip.setAttribute('visible',false); }
+        }
       }
     });
 
-    document.addEventListener('DOMContentLoaded', () => {
-      const collectables = document.querySelectorAll('.collectable');
-      collectables.forEach(c => c.setAttribute('collectable-trigger',''));
-
-      document.addEventListener('keydown', function(e) {
-        if(e.key.toLowerCase() !== 'e') return;
-
-        const player = document.getElementById('player');
-        const collectText = document.getElementById('collect-text');
-
-        collectables.forEach(c => {
-          const playerPos = new THREE.Vector3();
-          const objPos = new THREE.Vector3();
-          player.object3D.getWorldPosition(playerPos);
-          c.object3D.getWorldPosition(objPos);
-          const distance = playerPos.distanceTo(objPos);
-
-          if(distance < 2 && currentIngredients.includes(c.getAttribute('data-name'))) {
+    document.addEventListener('DOMContentLoaded',()=>{
+      document.querySelectorAll('.collectable').forEach(c=>c.setAttribute('collectable-trigger',''));
+      document.addEventListener('keydown', e=>{
+        if(e.key.toLowerCase()!=='e') return;
+        const player=document.getElementById('player');
+        const tip=document.getElementById('collect-text');
+        document.querySelectorAll('.collectable').forEach(c=>{
+          const pPos=new THREE.Vector3();
+          const oPos=new THREE.Vector3();
+          player.object3D.getWorldPosition(pPos);
+          c.object3D.getWorldPosition(oPos);
+          if(pPos.distanceTo(oPos)<2 && currentIngredients.includes(c.getAttribute('data-name'))){
             c.setAttribute('visible','false');
-            collectText.setAttribute('visible','false');
-
-            const li = document.getElementById(`recipe-${c.getAttribute('data-name').replace(/\s+/g,'-')}`);
+            tip.setAttribute('visible','false');
+            const li=document.getElementById(`recipe-${c.getAttribute('data-name').replace(/\s+/g,'-')}`);
             if(li){ li.querySelector('.check').textContent='✅'; li.classList.add('collected'); }
           }
         });
