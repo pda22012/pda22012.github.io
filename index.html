@@ -51,20 +51,23 @@
   <div id="collect-tip">Press E to collect</div>
 
   <a-scene id="scene" physics="gravity:-9.8" style="display:none;">
-    <a-entity id="player" kinematic-body position="0 1.6 0">
-      <a-camera id="camera" wasd-controls look-controls>
-        <a-cursor id="cursor" fuse="false"
-                  raycaster="objects:.collectable"
-                  geometry="primitive:ring; radiusInner:0.01; radiusOuter:0.02"
-                  material="color:black; shader:flat"
-                  position="0 0 -1"></a-cursor>
-      </a-camera>
+    <!-- Player camera with collision -->
+    <a-entity id="player" kinematic-body position="0 45 0">
+      <a-entity id="cameraRig" camera look-controls wasd-controls="acceleration:150" position="0 0 0">
+        <a-entity cursor="fuse:false; rayOrigin:mouse" 
+                  raycaster="objects:.click-target" 
+                  position="0 0 -1" 
+                  geometry="primitive:ring; radiusInner:0.01; radiusOuter:0.015" 
+                  material="color:black; shader:flat">
+        </a-entity>
+      </a-entity>
     </a-entity>
 
+    <!-- Lights -->
     <a-entity light="type:ambient; intensity:0.5"></a-entity>
     <a-entity light="type:directional; intensity:0.8" position="0 2 1"></a-entity>
 
-    <!-- Kitchen objects -->
+    <!-- Kitchen with collision -->
     <a-entity id="backwall" gltf-model="backwall.glb" static-body></a-entity>
     <a-entity id="frontwall" gltf-model="frontwall.glb" static-body></a-entity>
     <a-entity id="rightwall" gltf-model="rightwall.glb" static-body></a-entity>
@@ -103,6 +106,103 @@
     <a-sound id="mainmusic" src="baking cooking jazz.mp3" autoplay="false" loop="true"></a-sound>
   </a-scene>
 
-  <script src="collectables.js"></script>
+  <script>
+    let currentIngredients = [];
+
+    function startGame(){
+      document.getElementById('startScreen').style.display='none';
+      document.getElementById('cakeChoices').style.display='flex';
+
+      // play music
+      const music = document.querySelector('#mainmusic');
+      if(music && music.components && music.components.sound && !music.components.sound.isPlaying){
+        music.components.sound.playSound();
+      }
+    }
+
+    function chooseCake(cakeName){
+      document.getElementById('cakeChoices').style.display='none';
+      document.getElementById('scene').style.display='block';
+
+      const recipePanel = document.getElementById('recipePanel');
+      recipePanel.style.display='block';
+      recipePanel.className = cakeName;
+
+      if(cakeName==='blueberry'){
+        currentIngredients = ["flour","sugar","butter","milk","vanilla","blueberry","strawberry","spatula","whisk","banana","cherries","egg"];
+      } else if(cakeName==='chocolate'){
+        currentIngredients = ["flour","sugar","butter","milk","vanilla","chocolate","strawberry","spatula","whisk","banana","cherries","egg"];
+      } else if(cakeName==='cherry'){
+        currentIngredients = ["flour","sugar","butter","milk","vanilla","cherry","spatula","whisk","banana","cherries","egg"];
+      }
+
+      recipePanel.innerHTML = `<h2>${cakeName.charAt(0).toUpperCase()+cakeName.slice(1)} Cake</h2>
+        <ul>${currentIngredients.map(i=>`<li id="recipe-${i.replace(/\s+/g,'-')}"><span class="check"></span> ${i}</li>`).join('')}</ul>`;
+    }
+
+    // Collision-based collectable system
+    AFRAME.registerComponent('collectable-trigger', {
+      schema: {},
+      init: function () {
+        this.playerInRange = false;
+        const tip = document.getElementById('collect-tip');
+        const el = this.el;
+
+        this.tick = () => {
+          const player = document.getElementById('player');
+          if(!player) return;
+          const playerPos = new THREE.Vector3();
+          const objPos = new THREE.Vector3();
+          player.object3D.getWorldPosition(playerPos);
+          el.object3D.getWorldPosition(objPos);
+          const distance = playerPos.distanceTo(objPos);
+
+          if(distance < 2){
+            if(!this.playerInRange){
+              this.playerInRange = true;
+              tip.style.display = 'block';
+            }
+          } else {
+            if(this.playerInRange){
+              this.playerInRange = false;
+              tip.style.display = 'none';
+            }
+          }
+        };
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const collectables = document.querySelectorAll('.collectable');
+      collectables.forEach(c => {
+        c.setAttribute('collectable-trigger','');
+      });
+    });
+
+    document.addEventListener('keydown', function(e){
+      if(e.key.toLowerCase() !== 'e') return;
+
+      const tip = document.getElementById('collect-tip');
+      const player = document.getElementById('player');
+      const collectables = document.querySelectorAll('.collectable');
+      collectables.forEach(c => {
+        const playerPos = new THREE.Vector3();
+        const objPos = new THREE.Vector3();
+        player.object3D.getWorldPosition(playerPos);
+        c.object3D.getWorldPosition(objPos);
+        const distance = playerPos.distanceTo(objPos);
+        if(distance < 2){
+          const name = c.getAttribute('data-name');
+          if(currentIngredients.includes(name)){
+            c.setAttribute('visible','false');
+            const li = document.getElementById(`recipe-${name.replace(/\s+/g,'-')}`);
+            if(li){ li.querySelector('.check').textContent='✅'; li.classList.add('collected'); }
+          }
+        }
+      });
+
+      tip.style.display = 'none';
+    });
+  </script>
 </body>
 </html>
