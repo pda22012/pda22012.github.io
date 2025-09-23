@@ -42,10 +42,15 @@
   <div id="recipePanel"></div>
 
   <a-scene id="scene" physics="gravity:-9.8" style="display:none;" cursor="rayOrigin: mouse; fuse: false">
-    <!-- Player camera with a capsule shape for accurate collisions -->
-    <a-entity id="player" kinematic-body="shape: capsule; radius: 0.4; height: 1.6" position="0 1.6 5">
-      <a-entity id="cameraRig" camera look-controls wasd-controls="acceleration:150">
-      </a-entity>
+    
+    <!-- CORRECTED PLAYER ENTITY -->
+    <!-- Camera, controls, and physics are now on the SAME entity. This prevents falling. -->
+    <a-entity id="player"
+              camera
+              look-controls
+              wasd-controls="acceleration: 150"
+              position="0 1.6 5"
+              kinematic-body="shape: capsule; radius: 0.4; height: 1.6">
     </a-entity>
 
     <!-- Lights -->
@@ -56,7 +61,7 @@
     <a-plane id="physical-floor" static-body position="0 0 0" rotation="-90 0 0" width="50" height="50" visible="false"></a-plane>
 
     <!-- Kitchen Fixtures with static-body for collision -->
-    <!-- The 'shape: box' provides a simple hitbox for the physics engine -->
+    <!-- The 'shape' provides a simple hitbox for the physics engine -->
     <a-entity id="backwall" gltf-model="backwall.glb" static-body="shape: box;"></a-entity>
     <a-entity id="frontwall" gltf-model="frontwall.glb" static-body="shape: box;"></a-entity>
     <a-entity id="rightwall" gltf-model="rightwall.glb" static-body="shape: box;"></a-entity>
@@ -73,7 +78,6 @@
     <a-entity id="stove" gltf-model="stove.glb" static-body="shape: box;"></a-entity>
 
     <!-- Kitchen Items with static-body for collision -->
-    <!-- These items are now solid objects that the player cannot walk through -->
     <a-entity id="salt" gltf-model="salt.glb" static-body="shape: box;"></a-entity>
     <a-entity id="eggcarton" gltf-model="eggcarton.glb" static-body="shape: box;"></a-entity>
     <a-entity id="cuttingboard" gltf-model="cuttingboard.glb" static-body="shape: box;"></a-entity>
@@ -99,7 +103,7 @@
     
     <!-- This entity will hold the final cake. It's invisible at the start. -->
     <a-entity id="final-cake-container" position="0 0.5 0" visible="false">
-        <!-- Make sure you have these cake models or replace with placeholders -->
+        <!-- Remember to replace these with your actual cake models -->
         <a-entity id="chocolate-cake-model" gltf-model="#chocolate-cake.glb" visible="false"></a-entity>
         <a-entity id="blueberry-cake-model" gltf-model="#blueberry-cake.glb" visible="false"></a-entity>
         <a-entity id="cherry-cake-model" gltf-model="#cherry-cake.glb" visible="false"></a-entity>
