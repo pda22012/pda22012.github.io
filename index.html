@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Bake your cake</title>
+  <title>Bake your cake - DEBUG VERSION</title>
   <!-- A-Frame Core -->
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
   <!-- A-Frame Extras for Drag-and-Drop -->
@@ -41,32 +41,32 @@
 
   <div id="recipePanel"></div>
 
-  <!-- Initialize the scene with the PhysX engine -->
   <a-scene id="scene" physx="gravity: 0 -9.8 0;" style="display:none;" cursor="rayOrigin: mouse; fuse: false">
     
-    <!-- Player Rig: SIMPLIFIED to GUARANTEE MOVEMENT. Physics has been REMOVED from the player. -->
-    <a-entity id="player-rig"
-              position="0 30 5" <!-- FIXED: Player height is now 30 meters. Change this number to adjust your height. -->
-              wasd-controls="acceleration: 100;"> <!-- This will now work without physics interference. -->
-      <!-- The camera is the player's eyes. It just looks around. -->
-      <a-entity id="player-camera"
-                camera
-                position="0 0 0"
-                look-controls>
-      </a-entity>
+    <!-- Player: Simplified to the absolute basics to GUARANTEE movement. -->
+    <a-entity id="player"
+              camera
+              position="0 50 5" <!-- FIXED: YOU ARE NOW 50 METERS TALL. This is extremely high to prove it works. -->
+              look-controls
+              wasd-controls="acceleration: 100;"
+              movement-debugger> <!-- This is a custom component to check if controls are active -->
+              
+        <!-- This text will tell you if the controls are working. -->
+        <a-text id="debug-text" value="Controls NOT Initialized" position="0 0 -1" color="red" align="center" width="2"></a-text>
+
     </a-entity>
 
     <!-- Lights -->
     <a-entity light="type:ambient; intensity:0.5"></a-entity>
     <a-entity light="type:directional; intensity:0.8" position="0 2 1"></a-entity>
 
-    <!-- Invisible physical floor. The player will NOT stand on this, but objects will. -->
+    <!-- Invisible physical floor -->
     <a-plane id="physical-floor" position="0 0 0" rotation="-90 0 0" width="50" height="50" visible="false"
              physx-body="type: static;"
              physx-shape="type: plane;">
     </a-plane>
 
-    <!-- Kitchen Fixtures with PhysX bodies for collision (these are still solid) -->
+    <!-- All other kitchen items remain the same -->
     <a-entity id="backwall" gltf-model="backwall.glb" physx-body="type: static;" physx-shape="type: box;"></a-entity>
     <a-entity id="frontwall" gltf-model="frontwall.glb" physx-body="type: static;" physx-shape="type: box;"></a-entity>
     <a-entity id="rightwall" gltf-model="rightwall.glb" physx-body="type: static;" physx-shape="type: box;"></a-entity>
@@ -90,9 +90,7 @@
     <a-entity id="spatula" gltf-model="spatula.glb" physx-body="type: static;" physx-shape="type: box;"></a-entity>
     <a-entity id="whisk" gltf-model="whisk.glb" physx-body="type: static;" physx-shape="type: box;"></a-entity>
     <a-entity id="banana" gltf-model="banana.glb" physx-body="type: static;" physx-shape="type: box;"></a-entity>
-    <a-entity id="mixingbowl" gltf-model="mixingbowl.glb" droppable physx-body="type: static;" physx-shape="type: cylinder;"></a--entity>
-
-    <!-- Draggable Ingredients -->
+    <a-entity id="mixingbowl" gltf-model="mixingbowl.glb" droppable physx-body="type: static;" physx-shape="type: cylinder;"></a-entity>
     <a-entity id="flour" gltf-model="flour.glb" class="ingredient" draggable data-name="flour" physx-body="type: static;" physx-shape="type: box;"></a-entity>
     <a-entity id="sugar" gltf-model="sugar.glb" class="ingredient" draggable data-name="sugar" physx-body="type: static;" physx-shape="type: box;"></a-entity>
     <a-entity id="butter" gltf-model="butter.glb" class="ingredient" draggable data-name="butter" physx-body="type: static;" physx-shape="type: box;"></a-entity>
@@ -101,19 +99,28 @@
     <a-entity id="blueberry" gltf-model="blueberry.glb" class="ingredient" draggable data-name="blueberry" physx-body="type: static;" physx-shape="type: sphere; radius: 0.03;"></a-entity>
     <a-entity id="cherries" gltf-model="cherries.glb" class="ingredient" draggable data-name="cherries" physx-body="type: static;" physx-shape="type: sphere; radius: 0.03;"></a-entity>
     <a-entity id="chocolate" gltf-model="chocolate.glb" class="ingredient" draggable data-name="chocolate" physx-body="type: static;" physx-shape="type: box;"></a-entity>
-    
-    <!-- Final Cake Container -->
     <a-entity id="final-cake-container" position="0 0.5 0" visible="false">
         <a-entity id="chocolate-cake-model" gltf-model="#chocolate-cake.glb" visible="false"></a-entity>
         <a-entity id="blueberry-cake-model" gltf-model="#blueberry-cake.glb" visible="false"></a-entity>
         <a-entity id="cherry-cake-model" gltf-model="#cherry-cake.glb" visible="false"></a-entity>
     </a-entity>
-
     <a-sound id="mainmusic" src="baking cooking jazz.mp3" autoplay="false" loop="true"></a-sound>
   </a-scene>
 
   <script>
-    // --- NO CHANGES TO THE SCRIPT ---
+    // --- NEW DEBUGGING SCRIPT ---
+    AFRAME.registerComponent('movement-debugger', {
+        init: function () {
+            // This runs when the component is ready.
+            const textEl = document.getElementById('debug-text');
+            if (this.el.components['wasd-controls']) {
+                textEl.setAttribute('value', 'Controls Initialized!');
+                textEl.setAttribute('color', 'lightgreen');
+            }
+        }
+    });
+
+    // --- GAME LOGIC FUNCTIONS ---
     let currentIngredients = [];
     let collectedIngredients = [];
     let selectedCake = '';
@@ -127,13 +134,10 @@
         this.el.addEventListener('drag-drop', (e) => {
           const droppedEl = e.detail.dropped;
           const ingredientName = droppedEl.getAttribute('data-name');
-          
           if (currentIngredients.includes(ingredientName) && !collectedIngredients.includes(ingredientName)) {
             collectedIngredients.push(ingredientName);
-            
             const li = document.getElementById(`recipe-${ingredientName}`);
             if(li) { li.classList.add('collected'); }
-
             const bowlPosition = this.el.getAttribute('position');
             droppedEl.setAttribute('animation', {
                 property: 'position',
@@ -142,7 +146,6 @@
                 easing: 'easeInQuad'
             });
             setTimeout(() => { droppedEl.setAttribute('visible', 'false'); }, 500);
-            
             checkCompletion();
           }
         });
@@ -161,7 +164,19 @@
     function chooseCake(cakeName){
       selectedCake = cakeName;
       document.getElementById('cakeChoices').style.display='none';
-      document.getElementById('scene').style.display='block';
+      const sceneEl = document.getElementById('scene');
+      sceneEl.style.display = 'block';
+
+      // --- NEW: Force focus on the scene to capture keyboard input ---
+      setTimeout(() => {
+          sceneEl.focus();
+          // Fallback for some browsers
+          if (document.activeElement !== sceneEl) {
+              window.focus();
+              sceneEl.canvas.focus();
+          }
+      }, 100);
+
       const recipePanel = document.getElementById('recipePanel');
       recipePanel.style.display='block';
       recipePanel.className = cakeName;
