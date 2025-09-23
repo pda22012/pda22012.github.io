@@ -15,24 +15,47 @@
     #recipePanel { position:absolute; top:20%; left:5%; padding:20px; border-radius:12px; font-size:18px; display:none; z-index:10; min-width:200px; color:white; }
     #recipePanel h2 { margin-top:0; font-size:22px; text-align:center; }
     #recipePanel ul { list-style:none; padding:0; }
-    #recipePanel li { margin:5px 0; font-weight:bold; }
-    #recipePanel li.collected { color:lightgreen; text-decoration: line-through; }
+    #recipePanel li { margin:8px 0; font-weight:bold; cursor: pointer; transition: color 0.3s; }
+    #recipePanel li.collected { color:lightgreen; cursor: default; text-decoration: line-through;}
     #recipePanel.chocolate { background-color: rgba(139, 69, 19, 0.8); }
     #recipePanel.blueberry { background-color: rgba(30, 144, 255, 0.8); }
     #recipePanel.cherry { background-color: rgba(255, 105, 180, 0.8); }
-    #collect-tip {
+    
+    /* NEW: Loading Bar Styles */
+    #loading-container {
       position: absolute;
-      bottom: 30px;
+      top: 50%;
       left: 50%;
-      transform: translateX(-50%);
-      padding: 6px 10px;
-      background: rgba(0,0,0,0.7);
-      color: #fff;
-      border-radius: 6px;
-      font-family: sans-serif;
-      display: none;
+      transform: translate(-50%, -50%);
+      width: 50%;
+      max-width: 400px;
+      background-color: #333;
+      border: 2px solid white;
+      border-radius: 10px;
+      padding: 5px;
+      display: none; /* Hidden by default */
       z-index: 9999;
     }
+    #loading-bar {
+      width: 0%;
+      height: 30px;
+      background-color: #4CAF50;
+      border-radius: 5px;
+      text-align: center;
+      line-height: 30px;
+      color: white;
+      transition: width 0.1s linear;
+    }
+    #loading-text {
+      position: absolute;
+      width: 100%;
+      text-align: center;
+      top: -35px;
+      color: white;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
   </style>
 </head>
 <body>
@@ -48,24 +71,26 @@
   </div>
 
   <div id="recipePanel"></div>
-  <div id="collect-tip">Press E to collect</div>
+  
+  <!-- NEW: Loading Bar HTML -->
+  <div id="loading-container">
+    <div id="loading-text">Baking...</div>
+    <div id="loading-bar">0%</div>
+  </div>
 
   <a-scene id="scene" physics="gravity:-9.8" style="display:none;">
     
-    <!-- Player: Simplified into a single entity for stability and movement. -->
     <a-entity id="player"
               camera
               look-controls
               wasd-controls="acceleration: 150"
-              position="0 45 5" <!-- FIXED: Player height is now set to 45 -->
+              position="0 1.6 5"
               kinematic-body="shape: capsule; radius: 0.4; height: 1.6">
     </a-entity>
 
-    <!-- Lights -->
     <a-entity light="type:ambient; intensity:0.5"></a-entity>
     <a-entity light="type:directional; intensity:0.8" position="0 2 1"></a-entity>
 
-    <!-- Invisible physical floor to prevent falling -->
     <a-plane id="physical-floor" static-body position="0 0 0" rotation="-90 0 0" width="50" height="50" visible="false"></a-plane>
 
     <!-- Kitchen with collision -->
@@ -89,20 +114,22 @@
     <a-entity id="stool" gltf-model="stool.glb" static-body="shape: box;"></a-entity>
     <a-entity id="stove" gltf-model="stove.glb" static-body="shape: box;"></a-entity>
 
-    <!-- Collectables -->
-    <a-entity id="flour" gltf-model="flour.glb" class="collectable" static-body="shape: box;" data-name="flour"></a-entity>
-    <a-entity id="sugar" gltf-model="sugar.glb" class="collectable" static-body="shape: box;" data-name="sugar"></a-entity>
-    <a-entity id="butter" gltf-model="butter.glb" class="collectable" static-body="shape: box;" data-name="butter"></a-entity>
-    <a-entity id="milk" gltf-model="milk.glb" class="collectable" static-body="shape: box;" data-name="milk"></a-entity>
-    <a-entity id="vanilla" gltf-model="vanilla.glb" class="collectable" static-body="shape: box;" data-name="vanilla"></a-entity>
-    <a-entity id="blueberry" gltf-model="blueberry.glb" class="collectable" static-body="shape: sphere; radius: 0.03;" data-name="blueberry"></a-entity>
-    <a-entity id="strawberry" gltf-model="strawberry.glb" class="collectable" static-body="shape: sphere; radius: 0.05;" data-name="strawberry"></a-entity>
-    <a-entity id="chocolate" gltf-model="chocolate.glb" class="collectable" static-body="shape: box;" data-name="chocolate"></a-entity>
-    <a-entity id="spatula" gltf-model="spatula.glb" class="collectable" static-body="shape: box;" data-name="spatula"></a-entity>
-    <a-entity id="whisk" gltf-model="whisk.glb" class="collectable" static-body="shape: box;" data-name="whisk"></a-entity>
-    <a-entity id="banana" gltf-model="banana.glb" class="collectable" static-body="shape: box;" data-name="banana"></a-entity>
-    <a-entity id="cherries" gltf-model="cherries.glb" class="collectable" static-body="shape: sphere; radius: 0.03;" data-name="cherries"></a-entity>
-    <a-entity id="egg" gltf-model="egg.glb" class="collectable" static-body="shape: sphere; radius: 0.04;" data-name="egg"></a-entity>
+    <!-- Ingredients -->
+    <a-entity id="flour" gltf-model="flour.glb" class="ingredient" static-body="shape: box;" data-name="flour"></a-entity>
+    <a-entity id="sugar" gltf-model="sugar.glb" class="ingredient" static-body="shape: box;" data-name="sugar"></a-entity>
+    <a-entity id="butter" gltf-model="butter.glb" class="ingredient" static-body="shape: box;" data-name="butter"></a-entity>
+    <a-entity id="milk" gltf-model="milk.glb" class="ingredient" static-body="shape: box;" data-name="milk"></a-entity>
+    <a-entity id="egg" gltf-model="egg.glb" class="ingredient" static-body="shape: sphere; radius: 0.04;" data-name="egg"></a-entity>
+    <a-entity id="blueberry" gltf-model="blueberry.glb" class="ingredient" static-body="shape: sphere; radius: 0.03;" data-name="blueberry"></a-entity>
+    <a-entity id="cherries" gltf-model="cherries.glb" class="ingredient" static-body="shape: sphere; radius: 0.03;" data-name="cherries"></a-entity>
+    <a-entity id="chocolate" gltf-model="chocolate.glb" class="ingredient" static-body="shape: box;" data-name="chocolate"></a-entity>
+    
+    <!-- Non-recipe items -->
+    <a-entity id="vanilla" gltf-model="vanilla.glb" static-body="shape: box;"></a-entity>
+    <a-entity id="strawberry" gltf-model="strawberry.glb" static-body="shape: sphere; radius: 0.05;"></a-entity>
+    <a-entity id="spatula" gltf-model="spatula.glb" static-body="shape: box;"></a-entity>
+    <a-entity id="whisk" gltf-model="whisk.glb" static-body="shape: box;"></a-entity>
+    <a-entity id="banana" gltf-model="banana.glb" static-body="shape: box;"></a-entity>
 
     <!-- Final Cake Container -->
     <a-entity id="final-cake-container" position="0 1 -3" visible="false">
@@ -137,7 +164,6 @@
       recipePanel.style.display='block';
       recipePanel.className = cakeName;
 
-      // Simplified recipes for better gameplay
       const baseIngredients = ["flour", "sugar", "butter", "milk", "egg"];
       if(cakeName === 'blueberry'){
         currentIngredients = [...baseIngredients, "blueberry"];
@@ -147,86 +173,70 @@
         currentIngredients = [...baseIngredients, "cherries"];
       }
 
+      // Create the list with onclick events
       recipePanel.innerHTML = `<h2>${cakeName.charAt(0).toUpperCase()+cakeName.slice(1)} Cake</h2>
-        <ul>${currentIngredients.map(i=>`<li id="recipe-${i}"><span class="check"></span> ${i}</li>`).join('')}</ul>`;
+        <ul>${currentIngredients.map(i=>`<li id="recipe-${i}" onclick="collectIngredient('${i}')"><span class="check"></span> ${i}</li>`).join('')}</ul>`;
     }
-
-    AFRAME.registerComponent('collectable-trigger', {
-      init: function () {
-        this.playerInRange = false;
-        this.tip = document.getElementById('collect-tip');
-        this.player = document.getElementById('player');
-      },
-      tick: function () {
-        if (!this.player) return;
-        const playerPos = this.player.object3D.position;
-        const objPos = this.el.object3D.position;
-        const distance = playerPos.distanceTo(objPos);
-        const isInRange = distance < 2;
-
-        if (isInRange && !this.playerInRange) {
-          this.playerInRange = true;
-          this.tip.style.display = 'block';
-        } else if (!isInRange && this.playerInRange) {
-          this.playerInRange = false;
-          this.tip.style.display = 'none';
-        }
-      }
-    });
-
-    document.addEventListener('DOMContentLoaded', () => {
-      const collectables = document.querySelectorAll('.collectable');
-      collectables.forEach(c => {
-        c.setAttribute('collectable-trigger','');
-      });
-    });
-
-    document.addEventListener('keydown', function(e){
-      if(e.key.toLowerCase() !== 'e') return;
-
-      const player = document.getElementById('player');
-      const playerPos = player.object3D.position;
-      const collectables = document.querySelectorAll('.collectable');
-      
-      let itemCollected = false;
-      collectables.forEach(c => {
-        if (c.getAttribute('visible') === false) return;
-        const objPos = c.object3D.position;
-        const distance = playerPos.distanceTo(objPos);
+    
+    function collectIngredient(ingredientName) {
+      if (currentIngredients.includes(ingredientName) && !collectedIngredients.includes(ingredientName)) {
+        collectedIngredients.push(ingredientName);
         
-        if(distance < 2){
-          const name = c.getAttribute('data-name');
-          if(currentIngredients.includes(name) && !collectedIngredients.includes(name)){
-            c.setAttribute('visible','false');
-            collectedIngredients.push(name);
-            const li = document.getElementById(`recipe-${name}`);
-            if(li){ li.classList.add('collected'); }
-            itemCollected = true;
-          }
+        // Add checkmark and style the recipe list item
+        const li = document.getElementById(`recipe-${ingredientName}`);
+        if (li) {
+          li.classList.add('collected');
+          li.querySelector('.check').textContent = '✅ ';
         }
-      });
-
-      if (itemCollected) {
-        checkCompletion(); // Check if the game is won
+        
+        // Find the 3D model in the scene and fade it out
+        const ingredientEntity = document.querySelector(`.ingredient[data-name="${ingredientName}"]`);
+        if (ingredientEntity) {
+          ingredientEntity.setAttribute('animation', {
+            property: 'components.material.material.opacity',
+            to: 0,
+            dur: 1500,
+            easing: 'easeOutQuad'
+          });
+          setTimeout(() => {
+            ingredientEntity.setAttribute('visible', 'false');
+          }, 1500);
+        }
+        
+        checkCompletion();
       }
-      document.getElementById('collect-tip').style.display = 'none';
-    });
+    }
 
     function checkCompletion() {
       if (collectedIngredients.length === currentIngredients.length) {
-        setTimeout(showFinalCake, 1000);
+        startBakingSequence();
       }
     }
 
+    function startBakingSequence() {
+      const loadingContainer = document.getElementById('loading-container');
+      const loadingBar = document.getElementById('loading-bar');
+      loadingContainer.style.display = 'block';
+
+      let progress = 0;
+      const interval = setInterval(() => {
+        progress += 1;
+        loadingBar.style.width = progress + '%';
+        loadingBar.textContent = progress + '%';
+        if (progress >= 100) {
+          clearInterval(interval);
+          loadingContainer.style.display = 'none';
+          showFinalCake();
+        }
+      }, 50); // 5000ms / 100% = 50ms per 1%
+    }
+
     function showFinalCake() {
-      // Hide the mixing bowl
       document.getElementById('mixingbowl').setAttribute('visible', 'false');
-      // Show the correct cake model
       const finalCake = document.getElementById('final-cake-container');
       const cakeModel = document.getElementById(`${selectedCake}-cake-model`);
       cakeModel.setAttribute('visible', 'true');
       finalCake.setAttribute('visible', 'true');
-      // Animate it appearing
       finalCake.setAttribute('animation', {
         property: 'scale',
         from: '0.01 0.01 0.01',
