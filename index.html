@@ -4,9 +4,9 @@
   <title>Bake your cake</title>
   <!-- A-Frame Core -->
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-  <!-- A-Frame Extras for Drag-and-Drop ONLY. We are NOT using its movement controls. -->
+  <!-- A-Frame Extras for Drag-and-Drop -->
   <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v7.1.0/dist/aframe-extras.min.js"></script>
-  <!-- A-Frame PhysX - The Physics Engine -->
+  <!-- A-Frame PhysX - The Physics Engine (for the environment) -->
   <script src="https://cdn.jsdelivr.net/npm/aframe-physx@0.4.0/dist/aframe-physx.min.js"></script>
   
   <style>
@@ -44,13 +44,11 @@
   <!-- Initialize the scene with the PhysX engine -->
   <a-scene id="scene" physx="gravity: 0 -9.8 0;" style="display:none;" cursor="rayOrigin: mouse; fuse: false">
     
-    <!-- Player Rig: Simplified for stability and guaranteed movement. -->
+    <!-- Player Rig: SIMPLIFIED to GUARANTEE MOVEMENT. Physics has been REMOVED from the player. -->
     <a-entity id="player-rig"
-              position="0 15 5" <!-- FIXED: YOU ARE NOW 15 METERS TALL. Change the '15' to be shorter if you want. -->
-              wasd-controls="acceleration: 100;" <!-- FIXED: Using the simple, reliable built-in controls. -->
-              physx-body="type: kinematic; mass: 5; fixedRotation: true;"
-              physx-shape="type: capsule; radius: 0.5; height: 2.0;">
-      <!-- The camera is the player's eyes. It just looks around. The parent rig handles all movement. -->
+              position="0 30 5" <!-- FIXED: Player height is now 30 meters. Change this number to adjust your height. -->
+              wasd-controls="acceleration: 100;"> <!-- This will now work without physics interference. -->
+      <!-- The camera is the player's eyes. It just looks around. -->
       <a-entity id="player-camera"
                 camera
                 position="0 0 0"
@@ -62,13 +60,13 @@
     <a-entity light="type:ambient; intensity:0.5"></a-entity>
     <a-entity light="type:directional; intensity:0.8" position="0 2 1"></a-entity>
 
-    <!-- Invisible physical floor with PhysX body -->
+    <!-- Invisible physical floor. The player will NOT stand on this, but objects will. -->
     <a-plane id="physical-floor" position="0 0 0" rotation="-90 0 0" width="50" height="50" visible="false"
              physx-body="type: static;"
              physx-shape="type: plane;">
     </a-plane>
 
-    <!-- Kitchen Fixtures with PhysX bodies for collision -->
+    <!-- Kitchen Fixtures with PhysX bodies for collision (these are still solid) -->
     <a-entity id="backwall" gltf-model="backwall.glb" physx-body="type: static;" physx-shape="type: box;"></a-entity>
     <a-entity id="frontwall" gltf-model="frontwall.glb" physx-body="type: static;" physx-shape="type: box;"></a-entity>
     <a-entity id="rightwall" gltf-model="rightwall.glb" physx-body="type: static;" physx-shape="type: box;"></a-entity>
@@ -92,7 +90,7 @@
     <a-entity id="spatula" gltf-model="spatula.glb" physx-body="type: static;" physx-shape="type: box;"></a-entity>
     <a-entity id="whisk" gltf-model="whisk.glb" physx-body="type: static;" physx-shape="type: box;"></a-entity>
     <a-entity id="banana" gltf-model="banana.glb" physx-body="type: static;" physx-shape="type: box;"></a-entity>
-    <a-entity id="mixingbowl" gltf-model="mixingbowl.glb" droppable physx-body="type: static;" physx-shape="type: cylinder;"></a-entity>
+    <a-entity id="mixingbowl" gltf-model="mixingbowl.glb" droppable physx-body="type: static;" physx-shape="type: cylinder;"></a--entity>
 
     <!-- Draggable Ingredients -->
     <a-entity id="flour" gltf-model="flour.glb" class="ingredient" draggable data-name="flour" physx-body="type: static;" physx-shape="type: box;"></a-entity>
