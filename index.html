@@ -21,7 +21,7 @@
     #recipePanel.blueberry { background-color: rgba(30, 144, 255, 0.8); }
     #recipePanel.cherry { background-color: rgba(255, 105, 180, 0.8); }
     
-    /* NEW: Loading Bar Styles */
+    /* Loading Bar Styles */
     #loading-container {
       position: absolute;
       top: 50%;
@@ -72,7 +72,7 @@
 
   <div id="recipePanel"></div>
   
-  <!-- NEW: Loading Bar HTML -->
+  <!-- Loading Bar HTML -->
   <div id="loading-container">
     <div id="loading-text">Baking...</div>
     <div id="loading-bar">0%</div>
@@ -84,7 +84,7 @@
               camera
               look-controls
               wasd-controls="acceleration: 150"
-              position="0 1.6 5"
+              position="0 45 5" <!-- FIXED: Player height is set back to 45 -->
               kinematic-body="shape: capsule; radius: 0.4; height: 1.6">
     </a-entity>
 
