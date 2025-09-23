@@ -4,9 +4,9 @@
   <title>Bake your cake</title>
   <!-- A-Frame Core -->
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-  <!-- A-Frame Extras for Controls and Drag-and-Drop (Updated Version) -->
+  <!-- A-Frame Extras for Drag-and-Drop ONLY. We are NOT using its movement controls. -->
   <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v7.1.0/dist/aframe-extras.min.js"></script>
-  <!-- A-Frame PhysX - A more stable physics engine -->
+  <!-- A-Frame PhysX - The Physics Engine -->
   <script src="https://cdn.jsdelivr.net/npm/aframe-physx@0.4.0/dist/aframe-physx.min.js"></script>
   
   <style>
@@ -44,13 +44,13 @@
   <!-- Initialize the scene with the PhysX engine -->
   <a-scene id="scene" physx="gravity: 0 -9.8 0;" style="display:none;" cursor="rayOrigin: mouse; fuse: false">
     
-    <!-- Player Rig: This structure is more stable and fixes the movement issue. -->
+    <!-- Player Rig: Simplified for stability and guaranteed movement. -->
     <a-entity id="player-rig"
-              position="0 5 5" <!-- FIXED: Player height is now 5 meters. Change the middle number to be taller or shorter. -->
-              movement-controls="speed: 0.25; controls: keyboard, touch" <!-- FIXED: This structure enables keyboard movement. -->
+              position="0 15 5" <!-- FIXED: YOU ARE NOW 15 METERS TALL. Change the '15' to be shorter if you want. -->
+              wasd-controls="acceleration: 100;" <!-- FIXED: Using the simple, reliable built-in controls. -->
               physx-body="type: kinematic; mass: 5; fixedRotation: true;"
-              physx-shape="type: capsule; radius: 0.5; height: 1.8;">
-      <!-- The camera is a child of the rig. It represents the player's eyes. -->
+              physx-shape="type: capsule; radius: 0.5; height: 2.0;">
+      <!-- The camera is the player's eyes. It just looks around. The parent rig handles all movement. -->
       <a-entity id="player-camera"
                 camera
                 position="0 0 0"
@@ -73,7 +73,7 @@
     <a-entity id="frontwall" gltf-model="frontwall.glb" physx-body="type: static;" physx-shape="type: box;"></a-entity>
     <a-entity id="rightwall" gltf-model="rightwall.glb" physx-body="type: static;" physx-shape="type: box;"></a-entity>
     <a-entity id="leftwall" gltf-model="leftwall.glb" physx-body="type: static;" physx-shape="type: box;"></a-entity>
-    <a-entity id="floor" gltf-model="floor.glb"></a-entity> <!-- Visual floor has no physics -->
+    <a-entity id="floor" gltf-model="floor.glb"></a-entity>
     <a-entity id="fridge" gltf-model="fridge.glb" physx-body="type: static;" physx-shape="type: box;"></a-entity>
     <a-entity id="roof" gltf-model="roof.glb" physx-body="type: static;" physx-shape="type: box;"></a-entity>
     <a-entity id="counterdecor" gltf-model="counterdecor.glb" physx-body="type: static;" physx-shape="type: box;"></a-entity>
