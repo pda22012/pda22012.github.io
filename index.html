@@ -5,13 +5,13 @@
   <!-- A-Frame Core -->
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
   <!-- A-Frame Extras for Controls and Drag-and-Drop -->
-  <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
-  <!-- NEW: A-Frame PhysX - A more stable physics engine -->
+  <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v7.1.0/dist/aframe-extras.min.js"></script>
+  <!-- A-Frame PhysX - A more stable physics engine -->
   <script src="https://cdn.jsdelivr.net/npm/aframe-physx@0.4.0/dist/aframe-physx.min.js"></script>
   
   <style>
     body, html { margin:0; padding:0; height:100%; width:100%; font-family:sans-serif; overflow: hidden; }
-    #startScreen, #cakeChoices { position:absolute; top:0; left:0; width:100%; height:100%; display:flex; flex-direction:column; justify-content:center; align-items:center; background-size:cover; z-index:10; }
+    #startScreen, #cakeChoices { position:absolute; top:0; left:0; width:100%; height:100%; display:flex; flex-direction:column; justify-content:center; align-items-center; background-size:cover; z-index:10; }
     #startScreen { background: url('https://cdn.pixabay.com/photo/2015/01/14/19/20/bake-599521_1280.jpg') no-repeat center center; }
     #startScreen::before, #cakeChoices::before { content:""; position:absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index:-1; }
     #cakeChoices { background: url('https://cdn.pixabay.com/photo/2015/01/14/19/20/bake-599521_1280.jpg') no-repeat center center; display:none; }
@@ -41,17 +41,21 @@
 
   <div id="recipePanel"></div>
 
-  <!-- Initialize the scene with the new PhysX engine -->
+  <!-- Initialize the scene with the PhysX engine -->
   <a-scene id="scene" physx="gravity: 0 -9.8 0;" style="display:none;" cursor="rayOrigin: mouse; fuse: false">
     
-    <!-- PLAYER with PhysX body and improved controls -->
-    <a-entity id="player"
-              camera
-              position="0 1.6 5"
-              look-controls
-              movement-controls="speed: 0.15;"
+    <!-- Player Rig: This structure is more stable for physics and movement. -->
+    <a-entity id="player-rig"
+              position="0 2.5 5"
+              movement-controls="speed: 0.2; controls: keyboard, touch"
               physx-body="type: kinematic; mass: 5; fixedRotation: true;"
-              physx-shape="type: capsule; radius: 0.4; height: 1.6;">
+              physx-shape="type: capsule; radius: 0.4; height: 1.8;">
+      <!-- The camera is a child of the rig. Its position is the eye height relative to the rig's center. -->
+      <a-entity id="player-camera"
+                camera
+                position="0 0 0"
+                look-controls>
+      </a-entity>
     </a-entity>
 
     <!-- Lights -->
@@ -69,7 +73,7 @@
     <a-entity id="frontwall" gltf-model="frontwall.glb" physx-body="type: static;" physx-shape="type: box;"></a-entity>
     <a-entity id="rightwall" gltf-model="rightwall.glb" physx-body="type: static;" physx-shape="type: box;"></a-entity>
     <a-entity id="leftwall" gltf-model="leftwall.glb" physx-body="type: static;" physx-shape="type: box;"></a-entity>
-    <a-entity id="floor" gltf-model="floor.glb"></a-entity> <!-- Visual floor has no physics -->
+    <a-entity id="floor" gltf-model="floor.glb"></a-entity>
     <a-entity id="fridge" gltf-model="fridge.glb" physx-body="type: static;" physx-shape="type: box;"></a-entity>
     <a-entity id="roof" gltf-model="roof.glb" physx-body="type: static;" physx-shape="type: box;"></a-entity>
     <a-entity id="counterdecor" gltf-model="counterdecor.glb" physx-body="type: static;" physx-shape="type: box;"></a-entity>
@@ -79,22 +83,18 @@
     <a-entity id="shelves" gltf-model="shelves.glb" physx-body="type: static;" physx-shape="type: box;"></a-entity>
     <a-entity id="stool" gltf-model="stool.glb" physx-body="type: static;" physx-shape="type: box;"></a-entity>
     <a-entity id="stove" gltf-model="stove.glb" physx-body="type: static;" physx-shape="type: box;"></a-entity>
-
-    <!-- Kitchen Items with PhysX bodies -->
     <a-entity id="salt" gltf-model="salt.glb" physx-body="type: static;" physx-shape="type: box;"></a-entity>
     <a-entity id="eggcarton" gltf-model="eggcarton.glb" physx-body="type: static;" physx-shape="type: box;"></a-entity>
     <a-entity id="cuttingboard" gltf-model="cuttingboard.glb" physx-body="type: static;" physx-shape="type: box;"></a-entity>
-    <a-entity id="knife" gltf-model="knife.glb" physx-body="type: static;" physx-shape="type: box;"></a-entity>
+    <a-entity id="knife" gltf-model="knife.glb" physx-body="type: static;" physx-shape="type: box;"></a--entity>
     <a-entity id="vanilla" gltf-model="vanilla.glb" physx-body="type: static;" physx-shape="type: box;"></a-entity>
     <a-entity id="strawberry" gltf-model="strawberry.glb" physx-body="type: static;" physx-shape="type: sphere; radius: 0.05;"></a-entity>
     <a-entity id="spatula" gltf-model="spatula.glb" physx-body="type: static;" physx-shape="type: box;"></a-entity>
     <a-entity id="whisk" gltf-model="whisk.glb" physx-body="type: static;" physx-shape="type: box;"></a-entity>
     <a-entity id="banana" gltf-model="banana.glb" physx-body="type: static;" physx-shape="type: box;"></a-entity>
-
-    <!-- Mixing Bowl - The Drop Target -->
     <a-entity id="mixingbowl" gltf-model="mixingbowl.glb" droppable physx-body="type: static;" physx-shape="type: cylinder;"></a-entity>
 
-    <!-- Draggable Ingredients with PhysX bodies -->
+    <!-- Draggable Ingredients -->
     <a-entity id="flour" gltf-model="flour.glb" class="ingredient" draggable data-name="flour" physx-body="type: static;" physx-shape="type: box;"></a-entity>
     <a-entity id="sugar" gltf-model="sugar.glb" class="ingredient" draggable data-name="sugar" physx-body="type: static;" physx-shape="type: box;"></a-entity>
     <a-entity id="butter" gltf-model="butter.glb" class="ingredient" draggable data-name="butter" physx-body="type: static;" physx-shape="type: box;"></a-entity>
@@ -115,8 +115,16 @@
   </a-scene>
 
   <script>
-    // --- NO CHANGES TO THE SCRIPT ---
-    // The game logic is independent of the physics engine used.
+    document.addEventListener('DOMContentLoaded', () => {
+        // This is a simple check to make sure the libraries loaded.
+        if (!AFRAME.components['movement-controls']) {
+            alert("CRITICAL ERROR: aframe-extras library failed to load. Movement will not work.");
+        }
+        if (!AFRAME.components.physx) {
+            alert("CRITICAL ERROR: aframe-physx library failed to load. Physics will not work.");
+        }
+    });
+
     let currentIngredients = [];
     let collectedIngredients = [];
     let selectedCake = '';
@@ -165,11 +173,9 @@
       selectedCake = cakeName;
       document.getElementById('cakeChoices').style.display='none';
       document.getElementById('scene').style.display='block';
-
       const recipePanel = document.getElementById('recipePanel');
       recipePanel.style.display='block';
       recipePanel.className = cakeName;
-
       const baseIngredients = ["flour", "sugar", "butter", "milk", "egg"];
       if(cakeName === 'blueberry'){
         currentIngredients = [...baseIngredients, "blueberry"];
@@ -178,7 +184,6 @@
       } else if(cakeName === 'cherry'){
         currentIngredients = [...baseIngredients, "cherries"];
       }
-
       recipePanel.innerHTML = `<h2>${cakeName.charAt(0).toUpperCase() + cakeName.slice(1)} Cake</h2>
         <ul>${currentIngredients.map(i => `<li id="recipe-${i}">${i}</li>`).join('')}</ul>`;
     }
@@ -195,27 +200,17 @@
         const ingredientsToHide = document.querySelectorAll('.ingredient');
         ingredientsToHide.forEach(ing => {
             if (currentIngredients.includes(ing.dataset.name)) {
-                ing.setAttribute('animation__fade', {
-                    property: 'components.material.material.opacity', to: 0, dur: 1500
-                });
+                ing.setAttribute('animation__fade', { property: 'components.material.material.opacity', to: 0, dur: 1500 });
             }
         });
-
-        document.getElementById('mixingbowl').setAttribute('animation__fade', {
-            property: 'components.material.material.opacity', to: 0, dur: 1500
-        });
-
+        document.getElementById('mixingbowl').setAttribute('animation__fade', { property: 'components.material.material.opacity', to: 0, dur: 1500 });
         const bowl = document.getElementById('mixingbowl');
         const finalCakeContainer = document.getElementById('final-cake-container');
         finalCakeContainer.setAttribute('position', bowl.getAttribute('position'));
-
         const cakeModel = document.getElementById(`${selectedCake}-cake-model`);
         cakeModel.setAttribute('visible', 'true');
-        
         finalCakeContainer.setAttribute('visible', 'true');
-        finalCakeContainer.setAttribute('animation', {
-            property: 'scale', from: '0.01 0.01 0.01', to: '1 1 1', dur: 1500, easing: 'easeOutElastic'
-        });
+        finalCakeContainer.setAttribute('animation', { property: 'scale', from: '0.01 0.01 0.01', to: '1 1 1', dur: 1500, easing: 'easeOutElastic' });
     }
   </script>
 </body>
