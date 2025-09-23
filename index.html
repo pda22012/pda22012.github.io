@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Bake your cake</title>
+  <title>Bake your cake - FINAL FIX</title>
+  <!-- A-Frame Core -->
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+  <!-- A-Frame Physics System -->
   <script src="https://cdn.rawgit.com/donmccurdy/aframe-physics-system/v3.3.0/dist/aframe-physics-system.min.js"></script>
+  
   <style>
     body, html { margin:0; padding:0; height:100%; width:100%; font-family:sans-serif; overflow: hidden; }
     #startScreen, #cakeChoices { position:absolute; top:0; left:0; width:100%; height:100%; display:flex; flex-direction:column; justify-content:center; align-items:center; background-size:cover; z-index:10; }
@@ -83,7 +86,7 @@
               camera
               look-controls
               wasd-controls="acceleration: 150"
-              position="0 45 5"
+              position="0 1.6 5"
               kinematic-body="shape: capsule; radius: 0.4; height: 1.6">
     </a-entity>
 
@@ -118,15 +121,15 @@
     <a-entity id="whisk" gltf-model="whisk.glb" static-body="shape: box;"></a-entity>
     <a-entity id="banana" gltf-model="banana.glb" static-body="shape: box;"></a-entity>
 
-    <!-- Ingredients with material component initialized for animation -->
-    <a-entity id="flour" gltf-model="flour.glb" class="ingredient" static-body="shape: box;" data-name="flour" material="opacity: 1;"></a-entity>
-    <a-entity id="sugar" gltf-model="sugar.glb" class="ingredient" static-body="shape: box;" data-name="sugar" material="opacity: 1;"></a-entity>
-    <a-entity id="butter" gltf-model="butter.glb" class="ingredient" static-body="shape: box;" data-name="butter" material="opacity: 1;"></a-entity>
-    <a-entity id="milk" gltf-model="milk.glb" class="ingredient" static-body="shape: box;" data-name="milk" material="opacity: 1;"></a-entity>
-    <a-entity id="egg" gltf-model="egg.glb" class="ingredient" static-body="shape: sphere; radius: 0.04;" data-name="egg" material="opacity: 1;"></a-entity>
-    <a-entity id="blueberry" gltf-model="blueberry.glb" class="ingredient" static-body="shape: sphere; radius: 0.03;" data-name="blueberry" material="opacity: 1;"></a-entity>
-    <a-entity id="cherries" gltf-model="cherries.glb" class="ingredient" static-body="shape: sphere; radius: 0.03;" data-name="cherries" material="opacity: 1;"></a-entity>
-    <a-entity id="chocolate" gltf-model="chocolate.glb" class="ingredient" static-body="shape: box;" data-name="chocolate" material="opacity: 1;"></a-entity>
+    <!-- Ingredients with the new fade-out component -->
+    <a-entity id="flour" gltf-model="flour.glb" class="ingredient" static-body="shape: box;" data-name="flour" fade-out></a-entity>
+    <a-entity id="sugar" gltf-model="sugar.glb" class="ingredient" static-body="shape: box;" data-name="sugar" fade-out></a-entity>
+    <a-entity id="butter" gltf-model="butter.glb" class="ingredient" static-body="shape: box;" data-name="butter" fade-out></a-entity>
+    <a-entity id="milk" gltf-model="milk.glb" class="ingredient" static-body="shape: box;" data-name="milk" fade-out></a-entity>
+    <a-entity id="egg" gltf-model="egg.glb" class="ingredient" static-body="shape: sphere; radius: 0.04;" data-name="egg" fade-out></a-entity>
+    <a-entity id="blueberry" gltf-model="blueberry.glb" class="ingredient" static-body="shape: sphere; radius: 0.03;" data-name="blueberry" fade-out></a-entity>
+    <a-entity id="cherries" gltf-model="cherries.glb" class="ingredient" static-body="shape: sphere; radius: 0.03;" data-name="cherries" fade-out></a-entity>
+    <a-entity id="chocolate" gltf-model="chocolate.glb" class="ingredient" static-body="shape: box;" data-name="chocolate" fade-out></a-entity>
 
     <!-- Final Cake Container -->
     <a-entity id="final-cake-container" position="0 1 -3" visible="false">
@@ -139,6 +142,35 @@
   </a-scene>
 
   <script>
+    // --- NEW SCRIPT TO GUARANTEE FADING ANIMATION ---
+    AFRAME.registerComponent('fade-out', {
+      init: function () {
+        this.el.addEventListener('start-fade', () => {
+          const mesh = this.el.getObject3D('mesh');
+          if (!mesh) return;
+
+          // Animate the opacity of all materials on the model
+          mesh.traverse(node => {
+            if (node.isMesh && node.material) {
+              // Ensure material is transparent
+              node.material.transparent = true;
+              
+              new AFRAME.TWEEN.Tween({ opacity: node.material.opacity })
+                .to({ opacity: 0 }, 1500) // 1500ms duration
+                .onUpdate(function () {
+                  node.material.opacity = this.opacity;
+                })
+                .start();
+            }
+          });
+          
+          setTimeout(() => {
+            this.el.setAttribute('visible', 'false');
+          }, 1500);
+        });
+      }
+    });
+
     let currentIngredients = [];
     let collectedIngredients = [];
     let selectedCake = '';
@@ -170,7 +202,6 @@
         currentIngredients = [...baseIngredients, "cherries"];
       }
 
-      // Build the recipe list HTML
       let recipeHTML = `<h2>${cakeName.charAt(0).toUpperCase()+cakeName.slice(1)} Cake</h2><ul>`;
       currentIngredients.forEach(ingredient => {
         recipeHTML += `<li id="recipe-${ingredient}" onclick="collectIngredient('${ingredient}')"><span class="check"></span> ${ingredient}</li>`;
@@ -180,7 +211,6 @@
     }
     
     function collectIngredient(ingredientName) {
-      // Prevent collecting an item more than once
       if (collectedIngredients.includes(ingredientName)) {
         return; 
       }
@@ -194,18 +224,10 @@
           li.querySelector('.check').textContent = '✅ ';
         }
         
+        // Find the 3D model in the scene and tell it to start fading
         const ingredientEntity = document.querySelector(`.ingredient[data-name="${ingredientName}"]`);
         if (ingredientEntity) {
-          // Animate the material.opacity property
-          ingredientEntity.setAttribute('animation', {
-            property: 'material.opacity', // FIXED: Corrected animation property
-            to: 0,
-            dur: 1500,
-            easing: 'easeOutQuad'
-          });
-          setTimeout(() => {
-            ingredientEntity.setAttribute('visible', 'false');
-          }, 1500);
+          ingredientEntity.emit('start-fade'); // FIXED: Send a signal to the new component
         }
         
         checkCompletion();
@@ -252,4 +274,4 @@
     }
   </script>
 </body>
-</html>
+</html>```
