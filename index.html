@@ -6,7 +6,7 @@
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
   <!-- A-Frame Extras for Drag-and-Drop functionality -->
   <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
-  <!-- A-Frame Physics System from your original code -->
+  <!-- A-Frame Physics System -->
   <script src="https://cdn.rawgit.com/donmccurdy/aframe-physics-system/v3.3.0/dist/aframe-physics-system.min.js"></script>
   
   <style>
@@ -21,7 +21,6 @@
     #recipePanel h2 { margin-top:0; font-size:22px; text-align:center; }
     #recipePanel ul { list-style:none; padding:0; }
     #recipePanel li { margin:5px 0; font-weight:bold; transition: color 0.5s; }
-    /* Style for collected ingredients */
     #recipePanel li.collected { color:lightgreen; text-decoration: line-through; }
     #recipePanel.chocolate { background-color: rgba(139, 69, 19, 0.8); }
     #recipePanel.blueberry { background-color: rgba(30, 144, 255, 0.8); }
@@ -43,8 +42,8 @@
   <div id="recipePanel"></div>
 
   <a-scene id="scene" physics="gravity:-9.8" style="display:none;" cursor="rayOrigin: mouse; fuse: false">
-    <!-- Player camera with physics -->
-    <a-entity id="player" kinematic-body position="0 1.6 5">
+    <!-- Player camera with a capsule shape for accurate collisions -->
+    <a-entity id="player" kinematic-body="shape: capsule; radius: 0.4; height: 1.6" position="0 1.6 5">
       <a-entity id="cameraRig" camera look-controls wasd-controls="acceleration:150">
       </a-entity>
     </a-entity>
@@ -53,54 +52,57 @@
     <a-entity light="type:ambient; intensity:0.5"></a-entity>
     <a-entity light="type:directional; intensity:0.8" position="0 2 1"></a-entity>
 
-    <!-- Kitchen with collision -->
-    <a-entity id="backwall" gltf-model="backwall.glb" static-body></a-entity>
-    <a-entity id="frontwall" gltf-model="frontwall.glb" static-body></a-entity>
-    <a-entity id="rightwall" gltf-model="rightwall.glb" static-body></a-entity>
-    <a-entity id="leftwall" gltf-model="leftwall.glb" static-body></a-entity>
-    <a-entity id="floor" gltf-model="floor.glb" static-body></a-entity>
-    <a-entity id="fridge" gltf-model="fridge.glb" static-body></a-entity>
-    <a-entity id="roof" gltf-model="roof.glb" static-body></a-entity>
-    <a-entity id="counterdecor" gltf-model="counterdecor.glb" static-body></a-entity>
-    <a-entity id="counters" gltf-model="counters.glb" static-body></a-entity>
-    <a-entity id="radio" gltf-model="radio.glb" static-body></a-entity>
-    <a-entity id="light" gltf-model="light.glb" static-body></a-entity>
-    <a-entity id="salt" gltf-model="salt.glb" static-body></a-entity>
-    <a-entity id="eggcarton" gltf-model="eggcarton.glb" static-body></a-entity>
-    <a-entity id="cuttingboard" gltf-model="cuttingboard.glb" static-body></a-entity>
-    <a-entity id="shelves" gltf-model="shelves.glb" static-body></a-entity>
-    <a-entity id="knife" gltf-model="knife.glb" static-body></a-entity>
-    <a-entity id="stool" gltf-model="stool.glb" static-body></a-entity>
-    <a-entity id="stove" gltf-model="stove.glb" static-body></a-entity>
-    
-    <!-- Mixing Bowl - The Drop Target -->
-    <a-entity id="mixingbowl" gltf-model="mixingbowl.glb" static-body droppable></a-entity>
+    <!-- An invisible plane that acts as the physical floor to prevent falling -->
+    <a-plane id="physical-floor" static-body position="0 0 0" rotation="-90 0 0" width="50" height="50" visible="false"></a-plane>
 
-    <!-- Draggable Ingredients -->
-    <a-entity id="flour" gltf-model="flour.glb" class="ingredient" draggable data-name="flour"></a-entity>
-    <a-entity id="sugar" gltf-model="sugar.glb" class="ingredient" draggable data-name="sugar"></a-entity>
-    <a-entity id="butter" gltf-model="butter.glb" class="ingredient" draggable data-name="butter"></a-entity>
-    <a-entity id="milk" gltf-model="milk.glb" class="ingredient" draggable data-name="milk"></a-entity>
-    <a-entity id="egg" gltf-model="egg.glb" class="ingredient" draggable data-name="egg"></a-entity>
-    <a-entity id="blueberry" gltf-model="blueberry.glb" class="ingredient" draggable data-name="blueberry"></a-entity>
-    <a-entity id="cherries" gltf-model="cherries.glb" class="ingredient" draggable data-name="cherries"></a-entity>
-    <a-entity id="chocolate" gltf-model="chocolate.glb" class="ingredient" draggable data-name="chocolate"></a-entity>
-    
-    <!-- Items not in recipes (can still be moved if you add 'draggable') -->
-    <a-entity id="vanilla" gltf-model="vanilla.glb" data-name="vanilla"></a-entity>
-    <a-entity id="strawberry" gltf-model="strawberry.glb" data-name="strawberry"></a-entity>
-    <a-entity id="spatula" gltf-model="spatula.glb" data-name="spatula"></a-entity>
-    <a-entity id="whisk" gltf-model="whisk.glb" data-name="whisk"></a-entity>
-    <a-entity id="banana" gltf-model="banana.glb" data-name="banana"></a-entity>
+    <!-- Kitchen Fixtures with static-body for collision -->
+    <!-- The 'shape: box' provides a simple hitbox for the physics engine -->
+    <a-entity id="backwall" gltf-model="backwall.glb" static-body="shape: box;"></a-entity>
+    <a-entity id="frontwall" gltf-model="frontwall.glb" static-body="shape: box;"></a-entity>
+    <a-entity id="rightwall" gltf-model="rightwall.glb" static-body="shape: box;"></a-entity>
+    <a-entity id="leftwall" gltf-model="leftwall.glb" static-body="shape: box;"></a-entity>
+    <a-entity id="floor" gltf-model="floor.glb"></a-entity> <!-- Visual floor has no physics -->
+    <a-entity id="fridge" gltf-model="fridge.glb" static-body="shape: box;"></a-entity>
+    <a-entity id="roof" gltf-model="roof.glb" static-body="shape: box;"></a-entity>
+    <a-entity id="counterdecor" gltf-model="counterdecor.glb" static-body="shape: box;"></a-entity>
+    <a-entity id="counters" gltf-model="counters.glb" static-body="shape: box;"></a-entity>
+    <a-entity id="radio" gltf-model="radio.glb" static-body="shape: box;"></a-entity>
+    <a-entity id="light" gltf-model="light.glb" static-body="shape: box;"></a-entity>
+    <a-entity id="shelves" gltf-model="shelves.glb" static-body="shape: box;"></a-entity>
+    <a-entity id="stool" gltf-model="stool.glb" static-body="shape: box;"></a-entity>
+    <a-entity id="stove" gltf-model="stove.glb" static-body="shape: box;"></a-entity>
 
+    <!-- Kitchen Items with static-body for collision -->
+    <!-- These items are now solid objects that the player cannot walk through -->
+    <a-entity id="salt" gltf-model="salt.glb" static-body="shape: box;"></a-entity>
+    <a-entity id="eggcarton" gltf-model="eggcarton.glb" static-body="shape: box;"></a-entity>
+    <a-entity id="cuttingboard" gltf-model="cuttingboard.glb" static-body="shape: box;"></a-entity>
+    <a-entity id="knife" gltf-model="knife.glb" static-body="shape: box;"></a-entity>
+    <a-entity id="vanilla" gltf-model="vanilla.glb" static-body="shape: box;"></a-entity>
+    <a-entity id="strawberry" gltf-model="strawberry.glb" static-body="shape: sphere; sphereRadius: 0.05;"></a-entity>
+    <a-entity id="spatula" gltf-model="spatula.glb" static-body="shape: box;"></a-entity>
+    <a-entity id="whisk" gltf-model="whisk.glb" static-body="shape: box;"></a-entity>
+    <a-entity id="banana" gltf-model="banana.glb" static-body="shape: box;"></a-entity>
+
+    <!-- Mixing Bowl - The Drop Target (also a solid object) -->
+    <a-entity id="mixingbowl" gltf-model="mixingbowl.glb" static-body="shape: cylinder;" droppable></a-entity>
+
+    <!-- Draggable Ingredients (now also solid objects until picked up) -->
+    <a-entity id="flour" gltf-model="flour.glb" class="ingredient" draggable data-name="flour" static-body="shape: box;"></a-entity>
+    <a-entity id="sugar" gltf-model="sugar.glb" class="ingredient" draggable data-name="sugar" static-body="shape: box;"></a-entity>
+    <a-entity id="butter" gltf-model="butter.glb" class="ingredient" draggable data-name="butter" static-body="shape: box;"></a-entity>
+    <a-entity id="milk" gltf-model="milk.glb" class="ingredient" draggable data-name="milk" static-body="shape: box;"></a-entity>
+    <a-entity id="egg" gltf-model="egg.glb" class="ingredient" draggable data-name="egg" static-body="shape: sphere; sphereRadius: 0.04;"></a-entity>
+    <a-entity id="blueberry" gltf-model="blueberry.glb" class="ingredient" draggable data-name="blueberry" static-body="shape: sphere; sphereRadius: 0.03;"></a-entity>
+    <a-entity id="cherries" gltf-model="cherries.glb" class="ingredient" draggable data-name="cherries" static-body="shape: sphere; sphereRadius: 0.03;"></a-entity>
+    <a-entity id="chocolate" gltf-model="chocolate.glb" class="ingredient" draggable data-name="chocolate" static-body="shape: box;"></a-entity>
+    
     <!-- This entity will hold the final cake. It's invisible at the start. -->
     <a-entity id="final-cake-container" position="0 0.5 0" visible="false">
-        <a-entity id="chocolate-cake-model" gltf-model="chocolatecake.glb" visible="false"></a-entity>
-        <a-entity id="blueberry-cake-model" gltf-model="slicefruitcake.glb" visible="false"></a-entity>
-        <a-entity id="cherry-cake-model" gltf-model="cherrycake1.glb" visible="false"></a-entity>
-      <a-entity id="cherry-cake-model" gltf-model="cherrycake2.glb" visible="false"></a-entity>
-      <a-entity id="cherry-cake-model" gltf-model="cherrycake3.glb" visible="false"></a-entity>
-      <a-entity id="cherry-cake-model" gltf-model="cherrycake4.glb" visible="false"></a-entity>
+        <!-- Make sure you have these cake models or replace with placeholders -->
+        <a-entity id="chocolate-cake-model" gltf-model="#chocolate-cake.glb" visible="false"></a-entity>
+        <a-entity id="blueberry-cake-model" gltf-model="#blueberry-cake.glb" visible="false"></a-entity>
+        <a-entity id="cherry-cake-model" gltf-model="#cherry-cake.glb" visible="false"></a-entity>
     </a-entity>
 
     <a-sound id="mainmusic" src="baking cooking jazz.mp3" autoplay="false" loop="true"></a-sound>
@@ -113,14 +115,10 @@
 
     // --- A-FRAME COMPONENT DEFINITIONS ---
 
-    // Component to make an entity draggable
     AFRAME.registerComponent('draggable', {
-      init: function () {
-        this.el.classList.add('clickable'); // For cursor interaction
-      }
+      init: function () { this.el.classList.add('clickable'); }
     });
 
-    // Component for the drop target (the mixing bowl)
     AFRAME.registerComponent('droppable', {
       init: function () {
         this.el.addEventListener('drag-drop', (e) => {
@@ -130,11 +128,9 @@
           if (currentIngredients.includes(ingredientName) && !collectedIngredients.includes(ingredientName)) {
             collectedIngredients.push(ingredientName);
             
-            // Update the recipe list UI
             const li = document.getElementById(`recipe-${ingredientName}`);
             if(li) { li.classList.add('collected'); }
 
-            // Animate the ingredient into the bowl and then hide it
             const bowlPosition = this.el.getAttribute('position');
             droppedEl.setAttribute('animation', {
                 property: 'position',
@@ -142,11 +138,8 @@
                 dur: 500,
                 easing: 'easeInQuad'
             });
-            setTimeout(() => {
-                droppedEl.setAttribute('visible', 'false');
-            }, 500);
+            setTimeout(() => { droppedEl.setAttribute('visible', 'false'); }, 500);
             
-            // Check if all ingredients have been collected
             checkCompletion();
           }
         });
@@ -158,7 +151,6 @@
     function startGame(){
       document.getElementById('startScreen').style.display='none';
       document.getElementById('cakeChoices').style.display='flex';
-
       const music = document.querySelector('#mainmusic');
       if(music && music.components.sound && !music.components.sound.isPlaying){
         music.components.sound.playSound();
@@ -174,7 +166,6 @@
       recipePanel.style.display='block';
       recipePanel.className = cakeName;
 
-      // Define the ingredients for each cake
       const baseIngredients = ["flour", "sugar", "butter", "milk", "egg"];
       if(cakeName === 'blueberry'){
         currentIngredients = [...baseIngredients, "blueberry"];
@@ -189,55 +180,39 @@
     }
 
     function checkCompletion() {
-        // Use a Set to compare arrays regardless of order
         const allCollected = currentIngredients.length === collectedIngredients.length && 
                              currentIngredients.every(item => collectedIngredients.includes(item));
-
         if (allCollected) {
-            // Wait a moment before starting the final sequence
             setTimeout(showFinalCake, 1000);
         }
     }
 
     function showFinalCake() {
-        // Fade out all collected ingredients that are now invisible
         const ingredientsToHide = document.querySelectorAll('.ingredient');
         ingredientsToHide.forEach(ing => {
             if (currentIngredients.includes(ing.dataset.name)) {
                 ing.setAttribute('animation__fade', {
-                    property: 'components.material.material.opacity',
-                    to: 0,
-                    dur: 1500
+                    property: 'components.material.material.opacity', to: 0, dur: 1500
                 });
             }
         });
 
-        // Also fade out the mixing bowl
         document.getElementById('mixingbowl').setAttribute('animation__fade', {
-            property: 'components.material.material.opacity',
-            to: 0,
-            dur: 1500
+            property: 'components.material.material.opacity', to: 0, dur: 1500
         });
 
-        // Position the final cake container where the bowl was
         const bowl = document.getElementById('mixingbowl');
         const finalCakeContainer = document.getElementById('final-cake-container');
         finalCakeContainer.setAttribute('position', bowl.getAttribute('position'));
 
-        // Show the correct cake model
         const cakeModel = document.getElementById(`${selectedCake}-cake-model`);
         cakeModel.setAttribute('visible', 'true');
         
-        // Animate the final cake appearing
         finalCakeContainer.setAttribute('visible', 'true');
         finalCakeContainer.setAttribute('animation', {
-            property: 'scale',
-            from: '0.01 0.01 0.01',
-            to: '1 1 1', // Adjust scale as needed
-            dur: 1500,
-            easing: 'easeOutElastic'
+            property: 'scale', from: '0.01 0.01 0.01', to: '1 1 1', dur: 1500, easing: 'easeOutElastic'
         });
     }
   </script>
 </body>
-</html>```
+</html>
