@@ -109,17 +109,21 @@
 
   <script>
     // --- NEW DEBUGGING SCRIPT ---
-    AFRAME.registerComponent('movement-debugger', {
-        init: function () {
-            // This runs when the component is ready.
-            const textEl = document.getElementById('debug-text');
+   //---js---
+AFRAME.registerComponent('movement-debugger', {
+    init: function () {
+        const textEl = document.getElementById('debug-text');
+        setTimeout(() => {
             if (this.el.components['wasd-controls']) {
                 textEl.setAttribute('value', 'Controls Initialized!');
                 textEl.setAttribute('color', 'lightgreen');
+            } else {
+                textEl.setAttribute('value', 'Controls NOT Initialized');
+                textEl.setAttribute('color', 'red');
             }
-        }
-    });
-
+        }, 500); // 500 ms delay to wait for components to be ready
+    }
+});
     // --- GAME LOGIC FUNCTIONS ---
     let currentIngredients = [];
     let collectedIngredients = [];
