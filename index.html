@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Bake your cake - FINAL FIX</title>
+  <title>Bake your cake - DEBUG VERSION</title>
   <!-- A-Frame Core -->
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
   <!-- A-Frame Extras for Drag-and-Drop -->
@@ -43,18 +43,17 @@
 
   <a-scene id="scene" physx="gravity: 0 -9.8 0;" style="display:none;" cursor="rayOrigin: mouse; fuse: false">
     
-    <!-- Player Rig: This structure uses a custom component to force movement controls to activate. -->
-    <a-entity id="player-rig"
-              position="0 2.5 5" <!-- FIXED: Height is back to the comfortable level -->
-              force-controls> <!-- FIXED: This custom component will guarantee movement -->
+    <!-- Player: Simplified to the absolute basics to GUARANTEE movement. -->
+    <a-entity id="player"
+              camera
+              position="0 50 5" <!-- FIXED: YOU ARE NOW 50 METERS TALL. This is extremely high to prove it works. -->
+              look-controls
+              wasd-controls="acceleration: 100;"
+              movement-debugger> <!-- This is a custom component to check if controls are active -->
+              
+        <!-- This text will tell you if the controls are working. -->
+        <a-text id="debug-text" value="Controls NOT Initialized" position="0 0 -1" color="red" align="center" width="2"></a-text>
 
-      <!-- The camera is the player's eyes. -->
-      <a-entity id="player-camera"
-                camera
-                look-controls>
-          <!-- This new debug text will confirm that the fix has worked. -->
-          <a-text id="debug-text" value="Attempting to force controls..." position="0 0 -1" color="yellow" align="center" width="2"></a-text>
-      </a-entity>
     </a-entity>
 
     <!-- Lights -->
@@ -63,7 +62,8 @@
 
     <!-- Invisible physical floor -->
     <a-plane id="physical-floor" position="0 0 0" rotation="-90 0 0" width="50" height="50" visible="false"
-             physx-body="type: static;" physx-shape="type: plane;">
+             physx-body="type: static;"
+             physx-shape="type: plane;">
     </a-plane>
 
     <!-- All other kitchen items remain the same -->
@@ -108,30 +108,19 @@
   </a-scene>
 
   <script>
-    // --- NEW SCRIPT TO FORCE MOVEMENT CONTROLS ---
-    AFRAME.registerComponent('force-controls', {
+    // --- NEW DEBUGGING SCRIPT ---
+    AFRAME.registerComponent('movement-debugger', {
         init: function () {
-            const el = this.el;
-            const debugText = document.getElementById('debug-text');
-
-            // Wait for 500ms (half a second) to ensure A-Frame's core is fully ready.
-            setTimeout(() => {
-                // Forcefully add the wasd-controls component to the player rig.
-                el.setAttribute('wasd-controls', { acceleration: 100 });
-
-                // Now, check if it was successful.
-                if (el.components['wasd-controls']) {
-                    debugText.setAttribute('value', 'Controls FORCED successfully!');
-                    debugText.setAttribute('color', 'lightgreen');
-                } else {
-                    debugText.setAttribute('value', 'CRITICAL ERROR: Failed to force controls.');
-                    debugText.setAttribute('color', 'red');
-                }
-            }, 500);
+            // This runs when the component is ready.
+            const textEl = document.getElementById('debug-text');
+            if (this.el.components['wasd-controls']) {
+                textEl.setAttribute('value', 'Controls Initialized!');
+                textEl.setAttribute('color', 'lightgreen');
+            }
         }
     });
 
-    // --- All other game logic remains the same ---
+    // --- GAME LOGIC FUNCTIONS ---
     let currentIngredients = [];
     let collectedIngredients = [];
     let selectedCake = '';
@@ -175,7 +164,19 @@
     function chooseCake(cakeName){
       selectedCake = cakeName;
       document.getElementById('cakeChoices').style.display='none';
-      document.getElementById('scene').style.display = 'block';
+      const sceneEl = document.getElementById('scene');
+      sceneEl.style.display = 'block';
+
+      // --- NEW: Force focus on the scene to capture keyboard input ---
+      setTimeout(() => {
+          sceneEl.focus();
+          // Fallback for some browsers
+          if (document.activeElement !== sceneEl) {
+              window.focus();
+              sceneEl.canvas.focus();
+          }
+      }, 100);
+
       const recipePanel = document.getElementById('recipePanel');
       recipePanel.style.display='block';
       recipePanel.className = cakeName;
