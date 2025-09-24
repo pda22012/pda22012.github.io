@@ -100,7 +100,7 @@
         const direction = new THREE.Vector3();
         const clock = new THREE.Clock();
         
-        // Final Cake Scene Variables
+        
         let cherryScene, cherryCamera, cherryRenderer, cherryCakeGroup;
         let isCherrySceneSetup = false;
         
@@ -142,7 +142,6 @@
                         cherryCamera.position.set(0, 0, cameraZ);
                         cherryCamera.lookAt(0, 0, 0);
 
-                        // ▼▼▼ RENDER THE STATIC SCENE ONCE IT'S READY ▼▼▼
                         cherryRenderer.render(cherryScene, cherryCamera);
                     }
                 });
@@ -150,10 +149,6 @@
             isCherrySceneSetup = true;
         }
 
-        // ▼▼▼ THIS FUNCTION IS NO LONGER NEEDED FOR A CONTINUOUS LOOP ▼▼▼
-        // function animateCherryCake() { ... }
-
-        // --- Main Game Functions ---
         function setupScene() {
             scene.clear();
             interactiveObjects = [];
@@ -187,7 +182,7 @@
                 direction.z = Number(moveForward) - Number(moveBackward);
                 direction.x = Number(moveRight) - Number(moveLeft);
                 direction.normalize();
-                const moveSpeed = 130.0;
+                const moveSpeed = 200.0;
                 if (moveForward || moveBackward) velocity.z -= direction.z * moveSpeed * delta;
                 if (moveLeft || moveRight) velocity.x -= direction.x * moveSpeed * delta;
                 controls.moveRight(-velocity.x * delta);
@@ -247,8 +242,7 @@
                         if (!isCherrySceneSetup) {
                             setupFinalCherryCakeScene();
                         }
-                        // ▼▼▼ THE ANIMATION LOOP IS NO LONGER CALLED ▼▼▼
-                        // animateCherryCake(); 
+                        
                     } else {
                         const singleCakeViewer = document.getElementById('single-cake-viewer');
                         if (currentCake === 'strawberry') singleCakeViewer.src = 'strawberrycake.glb';
