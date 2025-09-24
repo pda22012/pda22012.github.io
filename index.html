@@ -6,7 +6,7 @@
     <title>Bake Your Cake</title>
 
     <!-- ================================================================ -->
-    <!--  CSS STYLES ARE NOW INSIDE THIS FILE                             -->
+    <!--  CSS STYLES                                                      -->
     <!-- ================================================================ -->
     <style>
         body {
@@ -23,7 +23,7 @@
             background-position: center;
         }
         .screen.active {
-            display: flex; /* Use Flexbox for easy centering */
+            display: flex;
             justify-content: center;
             align-items: center;
         }
@@ -66,8 +66,8 @@
         #cherry-cake-tab { background-color: #dc143c; }
         #game-screen {
             background-color: #a3c1ad;
-            justify-content: flex-start; /* Align items to the left */
-            align-items: stretch; /* Stretch items to fill height */
+            justify-content: flex-start;
+            align-items: stretch;
         }
         #ingredients-list {
             width: 250px;
@@ -133,9 +133,18 @@
             width: 50%;
             height: 50%;
             text-align: center;
+            position: relative; /* Needed for positioning the cake parts */
         }
         .final-cake-model {
-            display: none;
+            display: none; /* All cakes are hidden by default */
+        }
+        /* NEW CSS: This makes the cherry cake parts stack on top of each other */
+        .cherry-cake-part {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
         }
         #end-message {
             margin-top: 20px;
@@ -211,29 +220,39 @@
         <div id="loading-bar-container">
             <div id="loading-bar"></div>
         </div>
-        <div id="final-cake" style="display: none;">
+        <div id="final-cake">
+            <!-- ▼▼▼ THIS IS THE CHANGED SECTION ▼▼▼ -->
+
+            <!-- Strawberry and Blueberry cakes are single models -->
             <model-viewer id="strawberry-cake-final" class="final-cake-model" src="strawberrycake.glb" camera-controls auto-rotate></model-viewer>
             <model-viewer id="blueberry-cake-final" class="final-cake-model" src="blueberrycake.glb" camera-controls auto-rotate></model-viewer>
-            <model-viewer id="cherry-cake-final" class="final-cake-model" src="cherrycake4.glb" camera-controls auto-rotate></model-viewer>
+
+            <!-- The Cherry Cake is now a container holding all 4 parts -->
+            <div id="cherry-cake-final" class="final-cake-model">
+                <model-viewer class="cherry-cake-part" src="cherrycake1.glb" camera-controls auto-rotate></model-viewer>
+                <model-viewer class="cherry-cake-part" src="cherrycake2.glb" camera-controls auto-rotate></model-viewer>
+                <model-viewer class="cherry-cake-part" src="cherrycake3.glb" camera-controls auto-rotate></model-viewer>
+                <model-viewer class="cherry-cake-part" src="cherrycake4.glb" camera-controls auto-rotate></model-viewer>
+            </div>
+            
+            <!-- ▲▲▲ END OF CHANGED SECTION ▲▲▲ -->
             <h2 id="end-message"></h2>
         </div>
     </div>
 
-    <!-- This script link is required by Google for <model-viewer> to work -->
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
 
     <!-- ================================================================ -->
-    <!--  JAVASCRIPT IS NOW INSIDE THIS FILE                              -->
+    <!--  JAVASCRIPT (NO CHANGES NEEDED HERE)                             -->
     <!-- ================================================================ -->
     <script>
-        // Wait until the entire page is loaded before running the game logic
         document.addEventListener('DOMContentLoaded', () => {
             console.log("Game script starting...");
 
             const startBtn = document.getElementById('start-btn');
             if (!startBtn) {
                 console.error("FATAL ERROR: Could not find the 'start-btn' element. Check the HTML.");
-                return; // Stop everything if the button isn't found
+                return;
             }
 
             const quitBtn = document.getElementById('quit-btn');
@@ -251,7 +270,6 @@
             let currentCake = '';
             let collectedIngredients = [];
 
-            // --- Event Listeners ---
             startBtn.addEventListener('click', () => {
                 console.log("Start button clicked!");
                 backgroundMusic.play().catch(e => console.warn("Audio play failed. User must interact with the page first."));
@@ -279,7 +297,6 @@
                 }
             });
 
-            // --- Game Functions ---
             function setupGame() {
                 collectedIngredients = [];
                 document.querySelectorAll('#ingredients-list li').forEach(li => li.classList.remove('collected'));
