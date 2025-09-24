@@ -85,8 +85,7 @@
         
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        // ▼▼▼ CAMERA POSITION HAS BEEN CHANGED HERE ▼▼▼
-        camera.position.set(0, 7.5, 5); // Y is now 7.5 (5x higher than 1.5)
+        camera.position.set(0, 40, 5); 
         
         const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('three-canvas'), antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
