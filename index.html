@@ -38,7 +38,7 @@
         #final-cake-container { width: 50%; height: 50%; display: none; }
         .final-cake-model { display: none; width: 100%; height: 100%; position: relative; }
         #final-cake-container model-viewer { --mv-viewer-background-color: transparent; }
-        #cherry-cake-canvas { width: 100%; height: 100%; cursor: grab; }
+        #cherry-cake-canvas { width: 100%; height: 100%; }
         #end-message { margin-top: 20px; font-size: 2em; color: #333; }
     </style>
 </head>
@@ -100,12 +100,10 @@
         const direction = new THREE.Vector3();
         const clock = new THREE.Clock();
         
-        // --- Final Cake Scene Variables ---
+        // Final Cake Scene Variables
         let cherryScene, cherryCamera, cherryRenderer, cherryCakeGroup;
         let isCherrySceneSetup = false;
-        let isDragging = false, previousMousePosition = { x: 0 };
         
-        // ▼▼▼ THIS IS THE NEW, STABLE CHERRY CAKE SCENE SETUP ▼▼▼
         function setupFinalCherryCakeScene() {
             const cherryCanvas = document.getElementById('cherry-cake-canvas');
             cherryScene = new THREE.Scene();
@@ -135,6 +133,7 @@
                         const box = new THREE.Box3().setFromObject(cherryCakeGroup);
                         const center = box.getCenter(new THREE.Vector3());
                         cherryCakeGroup.position.sub(center);
+
                         const size = box.getSize(new THREE.Vector3());
                         const maxDim = Math.max(size.x, size.y, size.z);
                         const fov = cherryCamera.fov * (Math.PI / 180);
@@ -142,31 +141,17 @@
                         cameraZ *= 1.5;
                         cherryCamera.position.set(0, 0, cameraZ);
                         cherryCamera.lookAt(0, 0, 0);
+
+                        // ▼▼▼ RENDER THE STATIC SCENE ONCE IT'S READY ▼▼▼
+                        cherryRenderer.render(cherryScene, cherryCamera);
                     }
                 });
-            });
-
-            // Add manual drag controls
-            cherryCanvas.addEventListener('mousedown', (e) => { isDragging = true; });
-            cherryCanvas.addEventListener('mouseup', (e) => { isDragging = false; });
-            cherryCanvas.addEventListener('mousemove', (e) => {
-                if (isDragging) {
-                    const deltaX = e.clientX - previousMousePosition.x;
-                    cherryCakeGroup.rotation.y += deltaX * 0.01;
-                }
-                previousMousePosition.x = e.clientX;
             });
             isCherrySceneSetup = true;
         }
 
-        function animateCherryCake() {
-            requestAnimationFrame(animateCherryCake);
-            // If the user is NOT dragging the cake, let it auto-rotate slowly
-            if (!isDragging) {
-                cherryCakeGroup.rotation.y += 0.005; 
-            }
-            cherryRenderer.render(cherryScene, cherryCamera);
-        }
+        // ▼▼▼ THIS FUNCTION IS NO LONGER NEEDED FOR A CONTINUOUS LOOP ▼▼▼
+        // function animateCherryCake() { ... }
 
         // --- Main Game Functions ---
         function setupScene() {
@@ -262,7 +247,8 @@
                         if (!isCherrySceneSetup) {
                             setupFinalCherryCakeScene();
                         }
-                        animateCherryCake();
+                        // ▼▼▼ THE ANIMATION LOOP IS NO LONGER CALLED ▼▼▼
+                        // animateCherryCake(); 
                     } else {
                         const singleCakeViewer = document.getElementById('single-cake-viewer');
                         if (currentCake === 'strawberry') singleCakeViewer.src = 'strawberrycake.glb';
@@ -311,6 +297,8 @@
                 cherryCamera.aspect = cherryCanvas.clientWidth / cherryCanvas.clientHeight;
                 cherryCamera.updateProjectionMatrix();
                 cherryRenderer.setSize(cherryCanvas.clientWidth, cherryCanvas.clientHeight);
+                // Re-render the static scene if window is resized
+                cherryRenderer.render(cherryScene, cherryCamera);
             }
         });
         switchScreen('start');
