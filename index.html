@@ -1,31 +1,76 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Bake your cake </title>
-  <!-- A-Frame Core -->
+  <title>Bake your cake</title>
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-  <!-- A-Frame Extras for Drag-and-Drop -->
-  <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v7.1.0/dist/aframe-extras.min.js"></script>
-  <!-- A-Frame PhysX - The Physics Engine (for the environment) -->
-  <script src="https://cdn.jsdelivr.net/npm/aframe-physx@0.4.0/dist/aframe-physx.min.js"></script>
-  
+  <script src="https://cdn.rawgit.com/donmccurdy/aframe-physics-system/v3.3.0/dist/aframe-physics-system.min.js"></script>
   <style>
-    body, html { margin:0; padding:0; height:100%; width:100%; font-family:sans-serif; overflow: hidden; }
+    body, html { margin:0; padding:0; height:100%; width:100%; font-family:sans-serif; }
     #startScreen, #cakeChoices { position:absolute; top:0; left:0; width:100%; height:100%; display:flex; flex-direction:column; justify-content:center; align-items:center; background-size:cover; z-index:10; }
     #startScreen { background: url('https://cdn.pixabay.com/photo/2015/01/14/19/20/bake-599521_1280.jpg') no-repeat center center; }
     #startScreen::before, #cakeChoices::before { content:""; position:absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index:-1; }
     #cakeChoices { background: url('https://cdn.pixabay.com/photo/2015/01/14/19/20/bake-599521_1280.jpg') no-repeat center center; display:none; }
     .cake-tab { padding:20px; border-radius:10px; color:white; font-size:20px; cursor:pointer; text-align:center; width:180px; font-weight:bold; margin:10px; }
-    #chocolateTab{background-color:#8B4B36;} #blueberryTab{background-color:#1E90FF;} #cherryTab{background-color:#FF69B4;}
+    #chocolateTab{background-color:#8B4513;} #blueberryTab{background-color:#1E90FF;} #cherryTab{background-color:#FF69B4;}
     #recipePanel { position:absolute; top:20%; left:5%; padding:20px; border-radius:12px; font-size:18px; display:none; z-index:10; min-width:200px; color:white; }
     #recipePanel h2 { margin-top:0; font-size:22px; text-align:center; }
     #recipePanel ul { list-style:none; padding:0; }
-    #recipePanel li { margin:5px 0; font-weight:bold; transition: color 0.5s; }
-    #recipePanel li.collected { color:lightgreen; text-decoration: line-through; }
-    #recipePanel.chocolate { background-color: rgba(139, 69, 19, 0.8); }
-    #recipePanel.blueberry { background-color: rgba(30, 144, 255, 0.8); }
-    #recipePanel.cherry { background-color: rgba(255, 105, 180, 0.8); }
+    #recipePanel li { margin:5px 0; font-weight:bold; }
+    #recipePanel li.collected { color:lightgreen; }
+    #recipePanel.chocolate { background-color:#8B4513; }
+    #recipePanel.blueberry { background-color:#1E90FF; }
+    #recipePanel.cherry { background-color:#FF69B4; }
   </style>
+  <script>
+    let currentIngredients = [];
+
+    function startGame(){
+      document.getElementById('startScreen').style.display='none';
+      document.getElementById('cakeChoices').style.display='flex';
+    }
+
+    function chooseCake(cakeName){
+      document.getElementById('cakeChoices').style.display='none';
+      document.getElementById('scene').style.display='block';
+
+      const recipePanel = document.getElementById('recipePanel');
+      recipePanel.style.display='block';
+      recipePanel.className = cakeName;
+
+      if(cakeName==='blueberry'){
+        currentIngredients = ["flour","sugar","butter","milk","vanilla","blueberries","strawberry","spatula","whisk"];
+      } else if(cakeName==='chocolate'){
+        currentIngredients = ["flour","sugar","butter","milk","vanilla","choco","strawberry","spatula","whisk"];
+      } else if(cakeName==='cherry'){
+        currentIngredients = ["flour","sugar","butter","milk","vanilla","cherries","spatula","whisk"];
+      }
+
+      recipePanel.innerHTML=`<h2>${cakeName.charAt(0).toUpperCase()+cakeName.slice(1)} Cake</h2>
+        <ul>${currentIngredients.map(i=>`<li id="recipe-${i}"><span class="check"></span> ${i}</li>`).join('')}</ul>`;
+
+      // Show all kitchen objects and scale collectables
+      document.querySelectorAll('a-entity').forEach(el=>{
+        el.setAttribute('visible', true);
+        if(el.classList.contains('collectable')){
+          el.setAttribute('scale','2 2 2'); // make clickable
+        }
+      });
+    }
+
+    // Collectable component
+    AFRAME.registerComponent('collectable',{
+      init:function(){
+        this.el.addEventListener('click', ()=>{
+          const name = this.el.getAttribute('data-name');
+          if(currentIngredients.includes(name)){
+            this.el.setAttribute('visible', false); // disappear
+            const li = document.getElementById(`recipe-${name}`);
+            if(li){ li.querySelector('.check').textContent="✅"; li.classList.add('collected'); }
+          }
+        });
+      }
+    });
+  </script>
 </head>
 <body>
   <div id="startScreen">
@@ -41,181 +86,81 @@
 
   <div id="recipePanel"></div>
 
-  <a-scene id="scene" physx="gravity: 0 -9.8 0;" style="display:none;" cursor="rayOrigin: mouse; fuse: false">
-    
-    <!-- Player: Simplified to the absolute basics to GUARANTEE movement. -->
-    <a-entity id="player"
-              camera
-              position="0 50 5" <!-- FIXED: YOU ARE NOW 50 METERS TALL. This is extremely high to prove it works. -->
-              look-controls
-              wasd-controls="acceleration: 100;"
-              movement-debugger> <!-- This is a custom component to check if controls are active -->
-              
-        <!-- This text will tell you if the controls are working. -->
-        <a-text id="debug-text" value="Controls NOT Initialized" position="0 0 -1" color="red" align="center" width="2"></a-text>
-
+  <a-scene id="scene" style="display:none;" physics="gravity: -9.8;">
+    <!-- Camera with mouse cursor -->
+    <a-entity position="0 1.6 7">
+      <a-camera>
+        <a-cursor rayOrigin="mouse" fuse="false" material="color:black; shader:flat"></a-cursor>
+      </a-camera>
     </a-entity>
 
-    <!-- Lights -->
     <a-entity light="type:ambient; intensity:0.5"></a-entity>
     <a-entity light="type:directional; intensity:0.8" position="0 2 1"></a-entity>
 
-    <!-- Invisible physical floor -->
-    <a-plane id="physical-floor" position="0 0 0" rotation="-90 0 0" width="50" height="50" visible="false"
-             physx-body="type: static;"
-             physx-shape="type: plane;">
-    </a-plane>
+    <!-- Full kitchen with colliders -->
+    <a-entity id="kitchenrightwall" gltf-model="kitchenrightwall.glb" static-body></a-entity>
+    <a-entity id="blackcabinet" gltf-model="blackcabinet.glb" static-body></a-entity>
+    <a-entity id="blackplate" gltf-model="blackplate.glb" static-body></a-entity>
+    <a-entity id="bluebottle" gltf-model="bluebottle.glb" static-body></a-entity>
+    <a-entity id="bowl" gltf-model="bowl.glb" static-body></a-entity>
+    <a-entity id="clock" gltf-model="clock.glb" static-body></a-entity>
+    <a-entity id="coffee" gltf-model="coffee.glb" static-body></a-entity>
+    <a-entity id="coffeemaker" gltf-model="coffeemaker.glb" static-body></a-entity>
+    <a-entity id="counterfloorright" gltf-model="counterfloorright.glb" static-body></a-entity>
+    <a-entity id="exhaustfan" gltf-model="exhaustfan.glb" static-body></a-entity>
+    <a-entity id="faucet" gltf-model="faucet.glb" static-body></a-entity>
+    <a-entity id="floor" gltf-model="floor.glb" static-body></a-entity>
+    <a-entity id="kitchenopenwall" gltf-model="kitchenopenwall.glb" static-body></a-entity>
+    <a-entity id="kitchenroofslide" gltf-model="kitchenroofslide.glb" static-body></a-entity>
+    <a-entity id="kitchenrooftop" gltf-model="kitchenrooftop.glb" static-body></a-entity>
+    <a-entity id="kitchenwallback" gltf-model="kitchenwallback.glb" static-body></a-entity>
+    <a-entity id="kniveholder" gltf-model="kniveholder.glb" static-body></a-entity>
+    <a-entity id="plant" gltf-model="plant.glb" static-body></a-entity>
+    <a-entity id="plantwindow" gltf-model="plantwindow.glb" static-body></a-entity>
+    <a-entity id="salt1" gltf-model="salt1.glb" static-body></a-entity>
+    <a-entity id="salt2" gltf-model="salt2.glb" static-body></a-entity>
+    <a-entity id="salt3" gltf-model="salt3.glb" static-body></a-entity>
+    <a-entity id="shelves" gltf-model="shelves.glb" static-body></a-entity>
+    <a-entity id="sink" gltf-model="sink.glb" static-body></a-entity>
+    <a-entity id="stool" gltf-model="stool.glb" static-body></a-entity>
+    <a-entity id="stove" gltf-model="stove.glb" static-body></a-entity>
+    <a-entity id="stovecabinets" gltf-model="stovecabinets.glb" static-body></a-entity>
+    <a-entity id="wallclock" gltf-model="wallclock.glb" static-body></a-entity>
+    <a-entity id="wallcountertop" gltf-model="wallcountertop.glb" static-body></a-entity>
+    <a-entity id="wallstove" gltf-model="wallstove.glb" static-body></a-entity>
+    <a-entity id="whitebottle" gltf-model="whitebottle.glb" static-body></a-entity>
+    <a-entity id="windowbottom" gltf-model="windowbottom.glb" static-body></a-entity>
 
-    <!-- All other kitchen items remain the same -->
-    <a-entity id="backwall" gltf-model="backwall.glb" physx-body="type: static;" physx-shape="type: box;"></a-entity>
-    <a-entity id="frontwall" gltf-model="frontwall.glb" physx-body="type: static;" physx-shape="type: box;"></a-entity>
-    <a-entity id="rightwall" gltf-model="rightwall.glb" physx-body="type: static;" physx-shape="type: box;"></a-entity>
-    <a-entity id="leftwall" gltf-model="leftwall.glb" physx-body="type: static;" physx-shape="type: box;"></a-entity>
-    <a-entity id="floor" gltf-model="floor.glb"></a-entity>
-    <a-entity id="fridge" gltf-model="fridge.glb" physx-body="type: static;" physx-shape="type: box;"></a-entity>
-    <a-entity id="roof" gltf-model="roof.glb" physx-body="type: static;" physx-shape="type: box;"></a-entity>
-    <a-entity id="counterdecor" gltf-model="counterdecor.glb" physx-body="type: static;" physx-shape="type: box;"></a-entity>
-    <a-entity id="counters" gltf-model="counters.glb" physx-body="type: static;" physx-shape="type: box;"></a-entity>
-    <a-entity id="radio" gltf-model="radio.glb" physx-body="type: static;" physx-shape="type: box;"></a-entity>
-    <a-entity id="light" gltf-model="light.glb" physx-body="type: static;" physx-shape="type: box;"></a-entity>
-    <a-entity id="shelves" gltf-model="shelves.glb" physx-body="type: static;" physx-shape="type: box;"></a-entity>
-    <a-entity id="stool" gltf-model="stool.glb" physx-body="type: static;" physx-shape="type: box;"></a-entity>
-    <a-entity id="stove" gltf-model="stove.glb" physx-body="type: static;" physx-shape="type: box;"></a-entity>
-    <a-entity id="salt" gltf-model="salt.glb" physx-body="type: static;" physx-shape="type: box;"></a-entity>
-    <a-entity id="eggcarton" gltf-model="eggcarton.glb" physx-body="type: static;" physx-shape="type: box;"></a-entity>
-    <a-entity id="cuttingboard" gltf-model="cuttingboard.glb" physx-body="type: static;" physx-shape="type: box;"></a-entity>
-    <a-entity id="knife" gltf-model="knife.glb" physx-body="type: static;" physx-shape="type: box;"></a-entity>
-    <a-entity id="vanilla" gltf-model="vanilla.glb" physx-body="type: static;" physx-shape="type: box;"></a-entity>
-    <a-entity id="strawberry" gltf-model="strawberry.glb" physx-body="type: static;" physx-shape="type: sphere; radius: 0.05;"></a-entity>
-    <a-entity id="spatula" gltf-model="spatula.glb" physx-body="type: static;" physx-shape="type: box;"></a-entity>
-    <a-entity id="whisk" gltf-model="whisk.glb" physx-body="type: static;" physx-shape="type: box;"></a-entity>
-    <a-entity id="banana" gltf-model="banana.glb" physx-body="type: static;" physx-shape="type: box;"></a-entity>
-    <a-entity id="mixingbowl" gltf-model="mixingbowl.glb" droppable physx-body="type: static;" physx-shape="type: cylinder;"></a-entity>
-    <a-entity id="flour" gltf-model="flour.glb" class="ingredient" draggable data-name="flour" physx-body="type: static;" physx-shape="type: box;"></a-entity>
-    <a-entity id="sugar" gltf-model="sugar.glb" class="ingredient" draggable data-name="sugar" physx-body="type: static;" physx-shape="type: box;"></a-entity>
-    <a-entity id="butter" gltf-model="butter.glb" class="ingredient" draggable data-name="butter" physx-body="type: static;" physx-shape="type: box;"></a-entity>
-    <a-entity id="milk" gltf-model="milk.glb" class="ingredient" draggable data-name="milk" physx-body="type: static;" physx-shape="type: box;"></a-entity>
-    <a-entity id="egg" gltf-model="egg.glb" class="ingredient" draggable data-name="egg" physx-body="type: static;" physx-shape="type: sphere; radius: 0.04;"></a-entity>
-    <a-entity id="blueberry" gltf-model="blueberry.glb" class="ingredient" draggable data-name="blueberry" physx-body="type: static;" physx-shape="type: sphere; radius: 0.03;"></a-entity>
-    <a-entity id="cherries" gltf-model="cherries.glb" class="ingredient" draggable data-name="cherries" physx-body="type: static;" physx-shape="type: sphere; radius: 0.03;"></a-entity>
-    <a-entity id="chocolate" gltf-model="chocolate.glb" class="ingredient" draggable data-name="chocolate" physx-body="type: static;" physx-shape="type: box;"></a-entity>
-    <a-entity id="final-cake-container" position="0 0.5 0" visible="false">
-        <a-entity id="chocolate-cake-model" gltf-model="#chocolate-cake.glb" visible="false"></a-entity>
-        <a-entity id="blueberry-cake-model" gltf-model="#blueberry-cake.glb" visible="false"></a-entity>
-        <a-entity id="cherry-cake-model" gltf-model="#cherry-cake.glb" visible="false"></a-entity>
+    <!-- Collectable ingredients with invisible colliders -->
+    <a-entity id="flour" gltf-model="flour.glb" class="collectable" collectable data-name="flour" position="4 2 0.5">
+      <a-box visible="false" class="click-target" scale="2 2 2"></a-box>
     </a-entity>
+    <a-entity id="sugar" gltf-model="sugar.glb" class="collectable" collectable data-name="sugar" position="1 2 0.5">
+      <a-box visible="false" class="click-target" scale="2 2 2"></a-box>
+    </a-entity>
+    <a-entity id="butter" gltf-model="butter.glb" class="collectable" collectable data-name="butter" position="-2 2 1.5">
+      <a-box visible="false" class="click-target" scale="2 2 2"></a-box>
+    </a-entity>
+    <a-entity id="milk" gltf-model="milk.glb" class="collectable" collectable data-name="milk" position="7 2 1">
+      <a-box visible="false" class="click-target" scale="2 2 2"></a-box>
+    </a-entity>
+    <a-entity id="vanilla" gltf-model="vanilla.glb" class="collectable" collectable data-name="vanilla" position="-1 2 1">
+      <a-box visible="false" class="click-target" scale="2 2 2"></a-box>
+    </a-entity>
+    <a-entity id="blueberries" gltf-model="blueberries.glb" class="collectable" collectable data-name="blueberries" position="0.5 2 2">
+      <a-box visible="false" class="click-target" scale="2 2 2"></a-box>
+    </a-entity>
+    <a-entity id="strawberry" gltf-model="strawberry.glb" class="collectable" collectable data-name="strawberry" position="9 2 2">
+      <a-box visible="false" class="click-target" scale="2 2 2"></a-box>
+    </a-entity>
+    <a-entity id="spatula" gltf-model="spatula.glb" class="collectable" collectable data-name="spatula" position="-4 2 2.5">
+      <a-box visible="false" class="click-target" scale="2 2 2"></a-box>
+    </a-entity>
+    <a-entity id="whisk" gltf-model="whisk.glb" class="collectable" collectable data-name="whisk" position="10 2 2.5">
+      <a-box visible="false" class="click-target" scale="2 2 2"></a-box>
+    </a-entity>
+
     <a-sound id="mainmusic" src="baking cooking jazz.mp3" autoplay="false" loop="true"></a-sound>
   </a-scene>
-
-  <script>
-    // --- NEW DEBUGGING SCRIPT ---
-    AFRAME.registerComponent('movement-debugger', {
-        init: function () {
-            // This runs when the component is ready.
-            const textEl = document.getElementById('debug-text');
-            if (this.el.components['wasd-controls']) {
-                textEl.setAttribute('value', 'Controls Initialized!');
-                textEl.setAttribute('color', 'lightgreen');
-            }
-        }
-    });
-
-    // --- GAME LOGIC FUNCTIONS ---
-    let currentIngredients = [];
-    let collectedIngredients = [];
-    let selectedCake = '';
-
-    AFRAME.registerComponent('draggable', {
-      init: function () { this.el.classList.add('clickable'); }
-    });
-
-    AFRAME.registerComponent('droppable', {
-      init: function () {
-        this.el.addEventListener('drag-drop', (e) => {
-          const droppedEl = e.detail.dropped;
-          const ingredientName = droppedEl.getAttribute('data-name');
-          if (currentIngredients.includes(ingredientName) && !collectedIngredients.includes(ingredientName)) {
-            collectedIngredients.push(ingredientName);
-            const li = document.getElementById(`recipe-${ingredientName}`);
-            if(li) { li.classList.add('collected'); }
-            const bowlPosition = this.el.getAttribute('position');
-            droppedEl.setAttribute('animation', {
-                property: 'position',
-                to: `${bowlPosition.x} ${bowlPosition.y + 0.2} ${bowlPosition.z}`,
-                dur: 500,
-                easing: 'easeInQuad'
-            });
-            setTimeout(() => { droppedEl.setAttribute('visible', 'false'); }, 500);
-            checkCompletion();
-          }
-        });
-      }
-    });
-
-    function startGame(){
-      document.getElementById('startScreen').style.display='none';
-      document.getElementById('cakeChoices').style.display='flex';
-      const music = document.querySelector('#mainmusic');
-      if(music && music.components.sound && !music.components.sound.isPlaying){
-        music.components.sound.playSound();
-      }
-    }
-
-    function chooseCake(cakeName){
-      selectedCake = cakeName;
-      document.getElementById('cakeChoices').style.display='none';
-      const sceneEl = document.getElementById('scene');
-      sceneEl.style.display = 'block';
-
-      // --- NEW: Force focus on the scene to capture keyboard input ---
-      setTimeout(() => {
-          sceneEl.focus();
-          // Fallback for some browsers
-          if (document.activeElement !== sceneEl) {
-              window.focus();
-              sceneEl.canvas.focus();
-          }
-      }, 100);
-
-      const recipePanel = document.getElementById('recipePanel');
-      recipePanel.style.display='block';
-      recipePanel.className = cakeName;
-      const baseIngredients = ["flour", "sugar", "butter", "milk", "egg"];
-      if(cakeName === 'blueberry'){
-        currentIngredients = [...baseIngredients, "blueberry"];
-      } else if(cakeName === 'chocolate'){
-        currentIngredients = [...baseIngredients, "chocolate"];
-      } else if(cakeName === 'cherry'){
-        currentIngredients = [...baseIngredients, "cherries"];
-      }
-      recipePanel.innerHTML = `<h2>${cakeName.charAt(0).toUpperCase() + cakeName.slice(1)} Cake</h2>
-        <ul>${currentIngredients.map(i => `<li id="recipe-${i}">${i}</li>`).join('')}</ul>`;
-    }
-
-    function checkCompletion() {
-        const allCollected = currentIngredients.length === collectedIngredients.length && 
-                             currentIngredients.every(item => collectedIngredients.includes(item));
-        if (allCollected) {
-            setTimeout(showFinalCake, 1000);
-        }
-    }
-
-    function showFinalCake() {
-        const ingredientsToHide = document.querySelectorAll('.ingredient');
-        ingredientsToHide.forEach(ing => {
-            if (currentIngredients.includes(ing.dataset.name)) {
-                ing.setAttribute('animation__fade', { property: 'components.material.material.opacity', to: 0, dur: 1500 });
-            }
-        });
-        document.getElementById('mixingbowl').setAttribute('animation__fade', { property: 'components.material.material.opacity', to: 0, dur: 1500 });
-        const bowl = document.getElementById('mixingbowl');
-        const finalCakeContainer = document.getElementById('final-cake-container');
-        finalCakeContainer.setAttribute('position', bowl.getAttribute('position'));
-        const cakeModel = document.getElementById(`${selectedCake}-cake-model`);
-        cakeModel.setAttribute('visible', 'true');
-        finalCakeContainer.setAttribute('visible', 'true');
-        finalCakeContainer.setAttribute('animation', { property: 'scale', from: '0.01 0.01 0.01', to: '1 1 1', dur: 1500, easing: 'easeOutElastic' });
-    }
-  </script>
 </body>
 </html>
