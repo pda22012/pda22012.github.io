@@ -6,154 +6,6 @@
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
   <!-- A-Frame Physics System -->
   <script src="https://cdn.rawgit.com/donmccurdy/aframe-physics-system/v3.3.0/dist/aframe-physics-system.min.js"></script>
-      // --- New A-Frame Components ---
-
-    // Component for player (mixing bowl) movement
-    AFRAME.registerComponent('player-movement', {
-      schema: { speed: { type: 'number', default: 0.1 } }, // Adjust speed as needed
-      init: function () {
-        this.el.setAttribute('dynamic-body', 'mass: 1; linearDamping: 0.99; angularDamping: 0.99'); // Ensure dynamic-body is set up
-        this.keys = {};
-        window.addEventListener('keydown', (e) => { this.keys[e.key] = true; });
-        window.addEventListener('keyup', (e) => { this.keys[e.key] = false; });
-      },
-      tick: function () {
-        const el = this.el;
-        let currentPos = el.object3D.position;
-        let newX = currentPos.x;
-        const speed = this.data.speed;
-        const bounds = 4; // Max horizontal movement, adjust based on your kitchen width
-
-        if (this.keys['ArrowLeft'] || this.keys['a']) {
-          newX -= speed;
-        }
-        if (this.keys['ArrowRight'] || this.keys['d']) {
-          newX += speed;
-        }
-
-        // Clamp position to keep the bowl within bounds
-        newX = Math.max(-bounds, Math.min(bounds, newX));
-
-        // Apply force or set position. For more realistic physics, apply force.
-        // For simpler, direct control, set position. Let's try direct position first.
-        el.object3D.position.x = newX;
-
-        // If using physics, you might want to apply velocity directly
-        // const body = el.body;
-        // if (body) {
-        //   body.velocity.x = (newX - currentPos.x) / (this.el.sceneEl.timeDelta / 1000) * 10; // Apply a strong velocity
-        //   body.angularVelocity.set(0,0,0); // Prevent rotation
-        // }
-      }
-    });
-
-    // Component for ingredient collision detection
-    AFRAME.registerComponent('collision-listener', {
-      init: function () {
-        this.el.addEventListener('collide', (e) => {
-          const collidedEntity = e.detail.body.el;
-          if (collidedEntity.classList.contains('falling-ingredient')) {
-            const ingredientName = collidedEntity.dataset.name;
-            handleIngredientCollision(ingredientName, collidedEntity);
-          }
-        });
-      }
-    });
-
-    // --- Global Game State Variables ---
-    let currentIngredients = [];
-    let collectedIngredients = [];
-    let incorrectIngredientsCollectedCount = 0; // New: track incorrect items
-    let selectedCake = '';
-    let ingredientSpawnInterval = null; // To manage the falling ingredient interval
-    let allPossibleIngredients = []; // Will be populated with all template IDs
-    let gameActive = false; // New: to control game loop
-
-    // Function to handle ingredient collision (called from collision-listener)
-    function handleIngredientCollision(ingredientName, entity) {
-        if (!gameActive) return; // Only process collisions when game is active
-
-        // Check if it's a correct ingredient
-        if (currentIngredients.includes(ingredientName)) {
-            if (!collectedIngredients.includes(ingredientName)) { // Only collect once
-                collectedIngredients.push(ingredientName);
-                const li = document.getElementById(`recipe-${ingredientName}`);
-                if (li) {
-                    li.classList.add('collected');
-                    li.innerHTML = `✅ ${ingredientName}`; // Update with checkmark
-                }
-                // Fade out the collected ingredient
-                entity.emit('start-fade'); // Use your existing fade-out component
-                
-                checkCompletion();
-            } else {
-                // If it's a correct ingredient but already collected, just remove it from scene
-                entity.emit('start-fade'); // Or simply remove it faster
-            }
-        } else {
-            // It's an incorrect ingredient!
-            incorrectIngredientsCollectedCount++;
-            console.log(`Incorrect ingredient collected: ${ingredientName}. Incorrect count: ${incorrectIngredientsCollectedCount}`);
-            // You can decide here if one wrong item restarts, or if a certain number of wrong items restarts.
-            // For now, let's make one wrong item restart the collection process.
-            restartIngredientCollection();
-        }
-    }
-
-    // New function to restart ingredient collection
-    function restartIngredientCollection() {
-        console.log("Incorrect ingredient collected! Restarting collection...");
-        incorrectIngredientsCollectedCount = 0; // Reset count
-        collectedIngredients = []; // Clear collected
-        
-        // Remove all strike-throughs from recipe
-        currentIngredients.forEach(ingredient => {
-            const li = document.getElementById(`recipe-${ingredient}`);
-            if (li) {
-                li.classList.remove('collected');
-                li.innerHTML = ingredient; // Remove checkmark/strike-through
-            }
-        });
-
-        // Clear all falling ingredients from the scene
-        const sceneEl = document.querySelector('a-scene');
-        sceneEl.querySelectorAll('.falling-ingredient').forEach(el => {
-            if (el.parentNode) { // Check if it's still in the scene
-                el.parentNode.removeChild(el);
-            }
-        });
-        // Important: Reset physics state for falling items if necessary, though removing them should suffice.
-    }
-
-    // Modified startBakingSequence to clean up falling ingredients
-    function startBakingSequence() {
-        gameActive = false; // Pause game logic
-        clearInterval(ingredientSpawnInterval); // Stop spawning ingredients
-
-        // Remove any remaining falling ingredients
-        const sceneEl = document.querySelector('a-scene');
-        sceneEl.querySelectorAll('.falling-ingredient').forEach(el => {
-            if (el.parentNode) {
-                el.parentNode.removeChild(el);
-            }
-        });
-
-        const loadingContainer = document.getElementById('loading-container');
-        const loadingBar = document.getElementById('loading-bar');
-        loadingContainer.style.display = 'block';
-
-        let progress = 0;
-        const interval = setInterval(() => {
-            progress += 1;
-            loadingBar.style.width = progress + '%';
-            loadingBar.textContent = progress + '%';
-            if (progress >= 100) {
-                clearInterval(interval);
-                loadingContainer.style.display = 'none';
-                showFinalCake();
-            }
-        }, 50);
-    }
   
   <style>
     body, html { margin:0; padding:0; height:100%; width:100%; font-family:sans-serif; overflow: hidden; }
@@ -206,7 +58,6 @@
       font-size: 20px;
       font-weight: bold;
     }
-
   </style>
 </head>
 <body>
@@ -228,10 +79,9 @@
     <div id="loading-bar">0%</div>
   </div>
 
-    <a-scene id="scene" physics="gravity:-9.8" style="display:none;">
+  <a-scene id="scene" physics="gravity:-9.8" style="display:none;">
     <a-assets>
-      <!-- GLTF Models (assuming these are already defined somewhere or loaded from server) -->
-      <!-- Your existing GLTF model definitions like: -->
+      <!-- GLTF Models -->
       <a-asset-item id="backwall-model" src="backwall.glb"></a-asset-item>
       <a-asset-item id="frontwall-model" src="frontwall.glb"></a-asset-item>
       <a-asset-item id="rightwall-model" src="rightwall.glb"></a-asset-item>
@@ -245,7 +95,7 @@
       <a-asset-item id="light-model" src="light.glb"></a-asset-item>
       <a-asset-item id="salt-model" src="salt.glb"></a-asset-item>
       <a-asset-item id="eggcarton-model" src="eggcarton.glb"></a-asset-item>
-      <a-asset-item id="mixingbowl-model" src="mixingbowl.glb"></a-asset-item> <!-- Will be player model -->
+      <a-asset-item id="mixingbowl-model" src="mixingbowl.glb"></a-asset-item>
       <a-asset-item id="cuttingboard-model" src="cuttingboard.glb"></a-asset-item>
       <a-asset-item id="shelves-model" src="shelves.glb"></a-asset-item>
       <a-asset-item id="knife-model" src="knife.glb"></a-asset-item>
@@ -276,39 +126,30 @@
       <audio id="mainmusic-asset" src="baking cooking jazz.mp3" preload="auto"></audio>
       
       <!-- Templates for falling ingredients -->
-      <!-- These will be cloned by JS. Removed static-body as they will be dynamic. -->
-      <a-entity id="flour-template" gltf-model="#flour-model" class="falling-ingredient" data-name="flour" dynamic-body="shape: box; mass: 0.5" visible="false" scale="0.1 0.1 0.1"></a-entity>
-      <a-entity id="sugar-template" gltf-model="#sugar-model" class="falling-ingredient" data-name="sugar" dynamic-body="shape: box; mass: 0.5" visible="false" scale="0.1 0.1 0.1"></a-entity>
-      <a-entity id="butter-template" gltf-model="#butter-model" class="falling-ingredient" data-name="butter" dynamic-body="shape: box; mass: 0.5" visible="false" scale="0.1 0.1 0.1"></a-entity>
-      <a-entity id="milk-template" gltf-model="#milk-model" class="falling-ingredient" data-name="milk" dynamic-body="shape: box; mass: 0.5" visible="false" scale="0.1 0.1 0.1"></a-entity>
-      <a-entity id="egg-template" gltf-model="#egg-model" class="falling-ingredient" data-name="egg" dynamic-body="shape: sphere; radius: 0.04; mass: 0.2" visible="false" scale="0.1 0.1 0.1"></a-entity>
-      <a-entity id="blueberry-template" gltf-model="#blueberry-model" class="falling-ingredient" data-name="blueberry" dynamic-body="shape: sphere; radius: 0.03; mass: 0.1" visible="false" scale="0.1 0.1 0.1"></a-entity>
-      <a-entity id="cherries-template" gltf-model="#cherries-model" class="falling-ingredient" data-name="cherries" dynamic-body="shape: sphere; radius: 0.03; mass: 0.1" visible="false" scale="0.1 0.1 0.1"></a-entity>
-      <a-entity id="chocolate-template" gltf-model="#chocolate-model" class="falling-ingredient" data-name="chocolate" dynamic-body="shape: box; mass: 0.5" visible="false" scale="0.1 0.1 0.1"></a-entity>
+      <a-entity id="flour-template" gltf-model="#flour-model" class="falling-ingredient" data-name="flour" dynamic-body="shape: box; mass: 0.5" visible="false" scale="0.1 0.1 0.1" fade-out></a-entity>
+      <a-entity id="sugar-template" gltf-model="#sugar-model" class="falling-ingredient" data-name="sugar" dynamic-body="shape: box; mass: 0.5" visible="false" scale="0.1 0.1 0.1" fade-out></a-entity>
+      <a-entity id="butter-template" gltf-model="#butter-model" class="falling-ingredient" data-name="butter" dynamic-body="shape: box; mass: 0.5" visible="false" scale="0.1 0.1 0.1" fade-out></a-entity>
+      <a-entity id="milk-template" gltf-model="#milk-model" class="falling-ingredient" data-name="milk" dynamic-body="shape: box; mass: 0.5" visible="false" scale="0.1 0.1 0.1" fade-out></a-entity>
+      <a-entity id="egg-template" gltf-model="#egg-model" class="falling-ingredient" data-name="egg" dynamic-body="shape: sphere; radius: 0.04; mass: 0.2" visible="false" scale="0.1 0.1 0.1" fade-out></a-entity>
+      <a-entity id="blueberry-template" gltf-model="#blueberry-model" class="falling-ingredient" data-name="blueberry" dynamic-body="shape: sphere; radius: 0.03; mass: 0.1" visible="false" scale="0.1 0.1 0.1" fade-out></a-entity>
+      <a-entity id="cherries-template" gltf-model="#cherries-model" class="falling-ingredient" data-name="cherries" dynamic-body="shape: sphere; radius: 0.03; mass: 0.1" visible="false" scale="0.1 0.1 0.1" fade-out></a-entity>
+      <a-entity id="chocolate-template" gltf-model="#chocolate-model" class="falling-ingredient" data-name="chocolate" dynamic-body="shape: box; mass: 0.5" visible="false" scale="0.1 0.1 0.1" fade-out></a-entity>
       
       <!-- Incorrect ingredient templates -->
-      <a-entity id="strawberry-template" gltf-model="#strawberry-model" class="falling-ingredient incorrect" data-name="strawberry" dynamic-body="shape: sphere; radius: 0.05; mass: 0.1" visible="false" scale="0.1 0.1 0.1"></a-entity>
-      <a-entity id="banana-template" gltf-model="#banana-model" class="falling-ingredient incorrect" data-name="banana" dynamic-body="shape: box; mass: 0.2" visible="false" scale="0.1 0.1 0.1"></a-entity>
-      <a-entity id="salt-template" gltf-model="#salt-model" class="falling-ingredient incorrect" data-name="salt" dynamic-body="shape: box; mass: 0.2" visible="false" scale="0.1 0.1 0.1"></a-entity>
-      <!-- Add more incorrect items as needed based on your gltf-models -->
-      <a-entity id="knife-template" gltf-model="#knife-model" class="falling-ingredient incorrect" data-name="knife" dynamic-body="shape: box; mass: 0.2" visible="false" scale="0.1 0.1 0.1"></a-entity>
-      <a-entity id="spatula-template" gltf-model="#spatula-model" class="falling-ingredient incorrect" data-name="spatula" dynamic-body="shape: box; mass: 0.2" visible="false" scale="0.1 0.1 0.1"></a-entity>
-      <a-entity id="whisk-template" gltf-model="#whisk-model" class="falling-ingredient incorrect" data-name="whisk" dynamic-body="shape: box; mass: 0.2" visible="false" scale="0.1 0.1 0.1"></a-entity>
-
+      <a-entity id="strawberry-template" gltf-model="#strawberry-model" class="falling-ingredient incorrect" data-name="strawberry" dynamic-body="shape: sphere; radius: 0.05; mass: 0.1" visible="false" scale="0.1 0.1 0.1" fade-out></a-entity>
+      <a-entity id="banana-template" gltf-model="#banana-model" class="falling-ingredient incorrect" data-name="banana" dynamic-body="shape: box; mass: 0.2" visible="false" scale="0.1 0.1 0.1" fade-out></a-entity>
+      <a-entity id="salt-template" gltf-model="#salt-model" class="falling-ingredient incorrect" data-name="salt" dynamic-body="shape: box; mass: 0.2" visible="false" scale="0.1 0.1 0.1" fade-out></a-entity>
+      <a-entity id="knife-template" gltf-model="#knife-model" class="falling-ingredient incorrect" data-name="knife" dynamic-body="shape: box; mass: 0.2" visible="false" scale="0.1 0.1 0.1" fade-out></a-entity>
+      <a-entity id="spatula-template" gltf-model="#spatula-model" class="falling-ingredient incorrect" data-name="spatula" dynamic-body="shape: box; mass: 0.2" visible="false" scale="0.1 0.1 0.1" fade-out></a-entity>
+      <a-entity id="whisk-template" gltf-model="#whisk-model" class="falling-ingredient incorrect" data-name="whisk" dynamic-body="shape: box; mass: 0.2" visible="false" scale="0.1 0.1 0.1" fade-out></a-entity>
     </a-assets>
     
-    <!-- Static Camera for the scene -->
-    <a-entity camera position="0 2 10" look-at="#mixingbowl"></a-entity>
-    <!-- OR, a fixed perspective of the kitchen: -->
-    <!-- <a-entity camera position="0 5 15" rotation="-15 0 0" look-controls="enabled:false"></a-entity> -->
-
+    <a-entity camera position="0 2 10" look-at="#player-bowl"></a-entity>
 
     <a-entity light="type:ambient; intensity:0.5"></a-entity>
     <a-entity light="type:directional; intensity:0.8" position="0 2 1"></a-entity>
 
-    <!-- Physical Floor (important for falling ingredients) -->
     <a-plane id="physical-floor" static-body position="0 0 0" rotation="-90 0 0" width="10" height="10" visible="false"></a-plane> 
-    <!-- Adjusted width/height for a typical kitchen size. You might need to tweak this. -->
 
     <!-- Kitchen and Items -->
     <a-entity id="backwall" gltf-model="#backwall-model" static-body="shape: box;" position="0 0 -5"></a-entity>
@@ -317,22 +158,17 @@
     <a-entity id="leftwall" gltf-model="#leftwall-model" static-body="shape: box;" position="-5 0 0"></a-entity>
     <a-entity id="floor-model-entity" gltf-model="#floor-model" position="0 0 0"></a-entity>
     <a-entity id="fridge" gltf-model="#fridge-model" static-body="shape: box;"></a-entity>
-    <a-entity id="roof-model-entity" gltf-model="#roof-model" static-body="shape: box; position: 0 5 0"></a-entity> <!-- Place roof higher -->
+    <a-entity id="roof-model-entity" gltf-model="#roof-model" static-body="shape: box;" position="0 5 0"></a-entity>
     <a-entity id="counterdecor" gltf-model="#counterdecor-model" static-body="shape: box;"></a-entity>
     <a-entity id="counters" gltf-model="#counters-model" static-body="shape: box;"></a-entity>
     <a-entity id="radio" gltf-model="#radio-model" static-body="shape: box;"></a-entity>
     <a-entity id="light-model-entity" gltf-model="#light-model" static-body="shape: box;"></a-entity>
-    <a-entity id="salt-static" gltf-model="#salt-model" static-body="shape: box;"></a-entity> <!-- Rename static items to avoid conflict with falling ones -->
+    <a-entity id="salt-static" gltf-model="#salt-model" static-body="shape: box;"></a-entity>
     <a-entity id="eggcarton-static" gltf-model="#eggcarton-model" static-body="shape: box;"></a-entity>
     
-    <!-- Player Mixing Bowl -->
     <a-entity id="player-bowl" gltf-model="#mixingbowl-model" 
-              dynamic-body="shape: box; mass: 1; linearDamping: 0.99; angularDamping: 0.99" 
               position="0 1 -3" rotation="0 180 0" scale="0.5 0.5 0.5"
               player-movement collision-listener></a-entity> 
-    <!-- player-movement will be a new component for keyboard control -->
-    <!-- collision-listener will be a new component to handle ingredient collection -->
-    <!-- Starting position adjusted to be on the floor level and slightly forward -->
 
     <a-entity id="cuttingboard-static" gltf-model="#cuttingboard-model" static-body="shape: box;"></a-entity>
     <a-entity id="shelves-static" gltf-model="#shelves-model" static-body="shape: box;"></a-entity>
@@ -345,10 +181,6 @@
     <a-entity id="whisk-static" gltf-model="#whisk-model" static-body="shape: box;"></a-entity>
     <a-entity id="banana-static" gltf-model="#banana-model" static-body="shape: box;"></a-entity>
 
-    <!-- Ingredients are now generated dynamically, so remove the static ones here -->
-    <!-- <a-entity id="flour" gltf-model="flour.glb" class="ingredient" static-body="shape: box;" data-name="flour" fade-out></a-entity> -->
-    <!-- ... and so on for all other ingredients -->
-
     <!-- Final Cake Container -->
     <a-entity id="final-cake-container" position="0 1 -3" visible="false">
         <a-entity id="chocolate-cake-model" gltf-model="#chocolate-cake-model-asset" visible="false"></a-entity>
@@ -360,39 +192,87 @@
   </a-scene>
   
   <script>
-    // --- NEW SCRIPT TO GUARANTEE FADING ANIMATION ---
+    // --- Global Game State Variables ---
+    let currentIngredients = [];
+    let collectedIngredients = [];
+    let incorrectIngredientsCollectedCount = 0;
+    let selectedCake = '';
+    let ingredientSpawnInterval = null;
+    let allPossibleIngredients = [];
+    let gameActive = false;
+
+    // --- A-Frame Components ---
+
+    // Component for player (mixing bowl) movement
+    AFRAME.registerComponent('player-movement', {
+      schema: { speed: { type: 'number', default: 0.1 } },
+      init: function () {
+        this.el.setAttribute('dynamic-body', 'shape: box; mass: 1; linearDamping: 0.99; angularDamping: 0.99');
+        this.keys = {};
+        window.addEventListener('keydown', (e) => { this.keys[e.key] = true; });
+        window.addEventListener('keyup', (e) => { this.keys[e.key] = false; });
+      },
+      tick: function () {
+        const el = this.el;
+        let currentPos = el.object3D.position;
+        let newX = currentPos.x;
+        const speed = this.data.speed;
+        const bounds = 4;
+
+        if (this.keys['ArrowLeft'] || this.keys['a']) {
+          newX -= speed;
+        }
+        if (this.keys['ArrowRight'] || this.keys['d']) {
+          newX += speed;
+        }
+
+        newX = Math.max(-bounds, Math.min(bounds, newX));
+        el.object3D.position.x = newX;
+      }
+    });
+
+    // Component for ingredient collision detection
+    AFRAME.registerComponent('collision-listener', {
+      init: function () {
+        this.el.addEventListener('collide', (e) => {
+          const collidedEntity = e.detail.body.el;
+          if (collidedEntity.classList.contains('falling-ingredient')) {
+            const ingredientName = collidedEntity.dataset.name;
+            handleIngredientCollision(ingredientName, collidedEntity);
+          }
+        });
+      }
+    });
+
+    // Component for fading out ingredients
     AFRAME.registerComponent('fade-out', {
       init: function () {
         this.el.addEventListener('start-fade', () => {
           const mesh = this.el.getObject3D('mesh');
           if (!mesh) return;
 
-          // Animate the opacity of all materials on the model
           mesh.traverse(node => {
             if (node.isMesh && node.material) {
-              // Ensure material is transparent
               node.material.transparent = true;
-              
               new AFRAME.TWEEN.Tween({ opacity: node.material.opacity })
-                .to({ opacity: 0 }, 1500) // 1500ms duration
-                .onUpdate(function () {
-                  // 'this' refers to the tweening object, which has the opacity property
-                  node.material.opacity = this.opacity;
+                .to({ opacity: 0 }, 1000) // Fade over 1 second
+                .onUpdate(function (object) {
+                  node.material.opacity = object.opacity;
                 })
                 .start();
             }
           });
           
           setTimeout(() => {
-            this.el.setAttribute('visible', 'false');
-          }, 1500);
+            if (this.el.parentNode) {
+              this.el.parentNode.removeChild(this.el);
+            }
+          }, 1000);
         });
       }
     });
 
-    let currentIngredients = [];
-    let collectedIngredients = [];
-    let selectedCake = '';
+    // --- Game Logic Functions ---
 
     function startGame(){
       document.getElementById('startScreen').style.display='none';
@@ -403,7 +283,7 @@
       }
     }
 
-       function chooseCake(cakeName) {
+    function chooseCake(cakeName) {
       selectedCake = cakeName;
       document.getElementById('cakeChoices').style.display = 'none';
       document.getElementById('scene').style.display = 'block';
@@ -423,38 +303,32 @@
 
       let recipeHTML = `<h2>${cakeName.charAt(0).toUpperCase() + cakeName.slice(1)} Cake</h2><ul>`;
       currentIngredients.forEach(ingredient => {
-        // No onclick here, collection is now via 3D collision
         recipeHTML += `<li id="recipe-${ingredient}">${ingredient}</li>`;
       });
       recipeHTML += `</ul>`;
       recipePanel.innerHTML = recipeHTML;
 
-      // Initialize all possible ingredients for spawning
       allPossibleIngredients = [
           'flour-template', 'sugar-template', 'butter-template', 'milk-template', 'egg-template',
           'blueberry-template', 'cherries-template', 'chocolate-template',
           'strawberry-template', 'banana-template', 'salt-template', 'knife-template', 'spatula-template', 'whisk-template'
       ];
       
-      // Start the game loop for spawning ingredients
       startGamePlay();
     }
 
-    // New function to start the actual game play
     function startGamePlay() {
         gameActive = true;
         collectedIngredients = [];
         incorrectIngredientsCollectedCount = 0;
 
-        // Clear any previous ingredients
-        document.querySelectorAll('.falling-ingredient').forEach(el => el.remove());
+        document.querySelectorAll('.falling-ingredient').forEach(el => {
+          if (el.parentNode) el.parentNode.removeChild(el)
+        });
 
-        // Start spawning ingredients
-        ingredientSpawnInterval = setInterval(spawnIngredient, 1500); // Spawn every 1.5 seconds, adjust as needed
+        ingredientSpawnInterval = setInterval(spawnIngredient, 1500);
     }
 
-
-    // New function to spawn a single ingredient
     function spawnIngredient() {
         if (!gameActive) {
             clearInterval(ingredientSpawnInterval);
@@ -467,74 +341,70 @@
         const template = document.getElementById(ingredientTemplateId);
 
         if (template) {
-            const newIngredient = template.cloneNode(true); // Clone the template
-            newIngredient.removeAttribute('id'); // Remove id from clone
-            newIngredient.setAttribute('visible', 'true'); // Make it visible
+            const newIngredient = template.cloneNode(true);
+            newIngredient.removeAttribute('id');
+            newIngredient.setAttribute('visible', 'true');
             newIngredient.setAttribute('position', {
-                x: (Math.random() * 8) - 4, // Random X position across the kitchen width (adjust 8 and 4 based on your kitchen bounds)
-                y: 5, // Start height (adjust based on your roof/spawn point)
-                z: (Math.random() * 2) - 1 // Slight variation in Z position
+                x: (Math.random() * 8) - 4,
+                y: 5,
+                z: (Math.random() * 2) - 1
             });
-            // Reset rotation and physics velocity to ensure consistent falling
-            newIngredient.setAttribute('rotation', '0 0 0');
-            newIngredient.body.velocity.set(0, 0, 0);
-            newIngredient.body.angularVelocity.set(0, 0, 0);
-
-
+            
             sceneEl.appendChild(newIngredient);
 
-            // Set a timeout to remove ingredient if it falls off the screen without being caught
-            // This is important to prevent memory leaks with many falling entities
+            // Wait for the physics body to be loaded before changing its properties
+            newIngredient.addEventListener('body-loaded', function () {
+                this.body.velocity.set(0, 0, 0);
+                this.body.angularVelocity.set(0, 0, 0);
+            });
+
             setTimeout(() => {
-                if (newIngredient.parentNode) { // Check if it hasn't been removed by collision
+                if (newIngredient.parentNode) {
                     newIngredient.parentNode.removeChild(newIngredient);
                 }
-            }, 8000); // Remove after 8 seconds if not caught (adjust based on fall speed)
+            }, 8000);
         }
     }
-      const recipePanel = document.getElementById('recipePanel');
-      recipePanel.style.display='block';
-      recipePanel.className = cakeName;
 
-      const baseIngredients = ["flour", "sugar", "butter", "milk", "egg"];
-      if(cakeName === 'blueberry'){
-        currentIngredients = [...baseIngredients, "blueberry"];
-      } else if(cakeName === 'chocolate'){
-        currentIngredients = [...baseIngredients, "chocolate"];
-      } else if(cakeName === 'cherry'){
-        currentIngredients = [...baseIngredients, "cherries"];
-      }
+    function handleIngredientCollision(ingredientName, entity) {
+        if (!gameActive) return;
 
-      let recipeHTML = `<h2>${cakeName.charAt(0).toUpperCase()+cakeName.slice(1)} Cake</h2><ul>`;
-      currentIngredients.forEach(ingredient => {
-        recipeHTML += `<li id="recipe-${ingredient}" onclick="collectIngredient('${ingredient}')"><span class="check"></span> ${ingredient}</li>`;
-      });
-      recipeHTML += `</ul>`;
-      recipePanel.innerHTML = recipeHTML;
+        if (currentIngredients.includes(ingredientName)) {
+            if (!collectedIngredients.includes(ingredientName)) {
+                collectedIngredients.push(ingredientName);
+                const li = document.getElementById(`recipe-${ingredientName}`);
+                if (li) {
+                    li.classList.add('collected');
+                    li.innerHTML = `✅ ${ingredientName}`;
+                }
+                entity.emit('start-fade');
+                checkCompletion();
+            } else {
+                entity.emit('start-fade');
+            }
+        } else {
+            incorrectIngredientsCollectedCount++;
+            restartIngredientCollection();
+        }
     }
-    
-    function collectIngredient(ingredientName) {
-      if (collectedIngredients.includes(ingredientName)) {
-        return; 
-      }
 
-      if (currentIngredients.includes(ingredientName)) {
-        collectedIngredients.push(ingredientName);
+    function restartIngredientCollection() {
+        incorrectIngredientsCollectedCount = 0;
+        collectedIngredients = [];
         
-        const li = document.getElementById(`recipe-${ingredientName}`);
-        if (li) {
-          li.classList.add('collected');
-          li.querySelector('.check').textContent = '✅ ';
-        }
-        
-        // Find the 3D model in the scene and tell it to start fading
-        const ingredientEntity = document.querySelector(`.ingredient[data-name="${ingredientName}"]`);
-        if (ingredientEntity) {
-          ingredientEntity.emit('start-fade');
-        }
-        
-        checkCompletion();
-      }
+        currentIngredients.forEach(ingredient => {
+            const li = document.getElementById(`recipe-${ingredient}`);
+            if (li) {
+                li.classList.remove('collected');
+                li.innerHTML = ingredient;
+            }
+        });
+
+        document.querySelectorAll('.falling-ingredient').forEach(el => {
+          if (el.parentNode && el.getAttribute('visible')) {
+            el.parentNode.removeChild(el)
+          }
+        });
     }
 
     function checkCompletion() {
@@ -544,25 +414,35 @@
     }
 
     function startBakingSequence() {
-      const loadingContainer = document.getElementById('loading-container');
-      const loadingBar = document.getElementById('loading-bar');
-      loadingContainer.style.display = 'block';
+        gameActive = false;
+        clearInterval(ingredientSpawnInterval);
 
-      let progress = 0;
-      const interval = setInterval(() => {
-        progress += 1;
-        loadingBar.style.width = progress + '%';
-        loadingBar.textContent = progress + '%';
-        if (progress >= 100) {
-          clearInterval(interval);
-          loadingContainer.style.display = 'none';
-          showFinalCake();
-        }
-      }, 50);
+        document.querySelectorAll('.falling-ingredient').forEach(el => {
+            if (el.parentNode) {
+                el.parentNode.removeChild(el);
+            }
+        });
+
+        const loadingContainer = document.getElementById('loading-container');
+        const loadingBar = document.getElementById('loading-bar');
+        loadingContainer.style.display = 'block';
+
+        let progress = 0;
+        const interval = setInterval(() => {
+            progress += 1;
+            loadingBar.style.width = progress + '%';
+            loadingBar.textContent = progress + '%';
+            if (progress >= 100) {
+                clearInterval(interval);
+                loadingContainer.style.display = 'none';
+                showFinalCake();
+            }
+        }, 50);
     }
 
     function showFinalCake() {
-      document.getElementById('mixingbowl').setAttribute('visible', 'false');
+      // Corrected ID from 'mixingbowl' to 'player-bowl'
+      document.getElementById('player-bowl').setAttribute('visible', 'false');
       const finalCake = document.getElementById('final-cake-container');
       const cakeModel = document.getElementById(`${selectedCake}-cake-model`);
       cakeModel.setAttribute('visible', 'true');
