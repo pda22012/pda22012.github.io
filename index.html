@@ -38,7 +38,6 @@
         #final-cake-container { width: 50%; height: 50%; display: none; }
         .final-cake-model { display: none; width: 100%; height: 100%; position: relative; }
         #final-cake-container model-viewer { --mv-viewer-background-color: transparent; }
-        /* ▼▼▼ NEW: Canvas for the cherry cake ▼▼▼ */
         #cherry-cake-canvas { width: 100%; height: 100%; }
         #end-message { margin-top: 20px; font-size: 2em; color: #333; }
     </style>
@@ -62,7 +61,6 @@
         <div id="loading-bar-container"><div id="loading-bar"></div></div>
         <div id="final-cake-container">
             <model-viewer id="single-cake-viewer" class="final-cake-model" camera-controls auto-rotate></model-viewer>
-            <!-- ▼▼▼ The cherry cake now uses a canvas, not model-viewer tags ▼▼▼ -->
             <div id="cherry-cake-final" class="final-cake-model">
                 <canvas id="cherry-cake-canvas"></canvas>
             </div>
@@ -78,7 +76,6 @@
         import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
         import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-        // --- DOM Elements ---
         const screens = { start: document.getElementById('start-screen'), selection: document.getElementById('cake-selection-screen'), game: document.getElementById('game-screen'), end: document.getElementById('end-screen') };
         const startBtn = document.getElementById('start-btn');
         const quitBtn = document.getElementById('quit-btn');
@@ -88,10 +85,8 @@
         const backgroundMusic = document.getElementById('background-music');
         const instructionText = document.getElementById('instruction-text');
 
-        // --- Game State ---
         let currentCake = '', collectedIngredients = [], allIngredientsForCake = [];
         
-        // --- Main Game 3D Scene ---
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         camera.position.set(0, 35, 5); 
@@ -106,17 +101,15 @@
         const direction = new THREE.Vector3();
         const clock = new THREE.Clock();
         
-        // --- ▼▼▼ NEW: Final Cherry Cake 3D Scene ▼▼▼ ---
         let cherryScene, cherryCamera, cherryRenderer, cherryCakeGroup, cherryControls;
         let isCherrySceneSetup = false;
 
         function setupFinalCherryCakeScene() {
             cherryScene = new THREE.Scene();
-            cherryScene.background = new THREE.Color(0xf2d7d5); // Match end screen color
+            cherryScene.background = new THREE.Color(0xf2d7d5);
             const cherryCanvas = document.getElementById('cherry-cake-canvas');
-            
             cherryCamera = new THREE.PerspectiveCamera(75, cherryCanvas.clientWidth / cherryCanvas.clientHeight, 0.1, 1000);
-            cherryCamera.position.z = 10; // Pull camera back to see the cake
+            cherryCamera.position.z = 10;
             
             cherryRenderer = new THREE.WebGLRenderer({ canvas: cherryCanvas, antialias: true });
             cherryRenderer.setSize(cherryCanvas.clientWidth, cherryCanvas.clientHeight);
@@ -128,15 +121,38 @@
             cherryScene.add(directionalLight);
             
             cherryControls = new OrbitControls(cherryCamera, cherryRenderer.domElement);
+            // ▼▼▼ CAMERA CONTROL FIXES ▼▼▼
+            cherryControls.enablePan = false; // Disable dragging the cake around
+            cherryControls.enableZoom = false; // Disable zooming in/out
+            cherryControls.enableDamping = true; // Makes movement smoother
+            cherryControls.dampingFactor = 0.05;
+            cherryControls.autoRotate = true; // Re-enable auto-rotation here
+            cherryControls.autoRotateSpeed = 2.0;
             
             cherryCakeGroup = new THREE.Group();
             cherryScene.add(cherryCakeGroup);
             
             const loader = new GLTFLoader();
             const cakeParts = ['cherrycake1.glb', 'cherrycake2.glb', 'cherrycake3.glb', 'cherrycake4.glb'];
+            let partsLoaded = 0;
             cakeParts.forEach(partFile => {
                 loader.load(partFile, (gltf) => {
                     cherryCakeGroup.add(gltf.scene);
+                    partsLoaded++;
+                    // ▼▼▼ NEW: Center the camera on the cake once all parts are loaded ▼▼▼
+                    if (partsLoaded === cakeParts.length) {
+                        const box = new THREE.Box3().setFromObject(cherryCakeGroup);
+                        const center = box.getCenter(new THREE.Vector3());
+                        cherryControls.target.copy(center); // Look at the center
+                        
+                        const size = box.getSize(new THREE.Vector3());
+                        const maxDim = Math.max(size.x, size.y, size.z);
+                        const fov = cherryCamera.fov * (Math.PI / 180);
+                        let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
+                        cameraZ *= 1.5; // Zoom out a bit
+                        cherryCamera.position.z = center.z + cameraZ;
+                        cherryControls.update();
+                    }
                 });
             });
             isCherrySceneSetup = true;
@@ -144,14 +160,10 @@
 
         function animateCherryCake() {
             requestAnimationFrame(animateCherryCake);
-            if (cherryCakeGroup) {
-                cherryCakeGroup.rotation.y += 0.005; // Rotate the whole group
-            }
-            cherryControls.update();
+            cherryControls.update(); // Necessary for damping to work
             cherryRenderer.render(cherryScene, cherryCamera);
         }
 
-        // --- Main Functions ---
         function setupScene() {
             scene.clear();
             interactiveObjects = [];
@@ -248,7 +260,6 @@
                         animateCherryCake();
                     } else {
                         const singleCakeViewer = document.getElementById('single-cake-viewer');
-                        // ▼▼▼ STRAWBERRY CAKE MODEL IS NOW CORRECT ▼▼▼
                         if (currentCake === 'strawberry') singleCakeViewer.src = 'strawberrycake.glb';
                         else if (currentCake === 'blueberry') singleCakeViewer.src = 'blueberrycake.glb';
                         singleCakeViewer.style.display = 'block';
@@ -258,7 +269,6 @@
             }, 500);
         }
 
-        // --- Event Listeners ---
         startBtn.addEventListener('click', () => { backgroundMusic.play().catch(e => {}); switchScreen('selection'); });
         quitBtn.addEventListener('click', () => window.close());
         cakeTabs.forEach(tab => {
@@ -291,6 +301,13 @@
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
+            // Also handle resizing for the cherry cake canvas
+            if(isCherrySceneSetup) {
+                const cherryCanvas = document.getElementById('cherry-cake-canvas');
+                cherryCamera.aspect = cherryCanvas.clientWidth / cherryCanvas.clientHeight;
+                cherryCamera.updateProjectionMatrix();
+                cherryRenderer.setSize(cherryCanvas.clientWidth, cherryCanvas.clientHeight);
+            }
         });
         switchScreen('start');
         animate();
