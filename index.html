@@ -14,50 +14,19 @@
     #startScreen::before, #cakeChoices::before { content:""; position:absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index:-1; }
     #cakeChoices { background: url('https://cdn.pixabay.com/photo/2015/01/14/19/20/bake-599521_1280.jpg') no-repeat center center; display:none; }
     .cake-tab { padding:20px; border-radius:10px; color:white; font-size:20px; cursor:pointer; text-align:center; width:180px; font-weight:bold; margin:10px; }
-    #chocolateTab{background-color:#8B4513;} #blueberryTab{background-color:#1E90FF;} #cherryTab{background-color:#FF69B4;}
+    #strawberryTab{background-color:#FF6347;} #blueberryTab{background-color:#1E90FF;} #cherryTab{background-color:#FF69B4;}
     #recipePanel { position:absolute; top:20%; left:5%; padding:20px; border-radius:12px; font-size:18px; display:none; z-index:10; min-width:200px; color:white; }
     #recipePanel h2 { margin-top:0; font-size:22px; text-align:center; }
     #recipePanel ul { list-style:none; padding:0; }
     #recipePanel li { margin:8px 0; font-weight:bold; cursor: pointer; transition: color 0.3s; }
     #recipePanel li.collected { color:lightgreen; cursor: default; text-decoration: line-through;}
-    #recipePanel.chocolate { background-color: rgba(139, 69, 19, 0.8); }
+    #recipePanel.strawberry { background-color: rgba(255, 99, 71, 0.8); }
     #recipePanel.blueberry { background-color: rgba(30, 144, 255, 0.8); }
     #recipePanel.cherry { background-color: rgba(255, 105, 180, 0.8); }
     
-    /* Loading Bar Styles */
-    #loading-container {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 50%;
-      max-width: 400px;
-      background-color: #333;
-      border: 2px solid white;
-      border-radius: 10px;
-      padding: 5px;
-      display: none;
-      z-index: 9999;
-    }
-    #loading-bar {
-      width: 0%;
-      height: 30px;
-      background-color: #4CAF50;
-      border-radius: 5px;
-      text-align: center;
-      line-height: 30px;
-      color: white;
-      transition: width 0.1s linear;
-    }
-    #loading-text {
-      position: absolute;
-      width: 100%;
-      text-align: center;
-      top: -35px;
-      color: white;
-      font-size: 20px;
-      font-weight: bold;
-    }
+    #loading-container { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 50%; max-width: 400px; background-color: #333; border: 2px solid white; border-radius: 10px; padding: 5px; display: none; z-index: 9999; }
+    #loading-bar { width: 0%; height: 30px; background-color: #4CAF50; border-radius: 5px; text-align: center; line-height: 30px; color: white; transition: width 0.1s linear; }
+    #loading-text { position: absolute; width: 100%; text-align: center; top: -35px; color: white; font-size: 20px; font-weight: bold; }
   </style>
 </head>
 <body>
@@ -78,10 +47,10 @@
     <div id="loading-text">Baking...</div>
     <div id="loading-bar">0%</div>
   </div>
-
+  
   <a-scene id="scene" physics="gravity:-9.8" style="display:none;">
-    <a-assets>
-      <!-- GLTF Models -->
+    <a-assets timeout="10000">
+      <!-- GLB Models -->
       <a-asset-item id="backwall-model" src="backwall.glb"></a-asset-item>
       <a-asset-item id="frontwall-model" src="frontwall.glb"></a-asset-item>
       <a-asset-item id="rightwall-model" src="rightwall.glb"></a-asset-item>
@@ -107,7 +76,7 @@
       <a-asset-item id="whisk-model" src="whisk.glb"></a-asset-item>
       <a-asset-item id="banana-model" src="banana.glb"></a-asset-item>
       
-      <!-- Ingredient Models -->
+      <!-- Ingredient GLB Models -->
       <a-asset-item id="flour-model" src="flour.glb"></a-asset-item>
       <a-asset-item id="sugar-model" src="sugar.glb"></a-asset-item>
       <a-asset-item id="butter-model" src="butter.glb"></a-asset-item>
@@ -117,8 +86,8 @@
       <a-asset-item id="cherries-model" src="cherries.glb"></a-asset-item>
       <a-asset-item id="chocolate-model" src="chocolate.glb"></a-asset-item>
 
-      <!-- Cake Models -->
-      <a-asset-item id="chocolate-cake-model-asset" src="strawberrycake.glb"></a-asset-item>
+      <!-- Cake GLB Models -->
+      <a-asset-item id="strawberry-cake-model-asset" src="strawberrycake.glb"></a-asset-item>
       <a-asset-item id="blueberry-cake-model-asset" src="blueberrycake.glb"></a-asset-item>
       <a-asset-item id="cherry-cake-model-asset" src="cherrycake1.glb"></a-asset-item>
 
@@ -134,9 +103,7 @@
       <a-entity id="blueberry-template" gltf-model="#blueberry-model" class="falling-ingredient" data-name="blueberry" dynamic-body="shape: sphere; radius: 0.03; mass: 0.1" visible="false" scale="0.1 0.1 0.1" fade-out></a-entity>
       <a-entity id="cherries-template" gltf-model="#cherries-model" class="falling-ingredient" data-name="cherries" dynamic-body="shape: sphere; radius: 0.03; mass: 0.1" visible="false" scale="0.1 0.1 0.1" fade-out></a-entity>
       <a-entity id="chocolate-template" gltf-model="#chocolate-model" class="falling-ingredient" data-name="chocolate" dynamic-body="shape: box; mass: 0.5" visible="false" scale="0.1 0.1 0.1" fade-out></a-entity>
-      
-      <!-- Incorrect ingredient templates -->
-      <a-entity id="strawberry-template" gltf-model="#strawberry-model" class="falling-ingredient incorrect" data-name="strawberry" dynamic-body="shape: sphere; radius: 0.05; mass: 0.1" visible="false" scale="0.1 0.1 0.1" fade-out></a-entity>
+      <a-entity id="strawberry-template" gltf-model="#strawberry-model" class="falling-ingredient" data-name="strawberry" dynamic-body="shape: sphere; radius: 0.05; mass: 0.1" visible="false" scale="0.1 0.1 0.1" fade-out></a-entity>
       <a-entity id="banana-template" gltf-model="#banana-model" class="falling-ingredient incorrect" data-name="banana" dynamic-body="shape: box; mass: 0.2" visible="false" scale="0.1 0.1 0.1" fade-out></a-entity>
       <a-entity id="salt-template" gltf-model="#salt-model" class="falling-ingredient incorrect" data-name="salt" dynamic-body="shape: box; mass: 0.2" visible="false" scale="0.1 0.1 0.1" fade-out></a-entity>
       <a-entity id="knife-template" gltf-model="#knife-model" class="falling-ingredient incorrect" data-name="knife" dynamic-body="shape: box; mass: 0.2" visible="false" scale="0.1 0.1 0.1" fade-out></a-entity>
@@ -145,13 +112,10 @@
     </a-assets>
     
     <a-entity camera position="0 2 10" look-at="#player-bowl"></a-entity>
-
     <a-entity light="type:ambient; intensity:0.5"></a-entity>
     <a-entity light="type:directional; intensity:0.8" position="0 2 1"></a-entity>
-
     <a-plane id="physical-floor" static-body position="0 0 0" rotation="-90 0 0" width="10" height="10" visible="false"></a-plane> 
-
-    <!-- Kitchen and Items -->
+    
     <a-entity id="backwall" gltf-model="#backwall-model" static-body="shape: box;" position="0 0 -5"></a-entity>
     <a-entity id="frontwall" gltf-model="#frontwall-model" static-body="shape: box;" position="0 0 5"></a-entity>
     <a-entity id="rightwall" gltf-model="#rightwall-model" static-body="shape: box;" position="5 0 0"></a-entity>
@@ -165,11 +129,7 @@
     <a-entity id="light-model-entity" gltf-model="#light-model" static-body="shape: box;"></a-entity>
     <a-entity id="salt-static" gltf-model="#salt-model" static-body="shape: box;"></a-entity>
     <a-entity id="eggcarton-static" gltf-model="#eggcarton-model" static-body="shape: box;"></a-entity>
-    
-    <a-entity id="player-bowl" gltf-model="#mixingbowl-model" 
-              position="0 1 -3" rotation="0 180 0" scale="0.5 0.5 0.5"
-              player-movement collision-listener></a-entity> 
-
+    <a-entity id="player-bowl" gltf-model="#mixingbowl-model" position="0 1 -3" rotation="0 180 0" scale="0.5 0.5 0.5" player-movement collision-listener></a-entity> 
     <a-entity id="cuttingboard-static" gltf-model="#cuttingboard-model" static-body="shape: box;"></a-entity>
     <a-entity id="shelves-static" gltf-model="#shelves-model" static-body="shape: box;"></a-entity>
     <a-entity id="knife-static" gltf-model="#knife-model" static-body="shape: box;"></a-entity>
@@ -202,86 +162,12 @@
     let gameActive = false;
 
     // --- A-Frame Components ---
-
-    // Component for player (mixing bowl) movement
-    AFRAME.registerComponent('player-movement', {
-      schema: { speed: { type: 'number', default: 0.1 } },
-      init: function () {
-        this.el.setAttribute('dynamic-body', 'shape: box; mass: 1; linearDamping: 0.99; angularDamping: 0.99');
-        this.keys = {};
-        window.addEventListener('keydown', (e) => { this.keys[e.key] = true; });
-        window.addEventListener('keyup', (e) => { this.keys[e.key] = false; });
-      },
-      tick: function () {
-        const el = this.el;
-        let currentPos = el.object3D.position;
-        let newX = currentPos.x;
-        const speed = this.data.speed;
-        const bounds = 4;
-
-        if (this.keys['ArrowLeft'] || this.keys['a']) {
-          newX -= speed;
-        }
-        if (this.keys['ArrowRight'] || this.keys['d']) {
-          newX += speed;
-        }
-
-        newX = Math.max(-bounds, Math.min(bounds, newX));
-        el.object3D.position.x = newX;
-      }
-    });
-
-    // Component for ingredient collision detection
-    AFRAME.registerComponent('collision-listener', {
-      init: function () {
-        this.el.addEventListener('collide', (e) => {
-          const collidedEntity = e.detail.body.el;
-          if (collidedEntity.classList.contains('falling-ingredient')) {
-            const ingredientName = collidedEntity.dataset.name;
-            handleIngredientCollision(ingredientName, collidedEntity);
-          }
-        });
-      }
-    });
-
-    // Component for fading out ingredients
-    AFRAME.registerComponent('fade-out', {
-      init: function () {
-        this.el.addEventListener('start-fade', () => {
-          const mesh = this.el.getObject3D('mesh');
-          if (!mesh) return;
-
-          mesh.traverse(node => {
-            if (node.isMesh && node.material) {
-              node.material.transparent = true;
-              new AFRAME.TWEEN.Tween({ opacity: node.material.opacity })
-                .to({ opacity: 0 }, 1000) // Fade over 1 second
-                .onUpdate(function (object) {
-                  node.material.opacity = object.opacity;
-                })
-                .start();
-            }
-          });
-          
-          setTimeout(() => {
-            if (this.el.parentNode) {
-              this.el.parentNode.removeChild(this.el);
-            }
-          }, 1000);
-        });
-      }
-    });
+    AFRAME.registerComponent('player-movement', { schema: { speed: { type: 'number', default: 0.1 } }, init: function () { this.el.setAttribute('dynamic-body', 'shape: box; mass: 1; linearDamping: 0.99; angularDamping: 0.99'); this.keys = {}; window.addEventListener('keydown', (e) => { this.keys[e.key] = true; }); window.addEventListener('keyup', (e) => { this.keys[e.key] = false; }); }, tick: function () { const el = this.el; let currentPos = el.object3D.position; let newX = currentPos.x; const speed = this.data.speed; const bounds = 4; if (this.keys['ArrowLeft'] || this.keys['a']) { newX -= speed; } if (this.keys['ArrowRight'] || this.keys['d']) { newX += speed; } newX = Math.max(-bounds, Math.min(bounds, newX)); el.object3D.position.x = newX; } });
+    AFRAME.registerComponent('collision-listener', { init: function () { this.el.addEventListener('collide', (e) => { const collidedEntity = e.detail.body.el; if (collidedEntity.classList.contains('falling-ingredient')) { const ingredientName = collidedEntity.dataset.name; handleIngredientCollision(ingredientName, collidedEntity); } }); } });
+    AFRAME.registerComponent('fade-out', { init: function () { this.el.addEventListener('start-fade', () => { const mesh = this.el.getObject3D('mesh'); if (!mesh) return; mesh.traverse(node => { if (node.isMesh && node.material) { node.material.transparent = true; new AFRAME.TWEEN.Tween({ opacity: node.material.opacity }).to({ opacity: 0 }, 1000).onUpdate(function (object) { node.material.opacity = object.opacity; }).start(); } }); setTimeout(() => { if (this.el.parentNode) { this.el.parentNode.removeChild(this.el); } }, 1000); }); } });
 
     // --- Game Logic Functions ---
-
-    function startGame(){
-      document.getElementById('startScreen').style.display='none';
-      document.getElementById('cakeChoices').style.display='flex';
-      const music = document.querySelector('#mainmusic');
-      if(music && music.components.sound && !music.components.sound.isPlaying){
-        music.components.sound.playSound();
-      }
-    }
+    function startGame(){ document.getElementById('startScreen').style.display='none'; document.getElementById('cakeChoices').style.display='flex'; const music = document.querySelector('#mainmusic'); if(music && music.components.sound && !music.components.sound.isPlaying){ music.components.sound.playSound(); } }
 
     function chooseCake(cakeName) {
       selectedCake = cakeName;
@@ -293,10 +179,11 @@
       recipePanel.className = cakeName;
 
       const baseIngredients = ["flour", "sugar", "butter", "milk", "egg"];
-      if (cakeName === 'blueberry') {
+      
+      if (cakeName === 'strawberry') {
+        currentIngredients = [...baseIngredients, "strawberry"];
+      } else if (cakeName === 'blueberry') {
         currentIngredients = [...baseIngredients, "blueberry"];
-      } else if (cakeName === 'chocolate') {
-        currentIngredients = [...baseIngredients, "chocolate"];
       } else if (cakeName === 'cherry') {
         currentIngredients = [...baseIngredients, "cherries"];
       }
@@ -310,151 +197,20 @@
 
       allPossibleIngredients = [
           'flour-template', 'sugar-template', 'butter-template', 'milk-template', 'egg-template',
-          'blueberry-template', 'cherries-template', 'chocolate-template',
-          'strawberry-template', 'banana-template', 'salt-template', 'knife-template', 'spatula-template', 'whisk-template'
+          'blueberry-template', 'cherries-template', 'chocolate-template', 'strawberry-template',
+          'banana-template', 'salt-template', 'knife-template', 'spatula-template', 'whisk-template'
       ];
       
       startGamePlay();
     }
 
-    function startGamePlay() {
-        gameActive = true;
-        collectedIngredients = [];
-        incorrectIngredientsCollectedCount = 0;
-
-        document.querySelectorAll('.falling-ingredient').forEach(el => {
-          if (el.parentNode) el.parentNode.removeChild(el)
-        });
-
-        ingredientSpawnInterval = setInterval(spawnIngredient, 1500);
-    }
-
-    function spawnIngredient() {
-        if (!gameActive) {
-            clearInterval(ingredientSpawnInterval);
-            return;
-        }
-
-        const sceneEl = document.querySelector('a-scene');
-        const randomIndex = Math.floor(Math.random() * allPossibleIngredients.length);
-        const ingredientTemplateId = allPossibleIngredients[randomIndex];
-        const template = document.getElementById(ingredientTemplateId);
-
-        if (template) {
-            const newIngredient = template.cloneNode(true);
-            newIngredient.removeAttribute('id');
-            newIngredient.setAttribute('visible', 'true');
-            newIngredient.setAttribute('position', {
-                x: (Math.random() * 8) - 4,
-                y: 5,
-                z: (Math.random() * 2) - 1
-            });
-            
-            sceneEl.appendChild(newIngredient);
-
-            // Wait for the physics body to be loaded before changing its properties
-            newIngredient.addEventListener('body-loaded', function () {
-                this.body.velocity.set(0, 0, 0);
-                this.body.angularVelocity.set(0, 0, 0);
-            });
-
-            setTimeout(() => {
-                if (newIngredient.parentNode) {
-                    newIngredient.parentNode.removeChild(newIngredient);
-                }
-            }, 8000);
-        }
-    }
-
-    function handleIngredientCollision(ingredientName, entity) {
-        if (!gameActive) return;
-
-        if (currentIngredients.includes(ingredientName)) {
-            if (!collectedIngredients.includes(ingredientName)) {
-                collectedIngredients.push(ingredientName);
-                const li = document.getElementById(`recipe-${ingredientName}`);
-                if (li) {
-                    li.classList.add('collected');
-                    li.innerHTML = `✅ ${ingredientName}`;
-                }
-                entity.emit('start-fade');
-                checkCompletion();
-            } else {
-                entity.emit('start-fade');
-            }
-        } else {
-            incorrectIngredientsCollectedCount++;
-            restartIngredientCollection();
-        }
-    }
-
-    function restartIngredientCollection() {
-        incorrectIngredientsCollectedCount = 0;
-        collectedIngredients = [];
-        
-        currentIngredients.forEach(ingredient => {
-            const li = document.getElementById(`recipe-${ingredient}`);
-            if (li) {
-                li.classList.remove('collected');
-                li.innerHTML = ingredient;
-            }
-        });
-
-        document.querySelectorAll('.falling-ingredient').forEach(el => {
-          if (el.parentNode && el.getAttribute('visible')) {
-            el.parentNode.removeChild(el)
-          }
-        });
-    }
-
-    function checkCompletion() {
-      if (collectedIngredients.length === currentIngredients.length) {
-        startBakingSequence();
-      }
-    }
-
-    function startBakingSequence() {
-        gameActive = false;
-        clearInterval(ingredientSpawnInterval);
-
-        document.querySelectorAll('.falling-ingredient').forEach(el => {
-            if (el.parentNode) {
-                el.parentNode.removeChild(el);
-            }
-        });
-
-        const loadingContainer = document.getElementById('loading-container');
-        const loadingBar = document.getElementById('loading-bar');
-        loadingContainer.style.display = 'block';
-
-        let progress = 0;
-        const interval = setInterval(() => {
-            progress += 1;
-            loadingBar.style.width = progress + '%';
-            loadingBar.textContent = progress + '%';
-            if (progress >= 100) {
-                clearInterval(interval);
-                loadingContainer.style.display = 'none';
-                showFinalCake();
-            }
-        }, 50);
-    }
-
-    function showFinalCake() {
-      // Corrected ID from 'mixingbowl' to 'player-bowl'
-      document.getElementById('player-bowl').setAttribute('visible', 'false');
-      const finalCake = document.getElementById('final-cake-container');
-      const cakeModel = document.getElementById(`${selectedCake}-cake-model`);
-      cakeModel.setAttribute('visible', 'true');
-      finalCake.setAttribute('visible', 'true');
-      finalCake.setAttribute('animation', {
-        property: 'scale',
-        from: '0.01 0.01 0.01',
-        to: '1 1 1',
-        dur: 1500,
-        easing: 'easeOutElastic'
-      });
-    }
+    function startGamePlay() { gameActive = true; collectedIngredients = []; incorrectIngredientsCollectedCount = 0; document.querySelectorAll('.falling-ingredient').forEach(el => { if (el.parentNode) el.parentNode.removeChild(el) }); ingredientSpawnInterval = setInterval(spawnIngredient, 1500); }
+    function spawnIngredient() { if (!gameActive) { clearInterval(ingredientSpawnInterval); return; } const sceneEl = document.querySelector('a-scene'); const randomIndex = Math.floor(Math.random() * allPossibleIngredients.length); const ingredientTemplateId = allPossibleIngredients[randomIndex]; const template = document.getElementById(ingredientTemplateId); if (template) { const newIngredient = template.cloneNode(true); newIngredient.removeAttribute('id'); newIngredient.setAttribute('visible', 'true'); newIngredient.setAttribute('position', { x: (Math.random() * 8) - 4, y: 5, z: (Math.random() * 2) - 1 }); sceneEl.appendChild(newIngredient); newIngredient.addEventListener('body-loaded', function () { this.body.velocity.set(0, 0, 0); this.body.angularVelocity.set(0, 0, 0); }); setTimeout(() => { if (newIngredient.parentNode) { newIngredient.parentNode.removeChild(newIngredient); } }, 8000); } }
+    function handleIngredientCollision(ingredientName, entity) { if (!gameActive) return; if (currentIngredients.includes(ingredientName)) { if (!collectedIngredients.includes(ingredientName)) { collectedIngredients.push(ingredientName); const li = document.getElementById(`recipe-${ingredientName}`); if (li) { li.classList.add('collected'); li.innerHTML = `✅ ${ingredientName}`; } entity.emit('start-fade'); checkCompletion(); } else { entity.emit('start-fade'); } } else { incorrectIngredientsCollectedCount++; restartIngredientCollection(); } }
+    function restartIngredientCollection() { incorrectIngredientsCollectedCount = 0; collectedIngredients = []; currentIngredients.forEach(ingredient => { const li = document.getElementById(`recipe-${ingredient}`); if (li) { li.classList.remove('collected'); li.innerHTML = ingredient; } }); document.querySelectorAll('.falling-ingredient').forEach(el => { if (el.parentNode && el.getAttribute('visible')) { el.parentNode.removeChild(el) } }); }
+    function checkCompletion() { if (collectedIngredients.length === currentIngredients.length) { startBakingSequence(); } }
+    function startBakingSequence() { gameActive = false; clearInterval(ingredientSpawnInterval); document.querySelectorAll('.falling-ingredient').forEach(el => { if (el.parentNode) { el.parentNode.removeChild(el); } }); const loadingContainer = document.getElementById('loading-container'); const loadingBar = document.getElementById('loading-bar'); loadingContainer.style.display = 'block'; let progress = 0; const interval = setInterval(() => { progress += 1; loadingBar.style.width = progress + '%'; loadingBar.textContent = progress + '%'; if (progress >= 100) { clearInterval(interval); loadingContainer.style.display = 'none'; showFinalCake(); } }, 50); }
+    function showFinalCake() { document.getElementById('player-bowl').setAttribute('visible', 'false'); const finalCake = document.getElementById('final-cake-container'); const cakeModel = document.getElementById(`${selectedCake}-cake-model`); cakeModel.setAttribute('visible', 'true'); finalCake.setAttribute('visible', 'true'); finalCake.setAttribute('animation', { property: 'scale', from: '0.01 0.01 0.01', to: '1 1 1', dur: 1500, easing: 'easeOutElastic' }); }
   </script>
 </body>
 </html>
