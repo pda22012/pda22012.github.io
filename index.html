@@ -7,6 +7,9 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- Background Music -->
+    <audio id="background-music" loop src="baking cooking jazz.mp3"></audio>
+
     <!-- Start Screen -->
     <div id="start-screen" class="screen active">
         <div class="start-content">
@@ -32,25 +35,42 @@
             <ul>
                 <li id="flour">Flour</li>
                 <li id="sugar">Sugar</li>
-                <li id="eggs">Eggs</li>
+                <li id="egg">Egg</li>
                 <li id="vanilla">Vanilla</li>
                 <li id="butter">Butter</li>
                 <li id="milk">Milk</li>
-                <li id="fruit"></li>
+                <li id="fruit"></li> <!-- This will be filled by JS -->
             </ul>
         </div>
         <div id="kitchen-area">
-            <!-- This is where your 3D kitchen and ingredients will go. -->
-            <!-- We are using placeholders here. -->
-            <div class="ingredient-object" data-ingredient="flour">Flour</div>
-            <div class="ingredient-object" data-ingredient="sugar">Sugar</div>
-            <div class="ingredient-object" data-ingredient="eggs">Eggs</div>
-            <div class="ingredient-object" data-ingredient="vanilla">Vanilla</div>
-            <div class="ingredient-object" data-ingredient="butter">Butter</div>
-            <div class="ingredient-object" data-ingredient="milk">Milk</div>
-            <div class="ingredient-object" data-ingredient="strawberry" style="display: none;">Strawberry</div>
-            <div class="ingredient-object" data-ingredient="blueberry" style="display: none;">Blueberry</div>
-            <div class="ingredient-object" data-ingredient="cherry" style="display: none;">Cherries</div>
+            <!-- Static Kitchen Parts (Non-interactive) -->
+            <model-viewer class="kitchen-part" src="backwall.glb" alt="Back Wall"></model-viewer>
+            <model-viewer class="kitchen-part" src="counters.glb" alt="Counters"></model-viewer>
+            <model-viewer class="kitchen-part" src="counterdecor.glb" alt="Counter Decor"></model-viewer>
+            <model-viewer class="kitchen-part" src="floor.glb" alt="Floor"></model-viewer>
+            <model-viewer class="kitchen-part" src="fridge.glb" alt="Fridge"></model-viewer>
+            <model-viewer class="kitchen-part" src="frontwall.glb" alt="Front Wall"></model-viewer>
+            <model-viewer class="kitchen-part" src="leftwall.glb" alt="Left Wall"></model-viewer>
+            <model-viewer class="kitchen-part" src="rightwall.glb" alt="Right Wall"></model-viewer>
+            <model-viewer class="kitchen-part" src="roof.glb" alt="Roof"></model-viewer>
+            <model-viewer class="kitchen-part" src="shelves.glb" alt="Shelves"></model-viewer>
+            <model-viewer class="kitchen-part" src="stool.glb" alt="Stool"></model-viewer>
+            <model-viewer class="kitchen-part" src="stove.glb" alt="Stove"></model-viewer>
+            <model-viewer class="kitchen-part" src="light.glb" alt="Light"></model-viewer>
+            <model-viewer class="kitchen-part" src="radio.glb" alt="Radio"></model-viewer>
+            
+            <!-- Collectible Ingredient Objects (Interactive) -->
+            <model-viewer class="ingredient-object" data-ingredient="flour" src="flour.glb" alt="Flour" camera-controls></model-viewer>
+            <model-viewer class="ingredient-object" data-ingredient="sugar" src="sugar.glb" alt="Sugar" camera-controls></model-viewer>
+            <model-viewer class="ingredient-object" data-ingredient="egg" src="egg.glb" alt="Egg" camera-controls></model-viewer>
+            <model-viewer class="ingredient-object" data-ingredient="vanilla" src="vanilla.glb" alt="Vanilla" camera-controls></model-viewer>
+            <model-viewer class="ingredient-object" data-ingredient="butter" src="butter.glb" alt="Butter" camera-controls></model-viewer>
+            <model-viewer class="ingredient-object" data-ingredient="milk" src="milk.glb" alt="Milk" camera-controls></model-viewer>
+            
+            <!-- Fruit models (hidden by default) -->
+            <model-viewer class="ingredient-object" data-ingredient="strawberry" src="strawberry.glb" alt="Strawberry" style="display: none;" camera-controls></model-viewer>
+            <model-viewer class="ingredient-object" data-ingredient="blueberry" src="blueberry.glb" alt="Blueberry" style="display: none;" camera-controls></model-viewer>
+            <model-viewer class="ingredient-object" data-ingredient="cherries" src="cherries.glb" alt="Cherries" style="display: none;" camera-controls></model-viewer>
         </div>
     </div>
 
@@ -60,13 +80,16 @@
             <div id="loading-bar"></div>
         </div>
         <div id="final-cake" style="display: none;">
-            <!-- This is where your final cake 3D model will appear -->
-            <p>Your cake is ready!</p>
+            <!-- Final Cake Models -->
+            <model-viewer id="strawberry-cake-final" class="final-cake-model" src="strawberrycake.glb" alt="Strawberry Cake" camera-controls auto-rotate></model-viewer>
+            <model-viewer id="blueberry-cake-final" class="final-cake-model" src="blueberrycake.glb" alt="Blueberry Cake" camera-controls auto-rotate></model-viewer>
+            <model-viewer id="cherry-cake-final" class="final-cake-model" src="cherrycake4.glb" alt="Cherry Cake" camera-controls auto-rotate></model-viewer>
+            
             <h2 id="end-message"></h2>
         </div>
     </div>
 
-    <!-- Import the <model-viewer> component -->
+    <!-- This script is essential for <model-viewer> to work -->
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
     <script src="script.js"></script>
 </body>
