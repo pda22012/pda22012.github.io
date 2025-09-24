@@ -27,7 +27,6 @@
         
         #crosshair { position: absolute; top: 50%; left: 50%; width: 10px; height: 10px; border: 2px solid white; border-radius: 50%; transform: translate(-50%, -50%); z-index: 99; mix-blend-mode: difference; }
 
-        /* ▼▼▼ NEW STYLE FOR THE INSTRUCTION TEXT ▼▼▼ */
         #instruction-text {
             position: absolute;
             top: 5%;
@@ -39,12 +38,12 @@
             border-radius: 10px;
             font-size: 1.5em;
             z-index: 99;
-            opacity: 0; /* Start invisible */
+            opacity: 0;
             transition: opacity 1s ease-in-out;
-            pointer-events: none; /* Can't be clicked */
+            pointer-events: none;
         }
         #instruction-text.visible {
-            opacity: 1; /* Class to fade it in */
+            opacity: 1;
         }
 
         #end-screen { flex-direction: column; background-color: #f2d7d5; z-index: 100; }
@@ -75,238 +74,12 @@
             <ul id="ingredient-ul-list"></ul>
         </div>
         <div id="crosshair"></div>
-        <!-- ▼▼▼ NEW INSTRUCTION TEXT ELEMENT ▼▼▼ -->
         <div id="instruction-text">press E to collect the items from the list</div>
     </div>
     <div id="end-screen" class="screen">
         <div id="loading-bar-container"><div id="loading-bar"></div></div>
         <div id="final-cake-container">
-            <!-- ▼▼▼ UPDATED FINAL CAKE DISPLAY AREA ▼▼▼ -->
             <model-viewer id="single-cake-viewer" class="final-cake-model" camera-controls auto-rotate></model-viewer>
             <div id="cherry-cake-final" class="final-cake-model">
                 <model-viewer class="cherry-cake-part" src="cherrycake1.glb" camera-controls auto-rotate></model-viewer>
-                <model-viewer class="cherry-cake-part" src="cherrycake2.glb" camera-controls auto-rotate></model-viewer>
-                <model-viewer class="cherry-cake-part" src="cherrycake3.glb" camera-controls auto-rotate></model-viewer>
-                <model-viewer class="cherry-cake-part" src="cherrycake4.glb" camera-controls auto-rotate></model-viewer>
-            </div>
-        </div>
-        <h2 id="end-message"></h2>
-    </div>
-
-    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
-    <script type="importmap">{"imports": {"three": "https://unpkg.com/three@0.164.1/build/three.module.js", "three/addons/": "https://unpkg.com/three@0.164.1/examples/jsm/"}}</script>
-    <script type="module">
-        import * as THREE from 'three';
-        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-        import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
-
-        const screens = { start: document.getElementById('start-screen'), selection: document.getElementById('cake-selection-screen'), game: document.getElementById('game-screen'), end: document.getElementById('end-screen') };
-        const startBtn = document.getElementById('start-btn');
-        const quitBtn = document.getElementById('quit-btn');
-        const cakeTabs = document.querySelectorAll('.tab');
-        const cakeTitle = document.getElementById('cake-title');
-        const ingredientListUL = document.getElementById('ingredient-ul-list');
-        const backgroundMusic = document.getElementById('background-music');
-        const instructionText = document.getElementById('instruction-text');
-
-        let currentCake = '', collectedIngredients = [], allIngredientsForCake = [];
-        
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(0, 35, 5); 
-        
-        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('three-canvas'), antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(window.devicePixelRatio);
-        
-        const controls = new PointerLockControls(camera, renderer.domElement);
-        const raycaster = new THREE.Raycaster();
-        let interactiveObjects = [];
-
-        let moveForward = false, moveBackward = false, moveLeft = false, moveRight = false;
-        const velocity = new THREE.Vector3();
-        const direction = new THREE.Vector3();
-        const clock = new THREE.Clock();
-
-        function setupScene() {
-            scene.clear();
-            interactiveObjects = [];
-            scene.background = new THREE.Color(0xa3c1ad);
-            scene.add(new THREE.AmbientLight(0xffffff, 1.5));
-            const directionalLight = new THREE.DirectionalLight(0xffffff, 2);
-            directionalLight.position.set(5, 10, 7.5);
-            scene.add(directionalLight);
-            
-            const loader = new GLTFLoader();
-            const allModels = [ 'backwall.glb', 'counters.glb', 'counterdecor.glb', 'floor.glb', 'fridge.glb', 'frontwall.glb', 'leftwall.glb', 'rightwall.glb', 'roof.glb', 'shelves.glb', 'stool.glb', 'stove.glb', 'light.glb', 'radio.glb', 'flour.glb', 'sugar.glb', 'egg.glb', 'vanilla.glb', 'butter.glb', 'milk.glb', 'banana.glb', 'cuttingboard.glb', 'eggcarton.glb', 'knife.glb', 'mixingbowl.glb', 'peanutbutter.glb', 'salt.glb', 'slicefruitcake.glb', 'spatula.glb', 'whisk.glb' ];
-            
-            if (currentCake === 'strawberry') { allModels.push('strawberry.glb'); allModels.push('chocolate.glb'); }
-            if (currentCake === 'blueberry') { allModels.push('blueberry.glb'); }
-            if (currentCake === 'cherry') { allModels.push('cherries.glb'); }
-
-            allModels.forEach(modelFile => {
-                loader.load(modelFile, (gltf) => {
-                    const model = gltf.scene;
-                    model.name = modelFile.replace('.glb', '');
-                    scene.add(model);
-                    if (allIngredientsForCake.includes(model.name)) {
-                        interactiveObjects.push(model);
-                    }
-                });
-            });
-        }
-        
-        function animate() {
-            requestAnimationFrame(animate);
-            const delta = clock.getDelta();
-
-            if (controls.isLocked === true) {
-                velocity.x -= velocity.x * 10.0 * delta;
-                velocity.z -= velocity.z * 10.0 * delta;
-
-                direction.z = Number(moveForward) - Number(moveBackward);
-                direction.x = Number(moveRight) - Number(moveLeft);
-                direction.normalize();
-                
-                const moveSpeed = 100.0;
-                if (moveForward || moveBackward) velocity.z -= direction.z * moveSpeed * delta;
-                if (moveLeft || moveRight) velocity.x -= direction.x * moveSpeed * delta;
-
-                controls.moveRight(-velocity.x * delta);
-                controls.moveForward(-velocity.z * delta);
-            }
-            renderer.render(scene, camera);
-        }
-
-        function switchScreen(screenName) {
-            Object.values(screens).forEach(screen => screen.classList.remove('active'));
-            if(screens[screenName]) screens[screenName].classList.add('active');
-        }
-
-        function setupGame() {
-            collectedIngredients = [];
-            ingredientListUL.innerHTML = '';
-            
-            const baseIngredients = ['flour', 'sugar', 'egg', 'vanilla', 'butter', 'milk'];
-            const recipes = {
-                strawberry: { name: 'Strawberry Cake', ingredients: [...baseIngredients, 'strawberry', 'chocolate'] },
-                blueberry: { name: 'Blueberry Cake', ingredients: [...baseIngredients, 'blueberry'] },
-                cherry: { name: 'Cherry Cake', ingredients: [...baseIngredients, 'cherries'] }
-            };
-
-            const recipe = recipes[currentCake];
-            cakeTitle.textContent = recipe.name;
-            allIngredientsForCake = recipe.ingredients;
-
-            allIngredientsForCake.forEach(ingredient => {
-                const li = document.createElement('li');
-                li.id = ingredient;
-                li.textContent = ingredient.charAt(0).toUpperCase() + ingredient.slice(1);
-                ingredientListUL.appendChild(li);
-            });
-            
-            // ▼▼▼ SHOW AND HIDE INSTRUCTION TEXT ▼▼▼
-            instructionText.classList.add('visible');
-            setTimeout(() => {
-                instructionText.classList.remove('visible');
-            }, 5000); // Text stays visible for 5 seconds
-
-            setupScene();
-        }
-
-        function collectIngredient(ingredientName) {
-            if (!collectedIngredients.includes(ingredientName) && allIngredientsForCake.includes(ingredientName)) {
-                collectedIngredients.push(ingredientName);
-                const listItem = document.getElementById(ingredientName);
-                if (listItem) listItem.classList.add('collected');
-                const objectToHide = scene.getObjectByName(ingredientName);
-                if (objectToHide) objectToHide.visible = false;
-                interactiveObjects = interactiveObjects.filter(obj => obj.name !== ingredientName);
-                if (collectedIngredients.length === allIngredientsForCake.length) finishGame();
-            }
-        }
-        
-        function finishGame() {
-            controls.unlock();
-            setTimeout(() => {
-                switchScreen('end');
-                document.querySelectorAll('.final-cake-model').forEach(el => el.style.display = 'none');
-
-                // ▼▼▼ UPDATED LOGIC TO SHOW CORRECT FINAL CAKE(S) ▼▼▼
-                if (currentCake === 'cherry') {
-                    document.getElementById('cherry-cake-final').style.display = 'block';
-                } else {
-                    const singleCakeViewer = document.getElementById('single-cake-viewer');
-                    if (currentCake === 'strawberry') {
-                        singleCakeViewer.src = 'strawberrychocolatecake.glb';
-                    } else if (currentCake === 'blueberry') {
-                        singleCakeViewer.src = 'blueberrycake.glb';
-                    }
-                    singleCakeViewer.style.display = 'block';
-                }
-                
-                setTimeout(() => {
-                    document.getElementById('loading-bar-container').style.display = 'none';
-                    document.getElementById('final-cake-container').style.display = 'block';
-                    document.getElementById('end-message').textContent = 'have a piece';
-                }, 5000);
-            }, 500);
-        }
-
-        startBtn.addEventListener('click', () => { backgroundMusic.play().catch(e => console.warn("Audio play failed")); switchScreen('selection'); });
-        quitBtn.addEventListener('click', () => window.close());
-        cakeTabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                currentCake = tab.dataset.cake;
-                switchScreen('game');
-                setupGame();
-                setTimeout(() => controls.lock(), 100);
-            });
-        });
-
-        screens.game.addEventListener('click', () => controls.lock());
-        
-        // ▼▼▼ UPDATED KEY LISTENER TO INCLUDE 'E' FOR COLLECTION ▼▼▼
-        const onKeyDown = (event) => {
-            if (controls.isLocked) {
-                switch (event.code) {
-                    case 'KeyW': moveForward = true; break;
-                    case 'KeyA': moveLeft = true; break;
-                    case 'KeyS': moveBackward = true; break;
-                    case 'KeyD': moveRight = true; break;
-                    case 'KeyE': // 'E' key now handles collection
-                        raycaster.setFromCamera({ x: 0, y: 0 }, camera);
-                        const intersects = raycaster.intersectObjects(interactiveObjects, true);
-                        if (intersects.length > 0 && intersects[0].distance < 15) {
-                            let clickedObject = intersects[0].object;
-                            while (clickedObject.parent && clickedObject.parent !== scene) {
-                                clickedObject = clickedObject.parent;
-                            }
-                            collectIngredient(clickedObject.name);
-                        }
-                        break;
-                }
-            }
-        };
-        const onKeyUp = (event) => {
-            switch (event.code) {
-                case 'KeyW': moveForward = false; break;
-                case 'KeyA': moveLeft = false; break;
-                case 'KeyS': moveBackward = false; break;
-                case 'KeyD': moveRight = false; break;
-            }
-        };
-        document.addEventListener('keydown', onKeyDown);
-        document.addEventListener('keyup', onKeyUp);
-        
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
-
-        switchScreen('start');
-        animate();
-    </script>
-</body>
-</html>
+                <model-viewer class="cherry-cake-part" src="cherrycake2.glb" camera-controls auto-rotate></model-v
