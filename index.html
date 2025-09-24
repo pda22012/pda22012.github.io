@@ -74,8 +74,6 @@
         import * as THREE from 'three';
         import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
         import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
-        // OrbitControls is no longer needed for the final cake, but we keep it here just in case.
-        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
         const screens = { start: document.getElementById('start-screen'), selection: document.getElementById('cake-selection-screen'), game: document.getElementById('game-screen'), end: document.getElementById('end-screen') };
         const startBtn = document.getElementById('start-btn');
@@ -102,15 +100,16 @@
         const direction = new THREE.Vector3();
         const clock = new THREE.Clock();
         
-        // Final Cake Scene Variables
+        // --- Final Cake Scene Variables ---
         let cherryScene, cherryCamera, cherryRenderer, cherryCakeGroup;
         let isCherrySceneSetup = false;
-
-        // ▼▼▼ THIS IS THE CORRECTED CHERRY CAKE SCENE SETUP ▼▼▼
+        let isDragging = false, previousMousePosition = { x: 0 };
+        
+        // ▼▼▼ THIS IS THE NEW, STABLE CHERRY CAKE SCENE SETUP ▼▼▼
         function setupFinalCherryCakeScene() {
+            const cherryCanvas = document.getElementById('cherry-cake-canvas');
             cherryScene = new THREE.Scene();
             cherryScene.background = new THREE.Color(0xf2d7d5);
-            const cherryCanvas = document.getElementById('cherry-cake-canvas');
             cherryCamera = new THREE.PerspectiveCamera(75, cherryCanvas.clientWidth / cherryCanvas.clientHeight, 0.1, 1000);
             
             cherryRenderer = new THREE.WebGLRenderer({ canvas: cherryCanvas, antialias: true });
@@ -135,31 +134,41 @@
                     if (partsLoaded === cakeParts.length) {
                         const box = new THREE.Box3().setFromObject(cherryCakeGroup);
                         const center = box.getCenter(new THREE.Vector3());
-                        // Move the whole group so its center is at the world origin (0,0,0)
                         cherryCakeGroup.position.sub(center);
-
                         const size = box.getSize(new THREE.Vector3());
                         const maxDim = Math.max(size.x, size.y, size.z);
                         const fov = cherryCamera.fov * (Math.PI / 180);
                         let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
-                        cameraZ *= 1.5; // Add some padding
+                        cameraZ *= 1.5;
                         cherryCamera.position.set(0, 0, cameraZ);
-                        cherryCamera.lookAt(0, 0, 0); // Look at the centered cake
+                        cherryCamera.lookAt(0, 0, 0);
                     }
                 });
+            });
+
+            // Add manual drag controls
+            cherryCanvas.addEventListener('mousedown', (e) => { isDragging = true; });
+            cherryCanvas.addEventListener('mouseup', (e) => { isDragging = false; });
+            cherryCanvas.addEventListener('mousemove', (e) => {
+                if (isDragging) {
+                    const deltaX = e.clientX - previousMousePosition.x;
+                    cherryCakeGroup.rotation.y += deltaX * 0.01;
+                }
+                previousMousePosition.x = e.clientX;
             });
             isCherrySceneSetup = true;
         }
 
         function animateCherryCake() {
             requestAnimationFrame(animateCherryCake);
-            if (cherryCakeGroup) {
-                // This rotates the cake itself. The camera does not move.
+            // If the user is NOT dragging the cake, let it auto-rotate slowly
+            if (!isDragging) {
                 cherryCakeGroup.rotation.y += 0.005; 
             }
             cherryRenderer.render(cherryScene, cherryCamera);
         }
 
+        // --- Main Game Functions ---
         function setupScene() {
             scene.clear();
             interactiveObjects = [];
