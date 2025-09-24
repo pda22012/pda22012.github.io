@@ -27,24 +27,8 @@
         
         #crosshair { position: absolute; top: 50%; left: 50%; width: 10px; height: 10px; border: 2px solid white; border-radius: 50%; transform: translate(-50%, -50%); z-index: 99; mix-blend-mode: difference; }
 
-        #instruction-text {
-            position: absolute;
-            top: 5%;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 10px 20px;
-            background-color: rgba(0, 0, 0, 0.7);
-            color: white;
-            border-radius: 10px;
-            font-size: 1.5em;
-            z-index: 99;
-            opacity: 0;
-            transition: opacity 1s ease-in-out;
-            pointer-events: none;
-        }
-        #instruction-text.visible {
-            opacity: 1;
-        }
+        #instruction-text { position: absolute; top: 5%; left: 50%; transform: translateX(-50%); padding: 10px 20px; background-color: rgba(0, 0, 0, 0.7); color: white; border-radius: 10px; font-size: 1.5em; z-index: 99; opacity: 0; transition: opacity 1s ease-in-out; pointer-events: none; }
+        #instruction-text.visible { opacity: 1; }
 
         #end-screen { flex-direction: column; background-color: #f2d7d5; z-index: 100; }
         #loading-bar-container { width: 50%; height: 30px; border: 2px solid #333; border-radius: 5px; }
@@ -54,7 +38,8 @@
         #final-cake-container { width: 50%; height: 50%; display: none; }
         .final-cake-model { display: none; width: 100%; height: 100%; position: relative; }
         #final-cake-container model-viewer { --mv-viewer-background-color: transparent; }
-        .cherry-cake-part { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        /* ▼▼▼ NEW: Canvas for the cherry cake ▼▼▼ */
+        #cherry-cake-canvas { width: 100%; height: 100%; }
         #end-message { margin-top: 20px; font-size: 2em; color: #333; }
     </style>
 </head>
@@ -69,10 +54,7 @@
     </div>
     <div id="game-screen" class="screen">
         <canvas id="three-canvas"></canvas>
-        <div id="ingredients-list">
-            <h2 id="cake-title"></h2>
-            <ul id="ingredient-ul-list"></ul>
-        </div>
+        <div id="ingredients-list"><h2 id="cake-title"></h2><ul id="ingredient-ul-list"></ul></div>
         <div id="crosshair"></div>
         <div id="instruction-text">press E to collect the items from the list</div>
     </div>
@@ -80,11 +62,9 @@
         <div id="loading-bar-container"><div id="loading-bar"></div></div>
         <div id="final-cake-container">
             <model-viewer id="single-cake-viewer" class="final-cake-model" camera-controls auto-rotate></model-viewer>
+            <!-- ▼▼▼ The cherry cake now uses a canvas, not model-viewer tags ▼▼▼ -->
             <div id="cherry-cake-final" class="final-cake-model">
-                <model-viewer class="cherry-cake-part" src="cherrycake1.glb" camera-controls auto-rotate></model-viewer>
-                <model-viewer class="cherry-cake-part" src="cherrycake2.glb" camera-controls auto-rotate></model-viewer>
-                <model-viewer class="cherry-cake-part" src="cherrycake3.glb" camera-controls auto-rotate></model-viewer>
-                <model-viewer class="cherry-cake-part" src="cherrycake4.glb" camera-controls auto-rotate></model-viewer>
+                <canvas id="cherry-cake-canvas"></canvas>
             </div>
         </div>
         <h2 id="end-message"></h2>
@@ -96,7 +76,9 @@
         import * as THREE from 'three';
         import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
         import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
+        // --- DOM Elements ---
         const screens = { start: document.getElementById('start-screen'), selection: document.getElementById('cake-selection-screen'), game: document.getElementById('game-screen'), end: document.getElementById('end-screen') };
         const startBtn = document.getElementById('start-btn');
         const quitBtn = document.getElementById('quit-btn');
@@ -106,26 +88,70 @@
         const backgroundMusic = document.getElementById('background-music');
         const instructionText = document.getElementById('instruction-text');
 
+        // --- Game State ---
         let currentCake = '', collectedIngredients = [], allIngredientsForCake = [];
         
+        // --- Main Game 3D Scene ---
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        // ▼▼▼ CAMERA HEIGHT SET TO 35 ▼▼▼
         camera.position.set(0, 35, 5); 
-        
         const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('three-canvas'), antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(window.devicePixelRatio);
-        
         const controls = new PointerLockControls(camera, renderer.domElement);
         const raycaster = new THREE.Raycaster();
         let interactiveObjects = [];
-
         let moveForward = false, moveBackward = false, moveLeft = false, moveRight = false;
         const velocity = new THREE.Vector3();
         const direction = new THREE.Vector3();
         const clock = new THREE.Clock();
+        
+        // --- ▼▼▼ NEW: Final Cherry Cake 3D Scene ▼▼▼ ---
+        let cherryScene, cherryCamera, cherryRenderer, cherryCakeGroup, cherryControls;
+        let isCherrySceneSetup = false;
 
+        function setupFinalCherryCakeScene() {
+            cherryScene = new THREE.Scene();
+            cherryScene.background = new THREE.Color(0xf2d7d5); // Match end screen color
+            const cherryCanvas = document.getElementById('cherry-cake-canvas');
+            
+            cherryCamera = new THREE.PerspectiveCamera(75, cherryCanvas.clientWidth / cherryCanvas.clientHeight, 0.1, 1000);
+            cherryCamera.position.z = 10; // Pull camera back to see the cake
+            
+            cherryRenderer = new THREE.WebGLRenderer({ canvas: cherryCanvas, antialias: true });
+            cherryRenderer.setSize(cherryCanvas.clientWidth, cherryCanvas.clientHeight);
+            cherryRenderer.setPixelRatio(window.devicePixelRatio);
+            
+            cherryScene.add(new THREE.AmbientLight(0xffffff, 1.5));
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 2);
+            directionalLight.position.set(5, 10, 7.5);
+            cherryScene.add(directionalLight);
+            
+            cherryControls = new OrbitControls(cherryCamera, cherryRenderer.domElement);
+            
+            cherryCakeGroup = new THREE.Group();
+            cherryScene.add(cherryCakeGroup);
+            
+            const loader = new GLTFLoader();
+            const cakeParts = ['cherrycake1.glb', 'cherrycake2.glb', 'cherrycake3.glb', 'cherrycake4.glb'];
+            cakeParts.forEach(partFile => {
+                loader.load(partFile, (gltf) => {
+                    cherryCakeGroup.add(gltf.scene);
+                });
+            });
+            isCherrySceneSetup = true;
+        }
+
+        function animateCherryCake() {
+            requestAnimationFrame(animateCherryCake);
+            if (cherryCakeGroup) {
+                cherryCakeGroup.rotation.y += 0.005; // Rotate the whole group
+            }
+            cherryControls.update();
+            cherryRenderer.render(cherryScene, cherryCamera);
+        }
+
+        // --- Main Functions ---
         function setupScene() {
             scene.clear();
             interactiveObjects = [];
@@ -137,19 +163,15 @@
             
             const loader = new GLTFLoader();
             const allModels = [ 'backwall.glb', 'counters.glb', 'counterdecor.glb', 'floor.glb', 'fridge.glb', 'frontwall.glb', 'leftwall.glb', 'rightwall.glb', 'roof.glb', 'shelves.glb', 'stool.glb', 'stove.glb', 'light.glb', 'radio.glb', 'flour.glb', 'sugar.glb', 'egg.glb', 'vanilla.glb', 'butter.glb', 'milk.glb', 'banana.glb', 'cuttingboard.glb', 'eggcarton.glb', 'knife.glb', 'mixingbowl.glb', 'peanutbutter.glb', 'salt.glb', 'slicefruitcake.glb', 'spatula.glb', 'whisk.glb' ];
-            
             if (currentCake === 'strawberry') { allModels.push('strawberry.glb'); allModels.push('chocolate.glb'); }
             if (currentCake === 'blueberry') { allModels.push('blueberry.glb'); }
             if (currentCake === 'cherry') { allModels.push('cherries.glb'); }
-
             allModels.forEach(modelFile => {
                 loader.load(modelFile, (gltf) => {
                     const model = gltf.scene;
                     model.name = modelFile.replace('.glb', '');
                     scene.add(model);
-                    if (allIngredientsForCake.includes(model.name)) {
-                        interactiveObjects.push(model);
-                    }
+                    if (allIngredientsForCake.includes(model.name)) interactiveObjects.push(model);
                 });
             });
         }
@@ -157,20 +179,15 @@
         function animate() {
             requestAnimationFrame(animate);
             const delta = clock.getDelta();
-
-            if (controls.isLocked === true) {
+            if (controls.isLocked) {
                 velocity.x -= velocity.x * 10.0 * delta;
                 velocity.z -= velocity.z * 10.0 * delta;
-
                 direction.z = Number(moveForward) - Number(moveBackward);
                 direction.x = Number(moveRight) - Number(moveLeft);
                 direction.normalize();
-                
-                // ▼▼▼ SPEED VALUE SET TO 130 ▼▼▼
                 const moveSpeed = 130.0;
                 if (moveForward || moveBackward) velocity.z -= direction.z * moveSpeed * delta;
                 if (moveLeft || moveRight) velocity.x -= direction.x * moveSpeed * delta;
-
                 controls.moveRight(-velocity.x * delta);
                 controls.moveForward(-velocity.z * delta);
             }
@@ -185,30 +202,19 @@
         function setupGame() {
             collectedIngredients = [];
             ingredientListUL.innerHTML = '';
-            
             const baseIngredients = ['flour', 'sugar', 'egg', 'vanilla', 'butter', 'milk'];
-            const recipes = {
-                strawberry: { name: 'Strawberry Cake', ingredients: [...baseIngredients, 'strawberry', 'chocolate'] },
-                blueberry: { name: 'Blueberry Cake', ingredients: [...baseIngredients, 'blueberry'] },
-                cherry: { name: 'Cherry Cake', ingredients: [...baseIngredients, 'cherries'] }
-            };
-
+            const recipes = { strawberry: { name: 'Strawberry Cake', ingredients: [...baseIngredients, 'strawberry', 'chocolate'] }, blueberry: { name: 'Blueberry Cake', ingredients: [...baseIngredients, 'blueberry'] }, cherry: { name: 'Cherry Cake', ingredients: [...baseIngredients, 'cherries'] } };
             const recipe = recipes[currentCake];
             cakeTitle.textContent = recipe.name;
             allIngredientsForCake = recipe.ingredients;
-
             allIngredientsForCake.forEach(ingredient => {
                 const li = document.createElement('li');
                 li.id = ingredient;
                 li.textContent = ingredient.charAt(0).toUpperCase() + ingredient.slice(1);
                 ingredientListUL.appendChild(li);
             });
-            
             instructionText.classList.add('visible');
-            setTimeout(() => {
-                instructionText.classList.remove('visible');
-            }, 5000);
-
+            setTimeout(() => instructionText.classList.remove('visible'), 5000);
             setupScene();
         }
 
@@ -228,45 +234,37 @@
             controls.unlock();
             setTimeout(() => {
                 switchScreen('end');
-                
                 setTimeout(() => {
                     document.getElementById('loading-bar-container').style.display = 'none';
-                    
-                    const finalCakeContainer = document.getElementById('final-cake-container');
-                    finalCakeContainer.style.display = 'block';
-
+                    document.getElementById('final-cake-container').style.display = 'block';
                     document.querySelectorAll('.final-cake-model').forEach(el => el.style.display = 'none');
 
                     if (currentCake === 'cherry') {
-                        document.getElementById('cherry-cake-final').style.display = 'block';
+                        const cherryCakeFinal = document.getElementById('cherry-cake-final');
+                        cherryCakeFinal.style.display = 'block';
+                        if (!isCherrySceneSetup) {
+                            setupFinalCherryCakeScene();
+                        }
+                        animateCherryCake();
                     } else {
                         const singleCakeViewer = document.getElementById('single-cake-viewer');
-                        if (currentCake === 'strawberry') {
-                            singleCakeViewer.src = 'strawberrychocolatecake.glb';
-                        } else if (currentCake === 'blueberry') {
-                            singleCakeViewer.src = 'blueberrycake.glb';
-                        }
+                        // ▼▼▼ STRAWBERRY CAKE MODEL IS NOW CORRECT ▼▼▼
+                        if (currentCake === 'strawberry') singleCakeViewer.src = 'strawberrycake.glb';
+                        else if (currentCake === 'blueberry') singleCakeViewer.src = 'blueberrycake.glb';
                         singleCakeViewer.style.display = 'block';
                     }
-                    
                     document.getElementById('end-message').textContent = 'have a piece';
                 }, 5000);
             }, 500);
         }
 
-        startBtn.addEventListener('click', () => { backgroundMusic.play().catch(e => console.warn("Audio play failed")); switchScreen('selection'); });
+        // --- Event Listeners ---
+        startBtn.addEventListener('click', () => { backgroundMusic.play().catch(e => {}); switchScreen('selection'); });
         quitBtn.addEventListener('click', () => window.close());
         cakeTabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                currentCake = tab.dataset.cake;
-                switchScreen('game');
-                setupGame();
-                setTimeout(() => controls.lock(), 100);
-            });
+            tab.addEventListener('click', () => { currentCake = tab.dataset.cake; switchScreen('game'); setupGame(); setTimeout(() => controls.lock(), 100); });
         });
-
         screens.game.addEventListener('click', () => controls.lock());
-        
         const onKeyDown = (event) => {
             if (controls.isLocked) {
                 switch (event.code) {
@@ -279,32 +277,21 @@
                         const intersects = raycaster.intersectObjects(interactiveObjects, true);
                         if (intersects.length > 0 && intersects[0].distance < 15) {
                             let clickedObject = intersects[0].object;
-                            while (clickedObject.parent && clickedObject.parent !== scene) {
-                                clickedObject = clickedObject.parent;
-                            }
+                            while (clickedObject.parent && clickedObject.parent !== scene) clickedObject = clickedObject.parent;
                             collectIngredient(clickedObject.name);
                         }
                         break;
                 }
             }
         };
-        const onKeyUp = (event) => {
-            switch (event.code) {
-                case 'KeyW': moveForward = false; break;
-                case 'KeyA': moveLeft = false; break;
-                case 'KeyS': moveBackward = false; break;
-                case 'KeyD': moveRight = false; break;
-            }
-        };
+        const onKeyUp = (event) => { switch (event.code) { case 'KeyW': moveForward = false; break; case 'KeyA': moveLeft = false; break; case 'KeyS': moveBackward = false; break; case 'KeyD': moveRight = false; break; } };
         document.addEventListener('keydown', onKeyDown);
         document.addEventListener('keyup', onKeyUp);
-        
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
-
         switchScreen('start');
         animate();
     </script>
