@@ -4,362 +4,259 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bake Your Cake</title>
-
-    <!-- ================================================================ -->
-    <!--  CSS STYLES                                                      -->
-    <!-- ================================================================ -->
     <style>
-        body {
-            margin: 0;
-            font-family: sans-serif;
-            overflow: hidden;
-            background-color: #000;
-        }
-        .screen {
-            width: 100vw;
-            height: 100vh;
-            display: none;
-            background-size: cover;
-            background-position: center;
-        }
-        .screen.active {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        model-viewer {
-            --mv-viewer-background-color: transparent;
-            width: 100%;
-            height: 100%;
-        }
-        #start-screen {
-            background-color: #f2d7d5;
-            text-align: center;
-            flex-direction: column;
-        }
-        .start-content h1 {
-            font-size: 4em;
-            color: white;
-            text-shadow: 2px 2px 4px #8c4a4a;
-        }
-        #start-btn, #quit-btn {
-            padding: 15px 30px;
-            font-size: 1.5em;
-            cursor: pointer;
-            margin: 10px;
-            border: none;
-            border-radius: 10px;
-        }
-        #cake-selection-screen {
-            background-color: #f2d7d5;
-            gap: 20px;
-        }
-        .tab {
-            padding: 20px 40px;
-            font-size: 1.5em;
-            cursor: pointer;
-            color: white;
-            border-radius: 10px;
-        }
-        #strawberry-cake-tab { background-color: #ffc0cb; }
-        #blueberry-cake-tab { background-color: #add8e6; }
-        #cherry-cake-tab { background-color: #dc143c; }
-        #game-screen {
-            background-color: #a3c1ad;
-            justify-content: flex-start;
-            align-items: stretch;
-        }
-        #ingredients-list {
-            width: 250px;
-            background-color: rgba(255, 255, 255, 0.85);
-            padding: 20px;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-            z-index: 10;
-        }
-        #ingredients-list ul {
-            list-style-type: none;
-            padding: 0;
-        }
-        #ingredients-list li {
-            font-size: 1.2em;
-            margin-bottom: 10px;
-        }
-        #ingredients-list li.collected {
-            text-decoration: line-through;
-            color: #888;
-        }
-        #kitchen-area {
-            flex-grow: 1;
-            position: relative;
-        }
-        .kitchen-part, .ingredient-object {
-            position: absolute;
-            top: 0;
-            left: 0;
-        }
-        .kitchen-part {
-            pointer-events: none;
-        }
-        .ingredient-object {
-            cursor: pointer;
-        }
-        .ingredient-object.collected {
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.5s;
-        }
-        #end-screen {
-            flex-direction: column;
-            background-color: #f2d7d5;
-        }
-        #loading-bar-container {
-            width: 50%;
-            height: 30px;
-            border: 2px solid #333;
-            border-radius: 5px;
-        }
-        #loading-bar {
-            width: 0%;
-            height: 100%;
-            background-color: #ffc0cb;
-            animation: load 5s linear forwards;
-            border-radius: 3px;
-        }
-        @keyframes load {
-            from { width: 0%; }
-            to { width: 100%; }
-        }
-        #final-cake {
-            width: 50%;
-            height: 50%;
-            text-align: center;
-            position: relative; /* Needed for positioning the cake parts */
-        }
-        .final-cake-model {
-            display: none; /* All cakes are hidden by default */
-        }
-        /* NEW CSS: This makes the cherry cake parts stack on top of each other */
-        .cherry-cake-part {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-        }
-        #end-message {
-            margin-top: 20px;
-            font-size: 2em;
-            color: #333;
-        }
+        body { margin: 0; font-family: sans-serif; overflow: hidden; }
+        .screen { width: 100vw; height: 100vh; display: none; background-size: cover; background-position: center; position: absolute; top: 0; left: 0; }
+        .screen.active { display: flex; justify-content: center; align-items: center; }
+        
+        #start-screen { background-color: #f2d7d5; text-align: center; flex-direction: column; z-index: 100; }
+        .start-content h1 { font-size: 4em; color: white; text-shadow: 2px 2px 4px #8c4a4a; }
+        #start-btn, #quit-btn { padding: 15px 30px; font-size: 1.5em; cursor: pointer; margin: 10px; border: none; border-radius: 10px; }
+        
+        #cake-selection-screen { background-color: #f2d7d5; gap: 20px; z-index: 100; }
+        .tab { padding: 20px 40px; font-size: 1.5em; cursor: pointer; color: white; border-radius: 10px; }
+        #strawberry-cake-tab { background-color: #ffc0cb; } #blueberry-cake-tab { background-color: #add8e6; } #cherry-cake-tab { background-color: #dc143c; }
+        
+        #game-screen { display: block; } /* Special case, handled by JS */
+        #three-canvas { display: block; width: 100%; height: 100%; z-index: 1; }
+        
+        #ingredients-list { position: absolute; top: 20px; left: 20px; width: 250px; background-color: rgba(255, 255, 255, 0.9); padding: 20px; box-shadow: 2px 0 5px rgba(0,0,0,0.2); z-index: 10; border-radius: 10px;}
+        #ingredients-list ul { list-style-type: none; padding: 0; }
+        #ingredients-list li { font-size: 1.4em; margin-bottom: 12px; }
+        #ingredients-list li.collected { text-decoration: line-through; color: #777; }
+        
+        #end-screen { flex-direction: column; background-color: #f2d7d5; z-index: 100; }
+        #loading-bar-container { width: 50%; height: 30px; border: 2px solid #333; border-radius: 5px; }
+        #loading-bar { width: 0%; height: 100%; background-color: #ffc0cb; animation: load 5s linear forwards; border-radius: 3px; }
+        @keyframes load { from { width: 0%; } to { width: 100%; } }
+
+        /* The final cake will be shown using <model-viewer> since it's just one object */
+        #final-cake-container { width: 50%; height: 50%; display: none; }
+        #final-cake-container model-viewer { width: 100%; height: 100%; --mv-viewer-background-color: transparent; }
+        #end-message { margin-top: 20px; font-size: 2em; color: #333; }
     </style>
 </head>
 <body>
-
-    <!-- ================================================================ -->
-    <!--  HTML BODY                                                       -->
-    <!-- ================================================================ -->
     <audio id="background-music" loop src="baking cooking jazz.mp3"></audio>
 
-    <div id="start-screen" class="screen active">
-        <div class="start-content">
-            <h1>Bake Your Cake</h1>
-            <button id="start-btn">Start</button>
-            <button id="quit-btn">Quit</button>
-        </div>
-    </div>
-
+    <div id="start-screen" class="screen"><div class="start-content"><h1>Bake Your Cake</h1><button id="start-btn">Start</button><button id="quit-btn">Quit</button></div></div>
     <div id="cake-selection-screen" class="screen">
         <div class="tab" id="strawberry-cake-tab" data-cake="strawberry">Strawberry Cake</div>
         <div class="tab" id="blueberry-cake-tab" data-cake="blueberry">Blueberry Cake</div>
         <div class="tab" id="cherry-cake-tab" data-cake="cherry">Cherry Cake</div>
     </div>
-
     <div id="game-screen" class="screen">
+        <canvas id="three-canvas"></canvas>
         <div id="ingredients-list">
             <h2 id="cake-title"></h2>
             <ul>
-                <li id="flour">Flour</li>
-                <li id="sugar">Sugar</li>
-                <li id="egg">Egg</li>
-                <li id="vanilla">Vanilla</li>
-                <li id="butter">Butter</li>
-                <li id="milk">Milk</li>
-                <li id="fruit"></li>
+                <li id="flour">Flour</li><li id="sugar">Sugar</li><li id="egg">Egg</li><li id="vanilla">Vanilla</li><li id="butter">Butter</li><li id="milk">Milk</li><li id="fruit"></li>
             </ul>
         </div>
-        <div id="kitchen-area">
-            <model-viewer class="kitchen-part" src="backwall.glb"></model-viewer>
-            <model-viewer class="kitchen-part" src="counters.glb"></model-viewer>
-            <model-viewer class="kitchen-part" src="counterdecor.glb"></model-viewer>
-            <model-viewer class="kitchen-part" src="floor.glb"></model-viewer>
-            <model-viewer class="kitchen-part" src="fridge.glb"></model-viewer>
-            <model-viewer class="kitchen-part" src="frontwall.glb"></model-viewer>
-            <model-viewer class="kitchen-part" src="leftwall.glb"></model-viewer>
-            <model-viewer class="kitchen-part" src="rightwall.glb"></model-viewer>
-            <model-viewer class="kitchen-part" src="roof.glb"></model-viewer>
-            <model-viewer class="kitchen-part" src="shelves.glb"></model-viewer>
-            <model-viewer class="kitchen-part" src="stool.glb"></model-viewer>
-            <model-viewer class="kitchen-part" src="stove.glb"></model-viewer>
-            <model-viewer class="kitchen-part" src="light.glb"></model-viewer>
-            <model-viewer class="kitchen-part" src="radio.glb"></model-viewer>
-            
-            <model-viewer class="ingredient-object" data-ingredient="flour" src="flour.glb" camera-controls></model-viewer>
-            <model-viewer class="ingredient-object" data-ingredient="sugar" src="sugar.glb" camera-controls></model-viewer>
-            <model-viewer class="ingredient-object" data-ingredient="egg" src="egg.glb" camera-controls></model-viewer>
-            <model-viewer class="ingredient-object" data-ingredient="vanilla" src="vanilla.glb" camera-controls></model-viewer>
-            <model-viewer class="ingredient-object" data-ingredient="butter" src="butter.glb" camera-controls></model-viewer>
-            <model-viewer class="ingredient-object" data-ingredient="milk" src="milk.glb" camera-controls></model-viewer>
-            
-            <model-viewer class="ingredient-object" data-ingredient="strawberry" src="strawberry.glb" style="display: none;" camera-controls></model-viewer>
-            <model-viewer class="ingredient-object" data-ingredient="blueberry" src="blueberry.glb" style="display: none;" camera-controls></model-viewer>
-            <model-viewer class="ingredient-object" data-ingredient="cherries" src="cherries.glb" style="display: none;" camera-controls></model-viewer>
-        </div>
     </div>
-
     <div id="end-screen" class="screen">
-        <div id="loading-bar-container">
-            <div id="loading-bar"></div>
+        <div id="loading-bar-container"><div id="loading-bar"></div></div>
+        <div id="final-cake-container">
+             <model-viewer id="final-cake-viewer" camera-controls auto-rotate></model-viewer>
         </div>
-        <div id="final-cake">
-            <!-- ▼▼▼ THIS IS THE CHANGED SECTION ▼▼▼ -->
-
-            <!-- Strawberry and Blueberry cakes are single models -->
-            <model-viewer id="strawberry-cake-final" class="final-cake-model" src="strawberrycake.glb" camera-controls auto-rotate></model-viewer>
-            <model-viewer id="blueberry-cake-final" class="final-cake-model" src="blueberrycake.glb" camera-controls auto-rotate></model-viewer>
-
-            <!-- The Cherry Cake is now a container holding all 4 parts -->
-            <div id="cherry-cake-final" class="final-cake-model">
-                <model-viewer class="cherry-cake-part" src="cherrycake1.glb" camera-controls auto-rotate></model-viewer>
-                <model-viewer class="cherry-cake-part" src="cherrycake2.glb" camera-controls auto-rotate></model-viewer>
-                <model-viewer class="cherry-cake-part" src="cherrycake3.glb" camera-controls auto-rotate></model-viewer>
-                <model-viewer class="cherry-cake-part" src="cherrycake4.glb" camera-controls auto-rotate></model-viewer>
-            </div>
-            
-            <!-- ▲▲▲ END OF CHANGED SECTION ▲▲▲ -->
-            <h2 id="end-message"></h2>
-        </div>
+        <h2 id="end-message"></h2>
     </div>
 
+    <!-- Script for final cake display -->
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
+    
+    <!-- Scripts for Three.js 3D Scene -->
+    <script type="importmap">{"imports": {"three": "https://unpkg.com/three@0.164.1/build/three.module.js", "three/addons/": "https://unpkg.com/three@0.164.1/examples/jsm/"}}</script>
+    <script type="module">
+        import * as THREE from 'three';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-    <!-- ================================================================ -->
-    <!--  JAVASCRIPT (NO CHANGES NEEDED HERE)                             -->
-    <!-- ================================================================ -->
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log("Game script starting...");
+        // --- DOM ELEMENTS ---
+        const screens = {
+            start: document.getElementById('start-screen'),
+            selection: document.getElementById('cake-selection-screen'),
+            game: document.getElementById('game-screen'),
+            end: document.getElementById('end-screen'),
+        };
+        const startBtn = document.getElementById('start-btn');
+        const quitBtn = document.getElementById('quit-btn');
+        const cakeTabs = document.querySelectorAll('.tab');
+        const cakeTitle = document.getElementById('cake-title');
+        const fruitListItem = document.getElementById('fruit');
+        const backgroundMusic = document.getElementById('background-music');
 
-            const startBtn = document.getElementById('start-btn');
-            if (!startBtn) {
-                console.error("FATAL ERROR: Could not find the 'start-btn' element. Check the HTML.");
-                return;
-            }
+        // --- GAME STATE ---
+        let currentCake = '';
+        let collectedIngredients = [];
+        let allIngredientsForCake = [];
+        const baseIngredients = ['flour', 'sugar', 'egg', 'vanilla', 'butter', 'milk'];
+        
+        // --- 3D SCENE SETUP ---
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 1.5, 5); // Default camera position, adjust if needed
+        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('three-canvas'), antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        const controls = new OrbitControls(camera, renderer.domElement);
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+        
+        let interactiveObjects = []; // We will store clickable ingredients here
 
-            const quitBtn = document.getElementById('quit-btn');
-            const backgroundMusic = document.getElementById('background-music');
-            const startScreen = document.getElementById('start-screen');
-            const cakeSelectionScreen = document.getElementById('cake-selection-screen');
-            const gameScreen = document.getElementById('game-screen');
-            const endScreen = document.getElementById('end-screen');
-            const cakeTabs = document.querySelectorAll('.tab');
-            const cakeTitle = document.getElementById('cake-title');
-            const fruitIngredientListItem = document.getElementById('fruit');
+        function setupScene() {
+            scene.clear(); // Clear previous models
+            interactiveObjects = []; // Clear previous interactive objects
+            scene.background = new THREE.Color(0xa3c1ad);
+            const ambientLight = new THREE.AmbientLight(0xffffff, 1.5);
+            scene.add(ambientLight);
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 2);
+            directionalLight.position.set(5, 10, 7.5);
+            scene.add(directionalLight);
 
-            const baseIngredients = ['flour', 'sugar', 'egg', 'vanilla', 'butter', 'milk'];
-            let allIngredientsForCake = [];
-            let currentCake = '';
-            let collectedIngredients = [];
+            const loader = new GLTFLoader();
+            const allModels = [
+                'backwall.glb', 'counters.glb', 'counterdecor.glb', 'floor.glb', 'fridge.glb',
+                'frontwall.glb', 'leftwall.glb', 'rightwall.glb', 'roof.glb', 'shelves.glb',
+                'stool.glb', 'stove.glb', 'light.glb', 'radio.glb', 'flour.glb', 'sugar.glb',
+                'egg.glb', 'vanilla.glb', 'butter.glb', 'milk.glb'
+            ];
+            
+            // Add cake-specific fruit model
+            if (currentCake === 'strawberry') allModels.push('strawberry.glb');
+            if (currentCake === 'blueberry') allModels.push('blueberry.glb');
+            if (currentCake === 'cherry') allModels.push('cherries.glb');
 
-            startBtn.addEventListener('click', () => {
-                console.log("Start button clicked!");
-                backgroundMusic.play().catch(e => console.warn("Audio play failed. User must interact with the page first."));
-                startScreen.classList.remove('active');
-                cakeSelectionScreen.classList.add('active');
-            });
-
-            quitBtn.addEventListener('click', () => {
-                window.close();
-            });
-
-            cakeTabs.forEach(tab => {
-                tab.addEventListener('click', () => {
-                    currentCake = tab.dataset.cake;
-                    cakeSelectionScreen.classList.remove('active');
-                    gameScreen.classList.add('active');
-                    setupGame();
-                });
-            });
-
-            document.getElementById('kitchen-area').addEventListener('click', (event) => {
-                const clickedObject = event.target.closest('.ingredient-object');
-                if (clickedObject && !clickedObject.classList.contains('collected')) {
-                    collectIngredient(clickedObject.dataset.ingredient);
-                }
-            });
-
-            function setupGame() {
-                collectedIngredients = [];
-                document.querySelectorAll('#ingredients-list li').forEach(li => li.classList.remove('collected'));
-                document.querySelectorAll('.ingredient-object').forEach(obj => {
-                    obj.classList.remove('collected');
-                    obj.style.display = 'block';
-                });
-
-                document.querySelector('.ingredient-object[data-ingredient="strawberry"]').style.display = 'none';
-                document.querySelector('.ingredient-object[data-ingredient="blueberry"]').style.display = 'none';
-                document.querySelector('.ingredient-object[data-ingredient="cherries"]').style.display = 'none';
-
-                if (currentCake === 'strawberry') {
-                    cakeTitle.textContent = 'Strawberry Cake';
-                    fruitIngredientListItem.textContent = 'Strawberry';
-                    allIngredientsForCake = [...baseIngredients, 'strawberry'];
-                    document.querySelector('.ingredient-object[data-ingredient="strawberry"]').style.display = 'block';
-                } else if (currentCake === 'blueberry') {
-                    cakeTitle.textContent = 'Blueberry Cake';
-                    fruitIngredientListItem.textContent = 'Blueberry';
-                    allIngredientsForCake = [...baseIngredients, 'blueberry'];
-                    document.querySelector('.ingredient-object[data-ingredient="blueberry"]').style.display = 'block';
-                } else if (currentCake === 'cherry') {
-                    cakeTitle.textContent = 'Cherry Cake';
-                    fruitIngredientListItem.textContent = 'Cherries';
-                    allIngredientsForCake = [...baseIngredients, 'cherries'];
-                    document.querySelector('.ingredient-object[data-ingredient="cherries"]').style.display = 'block';
-                }
-            }
-
-            function collectIngredient(ingredientName) {
-                if (!collectedIngredients.includes(ingredientName)) {
-                    collectedIngredients.push(ingredientName);
-                    document.querySelector(`.ingredient-object[data-ingredient="${ingredientName}"]`).classList.add('collected');
-
-                    let listItem = (['strawberry', 'blueberry', 'cherries'].includes(ingredientName))
-                        ? fruitIngredientListItem
-                        : document.getElementById(ingredientName);
-                    
-                    if (listItem) listItem.classList.add('collected');
-
-                    if (collectedIngredients.length === allIngredientsForCake.length) {
-                        finishGame();
+            allModels.forEach(modelFile => {
+                loader.load(modelFile, (gltf) => {
+                    const model = gltf.scene;
+                    model.name = modelFile.replace('.glb', ''); // Give it a name for clicking
+                    scene.add(model);
+                    // If it's a collectible, add it to our interactive list
+                    if (allIngredientsForCake.includes(model.name)) {
+                        interactiveObjects.push(model);
                     }
+                }, undefined, (error) => console.error(`Error loading ${modelFile}`, error));
+            });
+        }
+        
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        // --- GAME LOGIC ---
+        function switchScreen(screenName) {
+            Object.values(screens).forEach(screen => screen.classList.remove('active'));
+            if(screens[screenName]) screens[screenName].classList.add('active');
+        }
+
+        function setupGame() {
+            collectedIngredients = [];
+            document.querySelectorAll('#ingredients-list li').forEach(li => li.classList.remove('collected'));
+
+            const cakeInfo = {
+                strawberry: { name: 'Strawberry Cake', fruit: 'strawberry' },
+                blueberry: { name: 'Blueberry Cake', fruit: 'blueberry' },
+                cherry: { name: 'Cherry Cake', fruit: 'cherries' }
+            }[currentCake];
+            
+            cakeTitle.textContent = cakeInfo.name;
+            fruitListItem.textContent = cakeInfo.fruit.charAt(0).toUpperCase() + cakeInfo.fruit.slice(1);
+            allIngredientsForCake = [...baseIngredients, cakeInfo.fruit];
+            
+            setupScene();
+        }
+
+        function collectIngredient(ingredientName) {
+            if (!collectedIngredients.includes(ingredientName)) {
+                console.log(`Collected: ${ingredientName}`);
+                collectedIngredients.push(ingredientName);
+                
+                // Strike through the list item
+                const listItem = document.getElementById(ingredientName) || document.getElementById('fruit');
+                if (listItem) listItem.classList.add('collected');
+
+                // Find and hide the 3D model
+                const objectToHide = scene.getObjectByName(ingredientName);
+                if (objectToHide) {
+                    objectToHide.visible = false;
+                }
+                
+                // Remove from interactive list so it can't be clicked again
+                interactiveObjects = interactiveObjects.filter(obj => obj.name !== ingredientName);
+
+                if (collectedIngredients.length === allIngredientsForCake.length) {
+                    finishGame();
                 }
             }
-
-            function finishGame() {
+        }
+        
+        function finishGame() {
+            setTimeout(() => {
+                switchScreen('end');
+                const finalCakeViewer = document.getElementById('final-cake-viewer');
+                
+                // For the multipart cherry cake, we need to handle it differently
+                if(currentCake === 'cherry') {
+                    // This is a limitation, we'll show just the first part.
+                    // A better way would be to export the final cherry cake as one model.
+                    finalCakeViewer.src = 'cherrycake1.glb'; 
+                } else {
+                    finalCakeViewer.src = `${currentCake}cake.glb`;
+                }
+                
                 setTimeout(() => {
-                    gameScreen.classList.remove('active');
-                    endScreen.classList.add('active');
+                    document.getElementById('loading-bar-container').style.display = 'none';
+                    document.getElementById('final-cake-container').style.display = 'block';
+                    document.getElementById('end-message').textContent = 'have a piece';
+                }, 5000);
+            }, 500);
+        }
 
-                    setTimeout(() => {
-                        document.getElementById('loading-bar-container').style.display = 'none';
-                        document.getElementById('final-cake').style.display = 'block';
-                        document.querySelectorAll('.final-cake-model').forEach(model => model.style.display = 'none');
-                        document.getElementById(`${currentCake}-cake-final`).style.display = 'block';
-                        document.getElementById('end-message').textContent = 'have a piece';
-                    }, 5000);
-                }, 500);
+        function onMouseClick(event) {
+            if (!screens.game.classList.contains('active')) return; // Only check for clicks during the game
+
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+            raycaster.setFromCamera(mouse, camera);
+
+            const intersects = raycaster.intersectObjects(interactiveObjects, true);
+
+            if (intersects.length > 0) {
+                // Traverse up to find the main model group's name
+                let clickedObject = intersects[0].object;
+                while (clickedObject.parent && clickedObject.parent !== scene) {
+                    clickedObject = clickedObject.parent;
+                }
+                collectIngredient(clickedObject.name);
             }
-        });
-    </script>
+        }
 
+        // --- INITIALIZATION ---
+        startBtn.addEventListener('click', () => {
+            backgroundMusic.play().catch(e => console.warn("Audio play failed"));
+            switchScreen('selection');
+        });
+        quitBtn.addEventListener('click', () => window.close());
+        cakeTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                currentCake = tab.dataset.cake;
+                switchScreen('game');
+                setupGame();
+            });
+        });
+        window.addEventListener('click', onMouseClick);
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        switchScreen('start');
+        animate();
+    </script>
 </body>
 </html>
