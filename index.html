@@ -109,7 +109,6 @@
             cherryScene.background = new THREE.Color(0xf2d7d5);
             const cherryCanvas = document.getElementById('cherry-cake-canvas');
             cherryCamera = new THREE.PerspectiveCamera(75, cherryCanvas.clientWidth / cherryCanvas.clientHeight, 0.1, 1000);
-            cherryCamera.position.z = 10;
             
             cherryRenderer = new THREE.WebGLRenderer({ canvas: cherryCanvas, antialias: true });
             cherryRenderer.setSize(cherryCanvas.clientWidth, cherryCanvas.clientHeight);
@@ -121,13 +120,12 @@
             cherryScene.add(directionalLight);
             
             cherryControls = new OrbitControls(cherryCamera, cherryRenderer.domElement);
-            // ▼▼▼ CAMERA CONTROL FIXES ▼▼▼
-            cherryControls.enablePan = false; // Disable dragging the cake around
-            cherryControls.enableZoom = false; // Disable zooming in/out
-            cherryControls.enableDamping = true; // Makes movement smoother
+            cherryControls.enablePan = false;
+            cherryControls.enableZoom = false;
+            cherryControls.enableDamping = true;
             cherryControls.dampingFactor = 0.05;
-            cherryControls.autoRotate = true; // Re-enable auto-rotation here
-            cherryControls.autoRotateSpeed = 2.0;
+            // ▼▼▼ AUTO ROTATE IS NOW DISABLED ON THE CONTROLS ▼▼▼
+            cherryControls.autoRotate = false;
             
             cherryCakeGroup = new THREE.Group();
             cherryScene.add(cherryCakeGroup);
@@ -139,18 +137,16 @@
                 loader.load(partFile, (gltf) => {
                     cherryCakeGroup.add(gltf.scene);
                     partsLoaded++;
-                    // ▼▼▼ NEW: Center the camera on the cake once all parts are loaded ▼▼▼
                     if (partsLoaded === cakeParts.length) {
                         const box = new THREE.Box3().setFromObject(cherryCakeGroup);
                         const center = box.getCenter(new THREE.Vector3());
-                        cherryControls.target.copy(center); // Look at the center
-                        
+                        cherryControls.target.copy(center);
                         const size = box.getSize(new THREE.Vector3());
                         const maxDim = Math.max(size.x, size.y, size.z);
                         const fov = cherryCamera.fov * (Math.PI / 180);
                         let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
-                        cameraZ *= 1.5; // Zoom out a bit
-                        cherryCamera.position.z = center.z + cameraZ;
+                        cameraZ *= 1.5;
+                        cherryCamera.position.set(center.x, center.y, center.z + cameraZ); // Position camera relative to center
                         cherryControls.update();
                     }
                 });
@@ -158,9 +154,14 @@
             isCherrySceneSetup = true;
         }
 
+        // ▼▼▼ THIS IS THE CORRECTED ANIMATION FUNCTION ▼▼▼
         function animateCherryCake() {
             requestAnimationFrame(animateCherryCake);
-            cherryControls.update(); // Necessary for damping to work
+            // We now rotate the cake GROUP directly, which guarantees a stable spin.
+            if (cherryCakeGroup) {
+                cherryCakeGroup.rotation.y += 0.005; 
+            }
+            cherryControls.update(); // This is needed for the smooth damping effect
             cherryRenderer.render(cherryScene, cherryCamera);
         }
 
@@ -301,7 +302,6 @@
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
-            // Also handle resizing for the cherry cake canvas
             if(isCherrySceneSetup) {
                 const cherryCanvas = document.getElementById('cherry-cake-canvas');
                 cherryCamera.aspect = cherryCanvas.clientWidth / cherryCanvas.clientHeight;
