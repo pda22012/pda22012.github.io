@@ -1,0 +1,264 @@
+body {
+    margin: 0;
+    font-family: sans-serif;
+    overflow: hidden;
+}
+
+.screen {
+    width: 100vw;
+    height: 100vh;
+    display: none;
+    background-size: cover;
+    background-position: center;
+}
+
+.screen.active {
+    display: block;
+}
+
+/* Start Screen Styles */
+#start-screen {
+    /* Replace with your background image */
+    background-image: url('your-background-image.jpg');
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.start-content h1 {
+    font-size: 4em;
+    color: white;
+    text-shadow: 2px 2px 4px #000000;
+}
+
+#start-btn, #quit-btn {
+    padding: 15px 30px;
+    font-size: 1.5em;
+    cursor: pointer;
+    margin: 10px;
+}
+
+/* Cake Selection Styles */
+#cake-selection-screen {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.cake-tabs {
+    display: flex;
+    gap: 20px;
+}
+
+.tab {
+    padding: 20px 40px;
+    font-size: 1.5em;
+    cursor: pointer;
+    color: white;
+    border-radius: 10px;
+}
+
+#strawberry-cake-tab {
+    background-color: #ffc0cb; /* Pink */
+}
+
+#blueberry-cake-tab {
+    background-color: #add8e6; /* Light Blue */
+}
+
+#cherry-cake-tab {
+    background-color: #dc143c; /* Crimson */
+}
+
+/* Game Screen Styles */
+#game-screen {
+    display: flex;
+}
+
+#ingredients-list {
+    width: 20%;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 20px;
+}
+
+#ingredients-list ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+#ingredients-list li {
+    font-size: 1.2em;
+    margin-bottom: 10px;
+}
+
+#ingredients-list li.collected {
+    text-decoration: line-through;
+}
+
+#kitchen-area {
+    width: 80%;
+    /* This is where your 3D kitchen background will be */
+}
+
+.ingredient-object {
+    position: absolute;
+    /* You will need to position your 3D models */
+    padding: 10px;
+    background-color: #ccc;
+    cursor: pointer;
+}
+
+.ingredient-object.collected {
+    opacity: 0;
+    transition: opacity 0.5s;
+}
+
+/* End Screen Styles */
+#end-screen {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#loading-bar-container {
+    width: 50%;
+    height: 30px;
+    border: 2px solid #333;
+}
+
+#loading-bar {
+    width: 0%;
+    height: 100%;
+    background-color: #ffc0cb; /* Pink */
+    animation: load 5s linear forwards;
+}
+
+@keyframes load {
+    from { width: 0%; }
+    to { width: 100%; }
+}
+
+#end-message {
+    margin-top: 20px;
+    font-size: 2em;
+}```
+
+---
+
+### **`script.js`**
+
+This file will contain all the logic for your game, such as switching screens, handling player input, and tracking game progress.
+
+```javascript
+document.addEventListener('DOMContentLoaded', () => {
+    const startBtn = document.getElementById('start-btn');
+    const quitBtn = document.getElementById('quit-btn');
+    const startScreen = document.getElementById('start-screen');
+    const cakeSelectionScreen = document.getElementById('cake-selection-screen');
+    const gameScreen = document.getElementById('game-screen');
+    const endScreen = document.getElementById('end-screen');
+
+    const cakeTabs = document.querySelectorAll('.tab');
+    const cakeTitle = document.getElementById('cake-title');
+    const fruitIngredient = document.getElementById('fruit');
+
+    const ingredients = ['flour', 'sugar', 'eggs', 'vanilla', 'butter', 'milk'];
+    let currentCake = '';
+    let collectedIngredients = [];
+
+    // Start Button
+    startBtn.addEventListener('click', () => {
+        startScreen.classList.remove('active');
+        cakeSelectionScreen.classList.add('active');
+    });
+
+    // Quit Button
+    quitBtn.addEventListener('click', () => {
+        // This will only work if the page is opened in a window that can be closed
+        window.close();
+    });
+
+    // Cake Selection
+    cakeTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            currentCake = tab.dataset.cake;
+            cakeSelectionScreen.classList.remove('active');
+            gameScreen.classList.add('active');
+            setupGame();
+        });
+    });
+
+    function setupGame() {
+        // Reset from previous game
+        collectedIngredients = [];
+        document.querySelectorAll('#ingredients-list li').forEach(li => li.classList.remove('collected'));
+        document.querySelectorAll('.ingredient-object').forEach(obj => obj.classList.remove('collected'));
+
+        // Set cake specific details
+        if (currentCake === 'strawberry') {
+            cakeTitle.textContent = 'Strawberry Cake';
+            fruitIngredient.textContent = 'Strawberry';
+            ingredients.push('strawberry');
+            document.querySelector('.ingredient-object[data-ingredient="strawberry"]').style.display = 'block';
+        } else if (currentCake === 'blueberry') {
+            cakeTitle.textContent = 'Blueberry Cake';
+            fruitIngredient.textContent = 'Blueberry';
+            ingredients.push('blueberry');
+            document.querySelector('.ingredient-object[data-ingredient="blueberry"]').style.display = 'block';
+        } else if (currentCake === 'cherry') {
+            cakeTitle.textContent = 'Cherry Cake';
+            fruitIngredient.textContent = 'Cherries';
+            ingredients.push('cherry');
+             document.querySelector('.ingredient-object[data-ingredient="cherry"]').style.display = 'block';
+        }
+    }
+
+    // Ingredient Collection
+    // For a real game, you would check the player's position relative to the ingredient.
+    // For this simple example, we will just listen for a click on the ingredient object.
+    document.querySelectorAll('.ingredient-object').forEach(obj => {
+        obj.addEventListener('click', () => {
+            // In a real game, you'd check for 'e' key press here and player proximity.
+            collectIngredient(obj.dataset.ingredient);
+        });
+    });
+
+    function collectIngredient(ingredient) {
+        if (!collectedIngredients.includes(ingredient)) {
+            collectedIngredients.push(ingredient);
+
+            // Fade out the ingredient object
+            document.querySelector(`.ingredient-object[data-ingredient="${ingredient}"]`).classList.add('collected');
+
+            // Add line-through to the ingredient list item
+            document.getElementById(ingredient) ? document.getElementById(ingredient).classList.add('collected') : null;
+            if(ingredient === 'strawberry' || ingredient === 'blueberry' || ingredient === 'cherry') {
+                 document.getElementById('fruit').classList.add('collected');
+            }
+
+
+            // Check if all ingredients are collected
+            if (collectedIngredients.length === ingredients.length) {
+                finishGame();
+            }
+        }
+    }
+
+    function finishGame() {
+        gameScreen.classList.remove('active');
+        endScreen.classList.add('active');
+
+        // After the loading bar (5 seconds)
+        setTimeout(() => {
+            document.getElementById('loading-bar-container').style.display = 'none';
+            document.getElementById('final-cake').style.display = 'block';
+            document.getElementById('end-message').textContent = 'have a piece';
+
+            // Play sound effect
+            // const winSound = new Audio('your-win-sound.mp3');
+            // winSound.play();
+        }, 5000);
+    }
+});
